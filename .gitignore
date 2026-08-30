@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+data/processed/*measurements.csv
+data/processed/*_post_*.csv
+data/processed/*_branch*.csv
+data/processed/*_bus_*.csv
+data/processed/*_load_*.csv
+*.log
+heavy.log
+.DS_Store

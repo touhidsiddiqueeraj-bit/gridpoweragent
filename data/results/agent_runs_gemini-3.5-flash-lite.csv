@@ -1,0 +1,367 @@
+scenario_id,event_class,config,model,correct_diag,correct_tool,grounded,halluc,recommendation,latency,confidence,is_correct,raw
+IEEE14_SCN_000529,E1,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.3056011199951172,1.0,True,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Injected event is a 20% demand increase at load_bus_13, which corresponds to a positive load surge.""
+}
+```"
+IEEE14_SCN_000755,E2,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.018874168395996,1.0,True,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is a regional 20% demand decrease across four load buses, which directly corresponds to a load drop event (E2).""
+}
+```"
+IEEE14_SCN_002952,E9,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0286948680877686,0.99,True,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 0.99,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected event description explicitly states an outage of line_2_5 combined with a 20 percent demand increase across 11 components, representing a compound mechanism.""
+}
+```"
+IEEE14_SCN_001155,E3,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0859942436218262,1.0,True,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is a single transmission line outage on line_2_5, which is classified as E3.""
+}
+```"
+IEEE14_SCN_000870,E2,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.2736499309539795,1.0,True,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""A 20 percent demand decrease at load_bus_6 represents a negative load change, which classifies as an E2 Load Drop.""
+}
+```"
+IEEE14_SCN_002776,E9,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1070899963378906,1.0,True,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism explicitly combines a transmission line outage (line_9_10) with a concurrent demand increase across multiple load buses, making it a compound event.""
+}
+```"
+IEEE14_SCN_001827,E6,E1_LLM,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.0540869235992432,1.0,False,"{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""The injected event is a single transmission line outage (line_6_13), which directly corresponds to class E3.""}"
+IEEE14_SCN_000405,E1,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0416429042816162,1.0,True,"```json
+{""event_class"":""E1"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected mechanism is a regional 40% demand increase across four load buses, which corresponds to a positive load surge.""}
+```"
+IEEE14_SCN_001384,E4,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0390548706054688,1.0,True,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly a single unit generator outage of gen_G2.""
+}
+```"
+IEEE14_SCN_001379,E4,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.9898555278778076,1.0,True,"```json
+{""event_class"":""E4"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected event is the outage of generator G6, which corresponds to a single generator outage (E4).""}
+```"
+IEEE14_SCN_000337,E1,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.9889974594116212,1.0,True,"```json
+{""event_class"":""E1"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected event is a 40 percent demand increase across four load buses, which classifies as a positive load surge.""}
+```"
+IEEE14_SCN_001784,E5,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0368995666503906,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected event is a medium up-ramp of availability at photovoltaic and wind generators.""}
+```"
+IEEE14_SCN_001664,E5,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1496217250823977,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected event is a renewable down-ramp at a specific wind generator.""}
+```"
+IEEE14_SCN_001796,E5,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0899477005004885,1.0,True,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is a large up-ramp of 60 availability points at renewable resource sgen_PV14, which directly classifies as a renewable ramp (E5).""
+}
+```"
+IEEE14_SCN_002785,E9,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0389180183410645,1.0,True,"```json
+{""event_class"":""E9"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected description explicitly combines a transmission line outage with a simultaneous demand increase across multiple load buses, making it a compound event.""}
+```"
+IEEE14_SCN_002988,E9,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1630034446716309,1.0,True,"```json
+{""event_class"":""E9"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected description explicitly specifies a compound event involving a transmission line outage and a demand increase.""}
+```"
+IEEE14_SCN_002341,E7,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0915205478668213,0.95,True,"```json
+{
+  ""event_class"": ""E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Excitation setpoints raised across multiple generators resulting in overvoltage conditions (V > 1.05 p.u.).""
+}
+```"
+IEEE14_SCN_002050,E6,E1_LLM,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.0393075942993164,1.0,False,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly a single transmission line outage (line_6_13).""
+}
+```"
+IEEE14_SCN_001817,E6,E1_LLM,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': True, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.0765564441680908,1.0,False,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly a single transmission line outage (line_6_13).""
+}
+```"
+IEEE14_SCN_001253,E4,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0545637607574463,1.0,True,"```json
+{""event_class"":""E4"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected mechanism is explicitly defined as the outage of generator G8, which corresponds to class E4.""}
+```"
+IEEE14_SCN_000529,E1,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0583786964416504,1.0,True,"```json
+{""event_class"":""E1"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""A 20 percent demand increase at load_bus_13 represents a positive load surge.""}
+```"
+IEEE14_SCN_000755,E2,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.462035894393921,1.0,True,"```json
+{""event_class"":""E2"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected 20% demand decrease across four load buses represents a load drop.""}
+```"
+IEEE14_SCN_002952,E9,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1257503032684326,1.0,True,"```json
+{""event_class"":""E9"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected event description explicitly states a compound mechanism consisting of the outage of line 2-5 and a 20% demand increase at multiple load buses.""}
+```"
+IEEE14_SCN_001155,E3,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.3038010597229004,1.0,True,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is a single transmission line outage of line_2_5.""
+}
+```"
+IEEE14_SCN_000870,E2,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.5086233615875244,1.0,True,"```json
+{""event_class"":""E2"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected event is a 20% demand decrease at a single load bus, corresponding to a load drop event.""}
+```"
+IEEE14_SCN_002776,E9,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,7.202996730804443,1.0,True,"```json
+{""event_class"":""E9"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected event description explicitly states a compound disturbance consisting of an outage of line_9_10 and a 25% demand increase across 11 components.""}
+```"
+IEEE14_SCN_001827,E6,E2_LLM_RAG,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': True, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.3933186531066897,0.99,False,"```json
+{""event_class"":""E3"",""confidence"":0.99,""tool"":""contingency"",""reason"":""The injected mechanism explicitly states an outage of a single transmission line (line_6_13), making this a Transmission-Line Outage.""}
+```"
+IEEE14_SCN_000405,E1,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.121932029724121,1.0,True,"```json
+{""event_class"":""E1"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected mechanism describes a +40% demand increase across multiple load buses, corresponding to a regional load surge (E1).""}
+```"
+IEEE14_SCN_001384,E4,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0963029861450195,1.0,True,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected event is explicitly defined as a single generator outage of gen_G2, mapping directly to class E4.""
+}
+```"
+IEEE14_SCN_001379,E4,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.5562148094177246,1.0,True,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected event is explicitly an outage of a single generator (gen_G6), which corresponds to class E4 (Generator Outage).""
+}
+```"
+IEEE14_SCN_000337,E1,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.254223346710205,1.0,True,"```json
+{""event_class"":""E1"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected mechanism describes a 40 percent demand increase across 4 regional load buses, which corresponds to a positive load surge.""}
+```"
+IEEE14_SCN_001784,E5,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.042099952697754,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected mechanism is a medium up-ramp of 30 availability points at renewable resources sgen_PV14 and sgen_WIND6.""}
+```"
+IEEE14_SCN_001664,E5,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0161807537078855,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected event is a small down-ramp of renewable generation availability at sgen_WIND6.""}
+```"
+IEEE14_SCN_001796,E5,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0008502006530762,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected event is a large up-ramp of 60 availability points at renewable generator sgen_PV14.""}
+```"
+IEEE14_SCN_002785,E9,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.3994688987731934,1.0,True,"```json
+{""event_class"": ""E9"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""The injected description explicitly specifies a compound event consisting of a transmission line outage (line_9_14) and a simultaneous load increase (25% demand increase at multiple buses).""}
+```"
+IEEE14_SCN_002988,E9,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.5576810836791992,0.99,True,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 0.99,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism explicitly combines a transmission line outage (line_6_13) with a 20% demand increase across multiple load buses, classifying this as a compound event (E9).""
+}
+```"
+IEEE14_SCN_002341,E7,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1785354614257812,0.95,True,"```json
+{
+  ""event_class"": ""E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Excitation setpoints raised across multiple generators resulting in systemic overvoltage conditions (V > 1.05 pu).""
+}
+```"
+IEEE14_SCN_002050,E6,E2_LLM_RAG,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.1027724742889404,1.0,False,"```json
+{""event_class"":""E3"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected event is explicitly a single transmission line outage (line_6_13), corresponding to taxonomy class E3.""}
+```"
+IEEE14_SCN_001817,E6,E2_LLM_RAG,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,0.9663467407226562,1.0,False,"```json
+{""event_class"":""E3"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected mechanism is explicitly a single-branch transmission line outage of line_6_13, which classifies as E3 regardless of the resulting undervoltage outcome.""}
+```"
+IEEE14_SCN_001253,E4,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.2943410873413086,1.0,True,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single unit generator outage of gen_G8, which classifies as E4 on the cause axis.""
+}
+```"
+IEEE14_SCN_000529,E1,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1987385749816897,1.0,True,"```json
+{""event_class"":""E1"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected description specifies a 20% demand increase at load_bus_13, which corresponds to a positive load surge.""}
+```"
+IEEE14_SCN_000755,E2,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.138052463531494,1.0,True,"```json
+{""event_class"":""E2"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected mechanism describes a negative demand change (-20% demand decrease) across 4 load buses, classifying this as a load drop.""}
+```"
+IEEE14_SCN_002952,E9,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.2393019199371338,1.0,True,"```json
+{""event_class"": ""E9"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""The injected description explicitly specifies a compound event consisting of a line outage and a demand increase.""}
+```"
+IEEE14_SCN_001155,E3,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.043433666229248,1.0,True,"```json
+{""event_class"":""E3"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected mechanism is explicitly a single transmission line outage of line_2_5.""}
+```"
+IEEE14_SCN_000870,E2,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1058909893035889,1.0,True,"```json
+{""event_class"":""E2"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected mechanism indicates a 20 percent demand decrease at a single load bus, which corresponds to a negative load drop.""}
+```"
+IEEE14_SCN_002776,E9,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1348309516906738,1.0,True,"```json
+{""event_class"":""E9"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected description explicitly specifies a compound event consisting of a transmission line outage combined with a load surge across multiple buses.""}
+```"
+IEEE14_SCN_001827,E6,E3_LLM_Tools,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.0788049697875977,1.0,False,"```json
+{""event_class"":""E3"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected mechanism is explicitly a single transmission line outage (line_6_13), which classifies as E3.""}
+```"
+IEEE14_SCN_000405,E1,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.2864527702331543,0.99,True,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 0.99,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is a regional 40% demand increase across multiple load buses, corresponding to a positive load surge (E1).""
+}
+```"
+IEEE14_SCN_001384,E4,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1939222812652588,1.0,True,"```json
+{""event_class"":""E4"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected mechanism is explicitly a single generator outage (gen_G2), corresponding directly to class E4.""}
+```"
+IEEE14_SCN_001379,E4,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.5470616817474363,1.0,True,"{""event_class"": ""E4"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""The injected mechanism is explicitly a single unit generator outage of gen_G6.""}"
+IEEE14_SCN_000337,E1,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.4430994987487793,1.0,True,"```json
+{""event_class"": ""E1"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""The injected event is a 40% demand increase across four load buses, which directly corresponds to a positive load surge.""}
+```"
+IEEE14_SCN_001784,E5,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.516526222229004,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected event is a medium up-ramp of availability at photovoltaic and wind resources, correctly classified as a renewable ramp.""}
+```"
+IEEE14_SCN_001664,E5,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.127338171005249,0.99,True,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 0.99,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is a renewable down-ramp of availability points at wind generator sgen_WIND6, which directly maps to class E5 (Renewable Ramp).""
+}
+```"
+IEEE14_SCN_001796,E5,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.5649516582489014,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected event is a large up-ramp of availability points at photovoltaic resource sgen_PV14, which corresponds to a renewable ramp.""}
+```"
+IEEE14_SCN_002785,E9,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.4383692741394043,1.0,True,"```json
+{""event_class"":""E9"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected description explicitly specifies a compound event combining a transmission line outage and a load surge.""}
+```"
+IEEE14_SCN_002988,E9,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.304900884628296,1.0,True,"```json
+{""event_class"":""E9"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected description explicitly combines a transmission line outage (line_6_13) and a concurrent load surge (20% demand increase at 11 components), defining a compound event.""}
+```"
+IEEE14_SCN_002341,E7,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.8933558464050293,0.99,True,"```json
+{""event_class"":""E7"",""confidence"":0.99,""tool"":""grid_query"",""reason"":""Excitation setpoints raised across multiple generators resulting in system overvoltage above 1.05 p.u.""}
+```"
+IEEE14_SCN_002050,E6,E3_LLM_Tools,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.1965434551239014,1.0,False,"```json
+{""event_class"":""E3"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected mechanism explicitly states a single transmission line outage (line_6_13), which classifies the event as E3 (Transmission-Line Outage).""}
+```"
+IEEE14_SCN_001817,E6,E3_LLM_Tools,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': True, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.573836326599121,1.0,False,"```json
+{""event_class"":""E3"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected event is the outage of transmission line 6_13, which corresponds to a single line outage (E3).""}
+```"
+IEEE14_SCN_001253,E4,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.9790303707122804,1.0,True,"```json
+{""event_class"":""E4"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected mechanism is the outage of a single generator (gen_G8), which corresponds to class E4.""}
+```"
+IEEE14_SCN_000529,E1,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.373729944229126,1.0,True,"```json
+{""event_class"":""E1"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected description explicitly states a 20% demand increase (load surge) at load_bus_13.""}
+```"
+IEEE14_SCN_000755,E2,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.4766793251037598,0.99,True,"```json
+{""event_class"":""E2"",""confidence"":0.99,""tool"":""power_flow"",""reason"":""The injected event describes a 20 percent demand decrease across four load buses, which corresponds to a negative load change classification (E2 Load Drop).""}
+```"
+IEEE14_SCN_002952,E9,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0133728981018066,1.0,True,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected description explicitly specifies a compound event involving both a transmission line outage and a load surge.""
+}
+```"
+IEEE14_SCN_001155,E3,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.249347448348999,1.0,True,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly a single line outage of line_2_5.""
+}
+```"
+IEEE14_SCN_000870,E2,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.2317287921905518,1.0,True,"```json
+{""event_class"":""E2"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected description explicitly specifies a 20% demand decrease at load_bus_6, which corresponds to a load drop.""}
+```"
+IEEE14_SCN_002776,E9,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.2178354263305664,0.99,True,"```json
+{""event_class"": ""E9"", ""confidence"": 0.99, ""tool"": ""power_flow"", ""reason"": ""The injected event explicitly describes a compound mechanism involving the outage of line_9_10 combined with a 25% demand increase across 11 components.""}
+```"
+IEEE14_SCN_001827,E6,E4_Full,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.1637356281280518,0.99,False,"```json
+{""event_class"":""E3"",""confidence"":0.99,""tool"":""contingency"",""reason"":""The injected mechanism is explicitly a single transmission line outage (line_6_13), which classifies the event as E3 according to the cause-axis taxonomy.""}
+```"
+IEEE14_SCN_000405,E1,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.013756275177002,0.99,True,"```json
+{""event_class"":""E1"",""confidence"":0.99,""tool"":""power_flow"",""reason"":""Injected event is a 40% demand increase across four regional load buses, constituting a positive load surge.""}
+```"
+IEEE14_SCN_001384,E4,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1340878009796145,1.0,True,"```json
+{""event_class"":""E4"",""confidence"":1.0,""tool"":""contingency"",""reason"":""The injected event is the outage of generator gen_G2, which classifies as a single generator outage (E4).""}
+```"
+IEEE14_SCN_001379,E4,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0322511196136477,1.0,True,"```json
+{""event_class"":""E4"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected event is a single generator outage of gen_G6, which maps directly to class E4 according to the cause axis taxonomy.""}
+```"
+IEEE14_SCN_000337,E1,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.056826114654541,1.0,True,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism explicitly states a 40% demand increase (positive load change) across multiple load buses, corresponding to a load surge.""
+}
+```"
+IEEE14_SCN_001784,E5,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.048469305038452,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected mechanism describes a medium up-ramp of 30 availability points at renewable resources sgen_PV14 and sgen_WIND6.""}
+```"
+IEEE14_SCN_001664,E5,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.093453884124756,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Injected mechanism is a renewable ramp at wind generator sgen_WIND6.""}
+```"
+IEEE14_SCN_001796,E5,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1266462802886963,1.0,True,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is a large up-ramp of availability at solar generator sgen_PV14, which corresponds directly to a renewable ramp event.""
+}
+```"
+IEEE14_SCN_002785,E9,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.4135141372680664,1.0,True,"```json
+{""event_class"":""E9"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""The injected description explicitly combines a transmission line outage (line_9_14) and a load surge (25% demand increase at 11 components), constituting a compound event.""}
+```"
+IEEE14_SCN_002988,E9,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1923532485961914,0.98,True,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 0.98,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected event explicitly combines a transmission line outage (line_6_13) with a 20% demand increase across multiple load buses, classifying it as a compound event.""
+}
+```"
+IEEE14_SCN_002341,E7,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.4580590724945068,0.95,True,"```json
+{
+  ""event_class"": ""E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is an AVR setpoint shift raising excitation across multiple generators, resulting in system overvoltage (V > 1.05 pu) classified as a regional voltage control ladder event (E7).""
+}
+```"
+IEEE14_SCN_002050,E6,E4_Full,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,0.9966564178466796,0.99,False,"```json
+{""event_class"":""E3"",""confidence"":0.99,""tool"":""contingency"",""reason"":""The injected mechanism is a single transmission line outage (line_6_13), which classifies as E3 despite causing undervoltage outcomes at buses 13 and 14.""}
+```"
+IEEE14_SCN_001817,E6,E4_Full,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.0673315525054932,0.99,False,"```json
+{""event_class"":""E3"",""confidence"":0.99,""tool"":""contingency"",""reason"":""The injected mechanism is a single transmission line outage (line_6_13), which classifies as a transmission-line outage (E3) despite causing subsequent undervoltage.""}
+```"
+IEEE14_SCN_001253,E4,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.005230188369751,1.0,True,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly a single unit generator outage of gen_G8, classified as E4.""
+}
+```"
