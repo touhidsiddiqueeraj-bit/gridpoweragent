@@ -151,6 +151,11 @@ def parse_tex_blocks():
 abstract, blocks = parse_tex_blocks()
 print(f"parsed: abstract {len(abstract)} chars, {len(blocks)} blocks")
 
+# sync figure assets into the workspace (texflow compiles in a temp dir)
+import shutil
+for fig_src in (ROOT / "paper/figures").glob("*.png"):
+    shutil.copy2(fig_src, Path(WS) / "figures" / fig_src.name)
+
 t = Tx(WS)
 # reset any prior content and set metadata
 t.call("document", {"action": "reset"})

@@ -213,26 +213,66 @@ plt.savefig(FIGDIR / "fig_halluc_latency.png", dpi=300)
 plt.close()
 print("  fig_halluc_latency.png saved")
 
-# ---------- Fig: architecture (no overlap, column-sized) ----------
-fig, ax = plt.subplots(figsize=(3.4, 1.35))
-boxes = [
-    (0.005, 0.26, 0.155, 0.48, "Grid\nstates", "#eaf2f8"),
-    (0.20, 0.26, 0.16, 0.48, "Measure\n+ label", "#eaf2f8"),
-    (0.40, 0.56, 0.17, 0.38, "RAG\n8 docs", "#fdebd0"),
-    (0.40, 0.04, 0.17, 0.38, "Tools:\nPF N-1 OPF", "#fdebd0"),
-    (0.61, 0.26, 0.155, 0.48, "LLM agent\nE1-E4", "#e8f8f5"),
-    (0.81, 0.26, 0.185, 0.48, "Advice", "#e8f8f5"),
-]
-for (bx, by, bw, bh, label, fc) in boxes:
-    ax.add_patch(plt.Rectangle((bx, by), bw, bh, fc=fc, ec="#333", lw=0.7))
-    ax.text(bx + bw / 2, by + bh / 2, label, ha="center", va="center", fontsize=7)
-arrows = [(0.18, 0.225, 0.50), (0.39, 0.435, 0.75), (0.39, 0.435, 0.25),
-          (0.605, 0.65, 0.50), (0.605, 0.65, 0.25), (0.805, 0.85, 0.50)]
-for x0, x1, y0 in arrows:
-    ax.annotate("", xy=(x1, y0), xytext=(x0, y0),
-                arrowprops=dict(arrowstyle="->", lw=0.8, color="#555"))
-ax.set_xlim(-0.01, 1.01)
-ax.set_ylim(0, 1)
+# ---------- Fig: architecture (layered, rounded, column-sized) ----------
+fig, ax = plt.subplots(figsize=(3.5, 2.05))
+
+def rbox(bx, by, bw, bh, fc, ec="#4a5568"):
+    ax.add_patch(matplotlib.patches.FancyBboxPatch(
+        (bx, by), bw, bh, boxstyle="round,pad=0.012,rounding_size=0.025",
+        fc=fc, ec=ec, lw=0.8))
+
+def arrow(x0, y0, x1, y1, c="#4a5568"):
+    ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
+                arrowprops=dict(arrowstyle="-|>", lw=1.0, color=c))
+
+# left: grid simulation feeding structured state
+rbox(0.015, 0.40, 0.155, 0.34, "#eaf2f8")
+ax.text(0.0925, 0.615, "Power-grid", ha="center", va="center", fontsize=7, fontweight="bold")
+ax.text(0.0925, 0.545, "simulation", ha="center", va="center", fontsize=7, fontweight="bold")
+ax.text(0.0925, 0.462, "(pandapower)", ha="center", va="center", fontsize=6, color="#555")
+rbox(0.015, 0.08, 0.155, 0.22, "#f5f7fa")
+ax.text(0.0925, 0.19, "10 classes", ha="center", va="center", fontsize=6.2)
+ax.text(0.0925, 0.125, "E0-E9", ha="center", va="center", fontsize=6.2, color="#555")
+
+# middle: agent core (LLM + RAG above + tools below)
+rbox(0.225, 0.02, 0.52, 0.80, "#fbfcfd", ec="#2c3e50")
+ax.text(0.255, 0.755, "GridPowerAgent", ha="left", va="center",
+        fontsize=7.5, fontweight="bold")
+rbox(0.265, 0.385, 0.21, 0.24, "#e8f6f3", ec="#16a085")
+ax.text(0.37, 0.545, "LLM core", ha="center", va="center", fontsize=7, fontweight="bold")
+ax.text(0.37, 0.44, "diagnose", ha="center", va="center", fontsize=6, color="#555")
+rbox(0.505, 0.545, 0.21, 0.24, "#fdf3e3", ec="#e67e22")
+ax.text(0.61, 0.705, "RAG", ha="center", va="center", fontsize=7, fontweight="bold")
+ax.text(0.61, 0.595, "8 procedure docs", ha="center", va="center", fontsize=6, color="#555")
+rbox(0.505, 0.085, 0.21, 0.24, "#fdf3e3", ec="#e67e22")
+ax.text(0.61, 0.245, "Tools", ha="center", va="center", fontsize=7, fontweight="bold")
+ax.text(0.61, 0.145, "PF - N-1 - OPF", ha="center", va="center", fontsize=6, color="#555")
+rbox(0.265, 0.085, 0.21, 0.24, "#eaf2f8", ec="#5d6d7e")
+ax.text(0.37, 0.245, "Grid state", ha="center", va="center", fontsize=6.5)
+ax.text(0.37, 0.145, "V - load - outages", ha="center", va="center", fontsize=5.8, color="#555")
+
+# right: output
+rbox(0.80, 0.36, 0.185, 0.44, "#e8f6f3", ec="#16a085")
+ax.text(0.8925, 0.665, "Decision", ha="center", va="center", fontsize=7, fontweight="bold")
+ax.text(0.8925, 0.555, "support", ha="center", va="center", fontsize=7, fontweight="bold")
+ax.text(0.8925, 0.44, "class - tool -", ha="center", va="center", fontsize=6, color="#555")
+ax.text(0.8925, 0.375, "advice (JSON)", ha="center", va="center", fontsize=6, color="#555")
+
+# arrows: grid -> state -> agent core; agent -> output
+arrow(0.0925, 0.51, 0.26, 0.40)
+arrow(0.475, 0.50, 0.505, 0.50)
+arrow(0.475, 0.38, 0.505, 0.24)
+arrow(0.475, 0.68, 0.505, 0.68)
+arrow(0.715, 0.655, 0.75, 0.62)
+arrow(0.71, 0.24, 0.75, 0.42)
+arrow(0.775, 0.52, 0.795, 0.52)
+
+# E1-E4 ablation strip
+ax.text(0.485, 0.005, "E1 LLM -  E2 +RAG -  E3 +Tools -  E4 Full",
+        ha="center", va="center", fontsize=6, color="#555", style="italic")
+
+ax.set_xlim(0, 1)
+ax.set_ylim(0, 0.86)
 ax.axis("off")
 plt.tight_layout(pad=0.2)
 plt.savefig(FIGDIR / "fig_architecture.png", dpi=300)
