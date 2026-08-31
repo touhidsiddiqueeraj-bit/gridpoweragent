@@ -381,13 +381,23 @@ def main():
     p.add_argument("--out", default=None)
     p.add_argument("--configs", default=None, help="comma list, e.g. E1_LLM,E2_LLM_RAG (default all)")
     p.add_argument("--force-api", action="store_true", help="route to Gemini REST even for gemma-* model strings")
+    p.add_argument("--case", default="ieee14", help="ieee14 | case39 | case118")
     args=p.parse_args()
+    case_tag = "" if args.case == "ieee14" else f"_{args.case}"
     _sel = None
     if args.configs:
         _sel = {k: v for k, v in CONFIGS.items() if k in args.configs.split(",")}
     print("="*80); print("STAGES 19-22 — FOUR CONFIGS (E1-E4) dual-model"); print("="*80)
-    scen=pd.read_csv(SCENARIOS_CSV)
-    ref=pd.read_csv(REF_CSV)
+    scen_path = OUTPUT_DIR / (f"{args.case}_scenarios.csv" if args.case != "ieee14" else "ieee14_scenarios.csv")
+    ref_path = OUTPUT_DIR / (f"{args.case}_reference_labels.csv" if args.case != "ieee14" else "ieee14_reference_labels.csv")
+    scen=pd.read_csv(scen_path)
+    ref=pd.read_csv(ref_path)
+    if args.case == "case39":
+        import pandas as _pd
+        nan_ids = set(_pd.read_csv("data/case39_nan_scenarios.csv").scenario_id)
+        n0 = len(scen)
+        scen = scen[~scen.scenario_id.isin(nan_ids)].reset_index(drop=True)
+        print(f"[INFO] case39: excluded {n0-len(scen)} islanding-NaN scenarios")
     if args.compare:
         # run all three: mock, gemini, muse-spark
         outs=[]
@@ -495,7 +505,7 @@ def main():
                 return
             model=args.model
             if model=="mock": model="gemini-3.5-flash-lite"
-            out=Path(args.out) if args.out else RESULTS_DIR/f"agent_runs_{model.replace('/','_')}.csv"
+            out=Path(args.out) if args.out else RESULTS_DIR/f"agent_runs_{model.replace('/','_').replace('.','_')}{case_tag}.csv"
             ckpt=Path("data/results/gemini_checkpoint.json")
             print(f"[INFO] Real Gemini {model} RPM {args.rpm} n_test {args.n_test} -> {out}")
             df=run_real_gemini(scen, ref, key, model, args.rpm, args.n_test, ckpt, out, configs=_sel)

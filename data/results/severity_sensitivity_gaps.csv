@@ -1,0 +1,5 @@
+set,API,Local,local_minus_api
+S0 published (grid-searched),31.1,45.5,14.4
+"S1 standards [0.05,0.10,0.15]",31.1,45.5,14.4
+"S2 tight [0.02,0.04,0.08]",31.1,45.5,14.4
+S3 empirical tertiles,31.1,45.5,14.4

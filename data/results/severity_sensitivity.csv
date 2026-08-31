@@ -1,0 +1,9 @@
+set,model,n,strict_ok,acc
+S0 published (grid-searched),API,560,174,31.1
+S0 published (grid-searched),Local,560,255,45.5
+"S1 standards [0.05,0.10,0.15]",API,560,174,31.1
+"S1 standards [0.05,0.10,0.15]",Local,560,255,45.5
+"S2 tight [0.02,0.04,0.08]",API,560,174,31.1
+"S2 tight [0.02,0.04,0.08]",Local,560,255,45.5
+S3 empirical tertiles,API,560,174,31.1
+S3 empirical tertiles,Local,560,255,45.5

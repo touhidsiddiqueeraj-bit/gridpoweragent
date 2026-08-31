@@ -106,13 +106,23 @@ def main():
     ap.add_argument("--model", default="gemma-4-E4B-it-Q4_0.gguf")
     ap.add_argument("--interval", type=float, default=5.0)
     ap.add_argument("--n-test", type=int, default=20)
+    ap.add_argument("--case", default="ieee14", help="ieee14 | case39 | case118")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
-    out_csv = Path(args.out) if args.out else RESULTS_DIR / f"agent_runs_{args.model.replace('.', '_').replace('/', '_')}.csv"
+    case_tag = "" if args.case == "ieee14" else f"_{args.case}"
+    out_csv = Path(args.out) if args.out else RESULTS_DIR / f"agent_runs_{args.model.replace('.', '_').replace('/', '_')}{case_tag}.csv"
 
-    scen = pd.read_csv(runner.SCENARIOS_CSV)
-    ref = pd.read_csv(runner.REF_CSV)
+    case = args.case
+    scen_path = HERE / "data/processed" / (f"{case}_scenarios.csv" if case != "ieee14" else "ieee14_scenarios.csv")
+    ref_path = HERE / "data/processed" / (f"{case}_reference_labels.csv" if case != "ieee14" else "ieee14_reference_labels.csv")
+    scen = pd.read_csv(scen_path)
+    ref = pd.read_csv(ref_path)
+    if case == "case39":
+        nan_ids = set(pd.read_csv(HERE / "data/case39_nan_scenarios.csv").scenario_id)
+        n0 = len(scen)
+        scen = scen[~scen.scenario_id.isin(nan_ids)].reset_index(drop=True)
+        print(f"[INFO] case39: excluded {n0-len(scen)} islanding-NaN scenarios")
     ref_map = {r.scenario_id: r for _, r in ref.iterrows()}
     try:
         kb = json.load(open(runner.KB_DOCS))

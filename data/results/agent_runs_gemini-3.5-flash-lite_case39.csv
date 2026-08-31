@@ -1,0 +1,1 @@
+scenario_id,event_class,config,model,correct_diag,correct_tool,grounded,halluc,recommendation,latency,confidence,is_correct,raw

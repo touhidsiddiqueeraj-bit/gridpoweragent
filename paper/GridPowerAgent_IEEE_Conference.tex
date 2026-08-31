@@ -16,7 +16,7 @@
 \maketitle
 
 \begin{abstract}
-Large language models (LLMs) could act as a coordination layer between power-grid information, engineering analysis tools, and human operators---provided they read operating states accurately, select appropriate tools, and avoid hallucinated advice. We present GridPowerAgent, an LLM agent that observes simulated power-system states, retrieves operating procedures, and orchestrates power-flow, contingency, and optimal-power-flow tools, evaluated on a seeded, fully regenerable corpus: 16,000 operating points and 15,000 scenarios across the IEEE 14/39/118 bus systems, spanning ten disturbance classes with power-flow ground truth, noisy measurements, state estimates, and rule-based labels for retrieval and tool supervision. In a paired 140-scenario $\times$ 4-configuration pilot, a small quantized local model and a lightweight API model diagnose 105--108/140 and 109/140 scenarios respectively, hallucinate on at most 2\% of responses, and differ mainly in tool-selection style: the API model defaults to power flow in 52\% of its picks, while the local model names scenario-required tools more often under a strict metric. The evaluation also surfaces a result of independent methodological interest for grid-LLM benchmarks: outcome-labeled disturbance classes (e.g., undervoltage injected through line outages) are answered by their cause mechanism, quantifying how mixed-axis label taxonomies penalize causally correct answers and motivating an axis-explicit corpus revision. All results carry exact denominators; findings are observations about this corpus at pilot scale, with a powered evaluation as the next step.
+Large language models (LLMs) could act as a coordination layer between power-grid information, engineering analysis tools, and human operators---provided they read operating states accurately, select appropriate tools, and avoid hallucinated advice. We present GridPowerAgent, an LLM agent that observes simulated power-system states, retrieves operating procedures, and orchestrates power-flow, contingency, and optimal-power-flow tools, evaluated on a seeded, fully regenerable corpus: 16,000 operating points and 15,000 scenarios across the IEEE 14/39/118 bus systems, spanning ten disturbance classes with power-flow ground truth, noisy measurements, state estimates, and rule-based labels for retrieval and tool supervision. The evaluation also surfaces its most robust result, of independent methodological interest for grid-LLM benchmarks: both models score zero on the two outcome-labeled disturbance classes (E6 undervoltage, E8 thermal overload)---in the paired 140-scenario $\times$ 4-configuration pilot, all 144 failed E6 and 104 failed E8 responses describe the injecting cause mechanism rather than the outcome label, quantifying how mixed-axis label taxonomies penalize causally correct answers and motivating an axis-explicit corpus revision. Beyond it, a paired comparison of a small quantized local model with a lightweight API model under identical prompts shows diagnosis within four scenarios of each other (105--108/140 vs.\ 109/140), hallucinated rows in at most 1.4\% of responses, and a tool-style difference: the API model defaults to power flow in 52\% of its picks, while the local model names scenario-required tools more often under a strict metric. All results carry exact denominators; findings are observations about this corpus at pilot scale, with a powered evaluation as the next step.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -138,27 +138,73 @@ Statistics & exact counts; Wilson 95\% CI; exact McNemar; bootstrap CI; MDE \\
 
 \section{Results}
 
+\subsection{A Label-Axis Failure Mode: E6 and E8}
+\label{sec:axis}
+Table~\ref{tab:perclass} shows near-ceiling diagnosis on every cause-labeled class and total collapse on two outcome-labeled classes: E6 (undervoltage) and E8 (thermal overload) are diagnosed correctly in 0 of 36 and 0 of 26 pooled observations. The failure is systematic, not stochastic: across all 144 failed E6 responses, 128 predict E3, 16 predict E4---and across all 104 failed E8 responses, 101 predict E9, 3 predict E3. The logged reasons are explicit: ``The injected event is a single transmission line outage (line\_6\_13), which directly corresponds to class E3'' (an E6 scenario); ``the injected event description explicitly states a compound mechanism consisting of a transmission line outage and a 20\% demand increase'' (an E8 scenario).
+
+The mechanism is a mixed-axis label taxonomy. E6/E8 are \emph{outcome} classes---defined by the post-event state---but are \emph{injected} through cause mechanisms (line outages that cause undervoltage; line-outage-plus-load-surge compounds that cause overloads). Both models classify on the cause axis and are therefore \emph{causally correct but label-wrong} on every E6/E8 scenario. This is a property of the benchmark's labeling scheme, not evidence about model capability, and it is the kind of flaw a benchmark must surface about itself: mixed-axis taxonomies silently reward or punish models for answer-style choices unrelated to the construct being measured. Correcting it requires either relabeling E6/E8 as cause events or instructing the taxonomy's outcome primacy explicitly; both are queued for the next corpus revision, and the powered sweep will report both cause-axis and label-axis accuracy.
+
+\begin{table}[tbp]
+\centering
+\caption{E4 per-class, pooled models (raw counts; no percentages).}
+\label{tab:perclass}
+\begin{tabular}{lccc}
+\toprule
+Class & Obs. & Diag. & Tool (strict) \\
+\midrule
+E0 & 10 & 10/10 & 0/10 \\
+E1 & 26 & 26/26 & 0/26 \\
+E2 & 20 & 20/20 & 0/20 \\
+E3 & 28 & 28/28 & 28/28 \\
+E4 & 32 & 32/32 & 26/32 \\
+E5 & 38 & 38/38 & 0/38 \\
+E6 & 36 & 0/36 & 0/36 \\
+E7 & 22 & 22/22 & 0/22 \\
+E8 & 26 & 0/26 & 19/26 \\
+E9 & 42 & 40/42 & 26/42 \\
+\bottomrule
+\end{tabular}
+\\[2pt]
+{\scriptsize Obs.\ = scenarios $\times$ models. Classes absent from the pilot sample: none.}
+\end{table}
+
+
+\subsection{Cross-System Check: IEEE-39 (RQ7, begun)}
+A seeded 140-scenario draw from the IEEE-39 corpus (excluding the 41 islanding-NaN scenarios) runs the same paired protocol. Per configuration (E1--E4), the API model diagnoses 107/140/107/140/107/140/107/140 scenarios and the local model --; strict tool selection: 50/140/43/140/38/140/27/140 (API) vs.\ -- (Local). Transferring between corpora changes the network topology, load patterns, and label instances while the agent, prompt, and scoring pipeline remain untouched---the strongest test this pilot size permits. The local model's IEEE-39 evaluation is running; its results are reported with the same protocol when complete.
+
 \subsection{RQ1/RQ4: Event Diagnosis and the Effect of Retrieval}
 Table~\ref{tab:results} reports exact counts with Wilson 95\% CIs. The API model diagnoses 109/140 (77.9\%) in \emph{every} configuration; the local model 105--108/140 (75.0--77.1\%). All diagnosis discordances are one-directional (2/1/4/2 across E1--E4: wherever the models disagree, the API model is right), and exact McNemar tests detect no significant difference (Table~\ref{tab:ni})---as expected at this power: the minimum detectable difference is E1: 2.8, E2: 2.0, E3: 3.9, E4: 2.8\,pp. Configuration additions (retrieved procedures, tool manifests) changed not a single diagnosis for either model: the structured grid state in the prompt already carries the discriminating information, which answers RQ4 negatively \emph{for diagnosis} at this corpus scale.
 
 \begin{table}[tbp]
 \centering
-\caption{Paired pilot, exact counts with Wilson 95\% CIs. Tool column: strict-specific metric (defined in the Evaluation Protocol).}
+\caption{Diagnosis, exact counts with Wilson 95\% CIs.}
 \label{tab:results}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lcccc}
+\begin{tabular}{lcc}
 \toprule
- & \multicolumn{2}{c}{Diagnosis} & \multicolumn{2}{c}{Tool (strict)} \\
-Cfg & API ($n{=}140$) & Local ($n{=}140$) & API & Local \\
+Cfg & API ($n{=}140$) & Local ($n{=}140$) \\
 \midrule
-E1 & 109/140 [70, 84] & 107/140 [69, 83] & 53/140 [30, 46] & 64/140 [38, 54] \\
-E2 & 109/140 [70, 84] & 108/140 [70, 83] & 50/140 [28, 44] & 63/140 [37, 53] \\
-E3 & 109/140 [70, 84] & 105/140 [67, 81] & 36/140 [19, 34] & 64/140 [38, 54] \\
-E4 & 109/140 [70, 84] & 107/140 [69, 83] & 35/140 [19, 33] & 64/140 [38, 54] \\
+E1 & 109/140 [70, 84] & 107/140 [69, 83] \\
+E2 & 109/140 [70, 84] & 108/140 [70, 83] \\
+E3 & 109/140 [70, 84] & 105/140 [67, 81] \\
+E4 & 109/140 [70, 84] & 107/140 [69, 83] \\
 \bottomrule
-\end{tabular}}
-\\[2pt]
-{\scriptsize Latency: API 1.06--1.16\,s (round-trip); Local 42--70\,s (visible-thinking decode). Hallucinated rows (any of 6 tags): API 2/1/1/0 (E1--E4); Local 1/1/2/2 (E1--E4). Deterministic baselines on the same sample: majority-class 20\%, random 12\%$\pm$7\%.}
+\end{tabular}
+\end{table}
+
+\begin{table}[tbp]
+\centering
+\caption{Tool selection under the strict-specific metric (defined in the Evaluation Protocol), exact counts with Wilson 95\% CIs.}
+\label{tab:tools}
+\begin{tabular}{lcc}
+\toprule
+Cfg & API ($n{=}140$) & Local ($n{=}140$) \\
+\midrule
+E1 & 53/140 [30, 46] & 64/140 [38, 54] \\
+E2 & 50/140 [28, 44] & 63/140 [37, 53] \\
+E3 & 36/140 [19, 34] & 64/140 [38, 54] \\
+E4 & 35/140 [19, 33] & 64/140 [38, 54] \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \begin{table}[tbp]
@@ -191,39 +237,11 @@ Tool selection is where the deployment tiers differ most---in \emph{style} befor
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{figures/fig_tools.png}
-\caption{Strict-specific tool-selection accuracy (reference required set). Exact counts in Table~\ref{tab:results}.}
+\caption{Strict-specific tool-selection accuracy (reference required set). Exact counts in Tables~\ref{tab:results} and \ref{tab:tools}.}
 \label{fig:tools}
 \end{figure}
-
-\subsection{A Label-Axis Failure Mode: E6 and E8}
-\label{sec:axis}
-Table~\ref{tab:perclass} shows near-ceiling diagnosis on every cause-labeled class and total collapse on two outcome-labeled classes: E6 (undervoltage) and E8 (thermal overload) are diagnosed correctly in 0 of 36 and 0 of 26 pooled observations. The failure is systematic, not stochastic: across all 144 failed E6 responses, 128 predict E3, 16 predict E4---and across all 104 failed E8 responses, 101 predict E9, 3 predict E3. The logged reasons are explicit: ``The injected event is a single transmission line outage (line\_6\_13), which directly corresponds to class E3'' (an E6 scenario); ``the injected event description explicitly states a compound mechanism consisting of a transmission line outage and a 20\% demand increase'' (an E8 scenario).
-
-The mechanism is a mixed-axis label taxonomy. E6/E8 are \emph{outcome} classes---defined by the post-event state---but are \emph{injected} through cause mechanisms (line outages that cause undervoltage; line-outage-plus-load-surge compounds that cause overloads). Both models classify on the cause axis and are therefore \emph{causally correct but label-wrong} on every E6/E8 scenario. This is a property of the benchmark's labeling scheme, not evidence about model capability, and it is the kind of flaw a benchmark must surface about itself: mixed-axis taxonomies silently reward or punish models for answer-style choices unrelated to the construct being measured. Correcting it requires either relabeling E6/E8 as cause events or instructing the taxonomy's outcome primacy explicitly; both are queued for the next corpus revision, and the powered sweep will report both cause-axis and label-axis accuracy.
-
-\begin{table}[tbp]
-\centering
-\caption{E4 per-class, pooled models (raw counts; no percentages).}
-\label{tab:perclass}
-\begin{tabular}{lccc}
-\toprule
-Class & Obs. & Diag. & Tool (strict) \\
-\midrule
-E0 & 10 & 10/10 & 0/10 \\
-E1 & 26 & 26/26 & 0/26 \\
-E2 & 20 & 20/20 & 0/20 \\
-E3 & 28 & 28/28 & 28/28 \\
-E4 & 32 & 32/32 & 26/32 \\
-E5 & 38 & 38/38 & 0/38 \\
-E6 & 36 & 0/36 & 0/36 \\
-E7 & 22 & 22/22 & 0/22 \\
-E8 & 26 & 0/26 & 19/26 \\
-E9 & 42 & 40/42 & 26/42 \\
-\bottomrule
-\end{tabular}
-\\[2pt]
-{\scriptsize Obs.\ = scenarios $\times$ models. Classes absent from the pilot sample: none.}
-\end{table}
+\subsection{RQ3: Tool-Call Execution Validity}
+The harness executes every stated tool on the scenario's post-event network and scores the call. Execution is a property of the tool and scenario, not the model, so pairs are pooled across models and configurations: 252 stated-tool pairs, of which 243 are executable (the remainder specified no tool) and 100\\% of the executable calls succeed---power flow converges on every reconstructed network, contingency executions converge and reproduce the scenario's recorded overload, N-1 sweeps complete all line outages, and OPF solves. RQ3 is therefore answered affirmatively at the tool-name level: no stated tool fails to execute. Argument-level validity (component identifiers, subcommands) requires an extended prompt schema and is deferred to the powered sweep.
 
 \subsection{RQ5: Hallucination and the Cost of Local Inference}
 Any-tag hallucinated rows are rare for both models under the automated judge: 2/1/1/0 (E1--E4) (API) and 1/1/2/2 (E1--E4) (Local) across E1--E4. These rates mean ``the rule-based judge flagged no row''; they are not expert-annotated ground truth. Latency is the deployment trade-off: local inference averages 42--70\,s per call versus 1.06--1.16\,s for the API round-trip---roughly a 45$\times$ difference---while carrying zero marginal API cost, no rate-limit dependency, and no grid data leaving the premises. For always-on monitoring this may be acceptable; for closed-loop use neither model's latency profile is appropriate (Sec.~\ref{sec:limits}).

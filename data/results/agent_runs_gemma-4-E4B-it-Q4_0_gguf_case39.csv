@@ -1,0 +1,831 @@
+scenario_id,event_class,config,model,correct_diag,correct_tool,grounded,halluc,recommendation,latency,confidence,is_correct,parse_mode,raw
+CASE39_SCN_001500,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,28.91532564163208,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a system-wide load change resulting in a 30% demand decrease, which defines a Load Drop event.""
+}
+```"
+CASE39_SCN_001213,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,25.508574962615967,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% decrease in demand at a single bus, which corresponds to a Load Drop (E2).""
+}
+```"
+CASE39_SCN_003341,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,24.43954348564148,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as the outage of a single generator (gen_1).""
+}
+```"
+CASE39_SCN_004981,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,30.04865336418152,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The event is compound, involving both a generator outage (gen_6) and a large down-ramp of renewable generation (sgen_PV, sgen_WIND).""
+}
+```"
+CASE39_SCN_003596,E7,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,34.532854318618774,0.95,True,json,"```json
+{
+  ""event_class"": ""E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The AVR setpoint shift (a regional control action) caused the post-event voltage to exceed 1.05 pu, classifying it as an overvoltage event.""
+}
+```"
+CASE39_SCN_002409,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,34.230881690979004,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is a single generator outage (gen_7), which directly corresponds to the E4 class.""
+}
+```"
+CASE39_SCN_000584,E1,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,38.586145877838135,1.0,True,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 30% demand increase across multiple load buses, which constitutes a load surge.""
+}
+```"
+CASE39_SCN_004225,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,37.415223121643066,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% demand increase across multiple components, which directly corresponds to a Load Surge (E1).""
+}
+```"
+CASE39_SCN_001649,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,36.464149713516235,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single line outage (line_17_18), which corresponds to E3.""
+}
+```"
+CASE39_SCN_004100,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,46.381309032440186,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is explicitly defined as a 20% demand increase across multiple load buses, which corresponds to a Load Surge (E1).""
+}
+```"
+CASE39_SCN_004191,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,50.40415024757385,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% demand increase across multiple buses, which corresponds directly to a Load Surge (E1).""
+}
+```"
+CASE39_SCN_001250,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,48.15525221824646,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% demand decrease at a single bus, which corresponds to a Load Drop (E2).""
+}
+```"
+CASE39_SCN_004829,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,56.44639873504639,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The event is a compound mechanism involving the outage of gen_1 (E4) and a large down-ramp of renewable generation (E5).""
+}
+```"
+CASE39_SCN_004875,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,40.61310577392578,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is a compound event combining a transmission line outage (E3) and a load surge (E1).""
+}
+```"
+CASE39_SCN_004772,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,51.96206307411194,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The scenario involves the simultaneous injection of a transmission line outage (E3) and a load surge (E1).""
+}
+```"
+CASE39_SCN_000677,E1,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,36.851136684417725,1.0,True,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 40% demand increase at a specific load bus, which constitutes a load surge.""
+}
+```"
+CASE39_SCN_003430,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,36.301491260528564,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as the outage of a single generator (gen_1).""
+}
+```"
+CASE39_SCN_004020,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,42.99239420890808,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly defined as a 20% demand increase across multiple load buses, which constitutes a load surge.""
+}
+```"
+CASE39_SCN_004901,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,53.80508351325989,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a compound event combining a transmission line outage (E3) and a load surge (E1).""
+}
+```"
+CASE39_SCN_003127,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,36.782246112823486,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as the outage of a single generator (gen_1).""
+}
+```"
+CASE39_SCN_001145,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,40.50667190551758,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected event is a 30% demand decrease at a single bus, which corresponds to a Load Drop (E2).""
+}
+```"
+CASE39_SCN_000089,E0,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,39.675684690475464,1.0,True,json,"```json
+{
+  ""event_class"": ""E0"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The scenario explicitly states that no disturbance was injected, indicating a normal operating condition.""
+}
+```"
+CASE39_SCN_003047,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,42.66696810722351,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single generator outage of gen_1.""
+}
+```"
+CASE39_SCN_002558,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,44.707793951034546,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly defined as a large up-ramp of PV generation, which corresponds to the Renewable Ramp class (E5).""
+}
+```"
+CASE39_SCN_003549,E7,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,47.33697700500488,1.0,True,json,"```json
+{
+  ""event_class"": ""E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The AVR setpoint shift is a voltage control mechanism (ladder injection) that resulted in an overvoltage condition (V > 1.05).""
+}
+```"
+CASE39_SCN_004879,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,44.68645429611206,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a compound event combining a transmission line outage and a load surge.""
+}
+```"
+CASE39_SCN_003432,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,36.285420656204224,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single generator outage (gen_1).""
+}
+```"
+CASE39_SCN_000863,E1,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,41.60250234603882,1.0,True,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 10% increase in demand at a single bus, which defines a Load Surge (E1).""
+}
+```"
+CASE39_SCN_004153,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,35.71577000617981,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% demand increase across multiple components, which constitutes a load surge.""
+}
+```"
+CASE39_SCN_000112,E0,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,40.08660340309143,1.0,True,json,"```json
+{
+  ""event_class"": ""E0"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The scenario explicitly states that no disturbance was injected, indicating a normal operating condition.""
+}
+```"
+CASE39_SCN_002986,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,34.661572217941284,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly identified as a renewable_ramp (down-ramp) affecting sgen_PV.""
+}
+```"
+CASE39_SCN_001223,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,46.034045934677124,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is a 20% demand decrease across multiple load buses, which is classified as a load drop.""
+}
+```"
+CASE39_SCN_002842,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,34.531071186065674,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly defined as a renewable_ramp targeting wind generation, which corresponds directly to the E5 Renewable Ramp class.""
+}
+```"
+CASE39_SCN_000654,E1,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,33.51568531990051,1.0,True,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% increase in demand at a single bus, which defines a load surge.""
+}
+```"
+CASE39_SCN_001616,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,44.13547968864441,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single line outage (line_15_16), which corresponds to E3.""
+}
+```"
+CASE39_SCN_003829,E7,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,42.541431188583374,0.95,True,json,"```json
+{
+  ""event_class"": ""E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected AVR setpoint shift is a regional control action (ladder) that resulted in an overvoltage outcome (V > 1.05 pu).""
+}
+```"
+CASE39_SCN_003276,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,39.46625876426697,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single generator outage (outage of gen_1), which maps directly to E4.""
+}
+```"
+CASE39_SCN_003038,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,36.74479579925537,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single unit generator outage (gen_1).""
+}
+```"
+CASE39_SCN_003378,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,39.152419090270996,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single unit generator outage (gen_1).""
+}
+```"
+CASE39_SCN_003280,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,40.958019495010376,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single generator outage (outage of gen_1).""
+}
+```"
+CASE39_SCN_001060,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,33.905484199523926,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 30% demand decrease at a single bus, which corresponds to a Load Drop (E2).""
+}
+```"
+CASE39_SCN_002714,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,39.033957719802856,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly defined as a renewable ramp (up-ramp of 30 availability points) targeting the wind generator.""
+}
+```"
+CASE39_SCN_002928,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,38.50384759902954,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly identified as a renewable_ramp (down-ramp of wind generation), which corresponds directly to the E5 Renewable Ramp class.""
+}
+```"
+CASE39_SCN_002147,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,38.77125597000122,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single generator outage (gen_3).""
+}
+```"
+CASE39_SCN_004226,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,38.549564838409424,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% demand increase across multiple load buses, which constitutes a Load Surge.""
+}
+```"
+CASE39_SCN_002910,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,36.39463710784912,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly defined as a renewable_ramp (down-ramp of PV generation), which corresponds directly to E5.""
+}
+```"
+CASE39_SCN_001586,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,38.238231897354126,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single line outage (line_6_7).""
+}
+```"
+CASE39_SCN_001407,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,33.08075952529907,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 10% demand decrease at a single bus, which corresponds to a Load Drop (E2).""
+}
+```"
+CASE39_SCN_002396,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,37.34208679199219,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single generator outage (gen_0), which corresponds to E4.""
+}
+```"
+CASE39_SCN_004155,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,42.418968200683594,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% demand increase (load_change) across multiple buses, which defines a Load Surge.""
+}
+```"
+CASE39_SCN_002918,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,47.638190269470215,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is explicitly defined as a renewable ramp (down-ramp of PV generation).""
+}
+```"
+CASE39_SCN_002718,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,40.47871279716492,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is explicitly defined as a renewable ramp (up-ramp of PV availability).""
+}
+```"
+CASE39_SCN_002982,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,40.75922417640686,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is explicitly defined as a renewable_ramp (down-ramp of PV availability).""
+}
+```"
+CASE39_SCN_004803,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,48.77719044685364,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected event is a compound mechanism combining a transmission line outage (E3) and a load surge (E1).""
+}
+```"
+CASE39_SCN_002028,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,37.54143476486206,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single generator outage (gen_3), which corresponds to the E4 class.""
+}
+```"
+CASE39_SCN_004819,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,33.093281984329224,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected event is a compound mechanism consisting of a transmission line outage (E3) and a load surge (E1).""
+}
+```"
+CASE39_SCN_003240,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,43.72867488861084,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single generator outage (gen_1).""
+}
+```"
+CASE39_SCN_001679,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,41.35209822654724,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single line outage (line_25_26).""
+}
+```"
+CASE39_SCN_001124,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,39.26594066619873,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% decrease in demand (load_change), which corresponds to a Load Drop (E2).""
+}
+```"
+CASE39_SCN_000615,E1,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,34.84456157684326,1.0,True,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 10% demand increase (load_change) at a specific bus, which corresponds to a Load Surge.""
+}
+```"
+CASE39_SCN_000158,E0,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,37.0809485912323,1.0,True,json,"```json
+{
+  ""event_class"": ""E0"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The scenario explicitly states that no disturbance was injected, indicating a normal operating state.""
+}
+```"
+CASE39_SCN_004208,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,43.04472613334656,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly defined as a 20% demand increase across multiple load buses, which corresponds to a Load Surge (E1).""
+}
+```"
+CASE39_SCN_002256,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,40.71810245513916,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is a single generator outage (gen_3), which directly corresponds to the E4 class.""
+}
+```"
+CASE39_SCN_002272,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,34.821717739105225,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single generator outage (gen_6).""
+}
+```"
+CASE39_SCN_004616,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,54.29045391082764,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event is compound, involving both a generator outage (gen_2) and a large down-ramp of renewable generation (PV/Wind).""
+}
+```"
+CASE39_SCN_003265,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,38.52123689651489,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is a single generator outage (gen_1), which directly corresponds to the E4 classification.""
+}
+```"
+CASE39_SCN_004714,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,45.96859526634216,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected event is a compound mechanism combining a transmission line outage (E3) and a load surge (E1).""
+}
+```"
+CASE39_SCN_001405,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,41.64769887924194,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected event is a 30% decrease in demand at a single bus, which is classified as a Load Drop (E2).""
+}
+```"
+CASE39_SCN_004513,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,50.970383405685425,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected event is a compound mechanism combining a transmission line outage (E3) and a load surge (E1).""
+}
+```"
+CASE39_SCN_001567,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,38.26910090446472,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is a single line outage (line_15_16), which directly corresponds to the E3 Transmission-Line Outage class.""
+}
+```"
+CASE39_SCN_000920,E1,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,38.58247709274292,1.0,True,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 10% demand increase (load_change) across multiple buses, which constitutes a load surge.""
+}
+```"
+CASE39_SCN_000634,E1,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,39.365222454071045,1.0,True,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is a 40% demand increase (load_change) at a single bus, which defines a load surge.""
+}
+```"
+CASE39_SCN_003775,E7,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,40.171128034591675,0.95,True,json,"```json
+{
+  ""event_class"": ""E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected AVR setpoint shift is a regional control disturbance (ladder mechanism) that resulted in a post-event overvoltage (V > 1.05).""
+}
+```"
+CASE39_SCN_004507,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,46.395164489746094,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected event is a compound mechanism combining a transmission line outage (E3) and a load surge (E1).""
+}
+```"
+CASE39_SCN_002576,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,42.682581424713135,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is explicitly defined as a renewable_ramp (down-ramp) targeting the wind generator availability.""
+}
+```"
+CASE39_SCN_001735,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,36.488182067871094,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single transmission line outage (line_16_24), which corresponds to E3.""
+}
+```"
+CASE39_SCN_002349,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,39.58370041847229,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is a single unit generator outage (gen_0), which directly corresponds to the E4 Generator Outage class.""
+}
+```"
+CASE39_SCN_000810,E1,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,38.01623296737671,1.0,True,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% increase in demand at a specific load bus, which defines a Load Surge (E1).""
+}
+```"
+CASE39_SCN_000120,E0,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,35.20405411720276,1.0,True,json,"```json
+{
+  ""event_class"": ""E0"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The scenario explicitly states that no disturbance was injected.""
+}
+```"
+CASE39_SCN_003612,E7,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,59.71136689186096,0.5,True,last-E-digit,"```json
+{
+  ""event_class"": ""E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  "
+CASE39_SCN_004806,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,47.552566051483154,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The event is compound, combining a single generator outage (gen_3) with a large down-ramp of renewable generation (PV and WIND).""
+}
+```"
+CASE39_SCN_001218,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,38.76947808265686,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 30% decrease in demand at a specific load bus, which defines a Load Drop event.""
+}
+```"
+CASE39_SCN_004035,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,41.800556659698486,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected event is explicitly defined as a 20% demand increase across multiple buses, which constitutes a load surge.""
+}
+```"
+CASE39_SCN_002965,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,41.49838829040527,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly defined as a renewable ramp (up-ramp of PV generation), which corresponds directly to E5.""
+}
+```"
+CASE39_SCN_004785,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,38.30619835853577,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected event is a compound mechanism consisting of a transmission line outage (E3) and a load surge (E1).""
+}
+```"
+CASE39_SCN_001762,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,39.13119435310364,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single transmission line outage (line_22_23), which corresponds to E3.""
+}
+```"
+CASE39_SCN_004533,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,38.641642808914185,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected event is a compound mechanism combining a generator outage (E4) and a large down-ramp of renewable generation (E5).""
+}
+```"
+CASE39_SCN_001915,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,43.506081342697144,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single line outage (line_5_6), which corresponds to E3.""
+}
+```"
+CASE39_SCN_002267,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,41.08318758010864,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single unit generator outage (gen_1).""
+}
+```"
+CASE39_SCN_002014,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,44.35457468032837,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is a single generator outage (gen_2), which directly corresponds to the E4 class.""
+}
+```"
+CASE39_SCN_004762,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,33.30901527404785,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The event is a compound mechanism involving a single generator outage (E4) and a large down-ramp of renewable generation (E5).""
+}
+```"
+CASE39_SCN_004461,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,36.50383734703064,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% demand increase across multiple load buses, which constitutes a load surge.""
+}
+```"
+CASE39_SCN_001646,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,37.721585273742676,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single line outage (line_5_8), which corresponds to the E3 Transmission-Line Outage class.""
+}
+```"
+CASE39_SCN_000854,E1,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,39.26695942878723,1.0,True,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The injected mechanism is a 40% demand increase (load_change), which corresponds to a Load Surge (E1).""
+}
+```"
+CASE39_SCN_002838,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,43.71167230606079,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly defined as a renewable ramp (up-ramp) of wind generation.""
+}
+```"
+CASE39_SCN_003815,E7,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,57.20249390602112,0.95,True,json,"```json
+{
+  ""event_class"": ""E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected AVR setpoint shift is a control action (ladder mechanism) that resulted in a post-event overvoltage violation (V > 1.05 pu).""
+}
+```"
+CASE39_SCN_002969,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,43.71517205238342,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly defined as a large up-ramp of renewable generation (PV and Wind), which corresponds directly to the E5 Renewable Ramp class.""
+}
+```"
+CASE39_SCN_002791,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,37.9317786693573,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is explicitly defined as a renewable_ramp targeting sgen_WIND, which corresponds directly to E5.""
+}
+```"
+CASE39_SCN_004410,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': True, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,37.37623381614685,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% demand increase across multiple components, which constitutes a load surge.""
+}
+```"
+CASE39_SCN_003202,E6,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,36.54547429084778,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single generator outage targeting gen_1.""
+}
+```"
+CASE39_SCN_004075,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,43.07448744773865,1.0,False,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single line outage (line_4_5), which corresponds to E3.""
+}
+```"
+CASE39_SCN_004007,E8,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,36.865742921829224,1.0,False,json,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The injected mechanism is a 20% demand increase, which corresponds to a Load Surge (E1).""
+}
+```"
+CASE39_SCN_001549,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,41.42783212661743,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single line outage (line_10_11).""
+}
+```"
+CASE39_SCN_001888,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,39.945810317993164,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The injected mechanism is explicitly defined as a single line outage (line_13_14), which falls under the E3 Transmission-Line Outage category.""
+}
+```"

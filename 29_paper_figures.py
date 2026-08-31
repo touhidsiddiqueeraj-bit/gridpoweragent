@@ -173,6 +173,10 @@ print("  fig_diagnosis.png saved")
 plt.figure(figsize=(3.5, 2.2))
 for i, (name, data, color, hatch) in enumerate(SERIES):
     bars_with_ci(plt.gca(), "strict", i, data, color, hatch)
+import matplotlib.patches as mpatches
+plt.legend(handles=[mpatches.Patch(facecolor=c, edgecolor="black", hatch=h, label=n)
+                    for n, _, c, h in SERIES],
+           loc="upper left", handlelength=1.2, borderpad=0.3)
 plt.axhline(100 * 0.532, color="#7f8c8d", lw=0.7, ls=":")
 plt.text(3.55, 100 * 0.532 + 0.012, "random tool 53%", fontsize=6, color="#7f8c8d", ha="right")
 plt.xticks(range(len(CFGS)), CFG_LABELS)
@@ -194,8 +198,7 @@ for i, (name, data, color, hatch) in enumerate(SERIES):
     ax1.bar(x + off, [data[c]["halluc"] * 100 for c in CFGS], w * 0.92, label=name,
             color=color, hatch=hatch, edgecolor="black", linewidth=0.5)
     ax2.bar(x + off, [data[c]["lat"] for c in CFGS], w * 0.92, label=name,
-            color=color, hatch=hatch, edgecolor="black", linewidth=0.5,
-            yerr=[data[c]["lat_sd"] for c in CFGS], capsize=1.5, ecolor="#333")
+            color=color, hatch=hatch, edgecolor="black", linewidth=0.5)
 ax1.set_xticks(x, CFG_LABELS)
 ax1.set_ylabel("Hallucinated rows (%)")
 ax1.set_ylim(0, 2.2)

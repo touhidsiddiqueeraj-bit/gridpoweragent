@@ -1,0 +1,23 @@
+{
+  "contingency": {
+    "pairs": 82,
+    "executed_ok": 82,
+    "rate": 100.0
+  },
+  "grid_query": {
+    "pairs": 61,
+    "executed_ok": 61,
+    "rate": 100.0
+  },
+  "none": {
+    "pairs": 9,
+    "executed_ok": 0,
+    "rate": 0.0
+  },
+  "power_flow": {
+    "pairs": 100,
+    "executed_ok": 100,
+    "rate": 100.0
+  },
+  "total_pairs": 252
+}
