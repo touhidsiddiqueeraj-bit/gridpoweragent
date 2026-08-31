@@ -297,7 +297,7 @@ Fig.~\ref{fig:methodology} overviews the pipeline. Stages 03--05 build networks,
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.7\columnwidth]{figures/fig_methodology_tree.png}
+\includegraphics[width=\columnwidth]{figures/fig_methodology_tree.png}
 \caption{Pipeline (Stages 03--28).}
 \label{fig:methodology}
 \end{figure}
@@ -355,7 +355,7 @@ with boundaries $0.0263/0.0526/0.1053$ selected by grid search over five candida
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.95\columnwidth]{figures/fig_architecture.png}
+\includegraphics[width=\columnwidth]{figures/fig_architecture.png}
 \caption{Agent architecture.}
 \label{fig:arch}
 \end{figure}
@@ -432,7 +432,7 @@ Cfg & Pairs & Diff (pp) & 95\% CI & McNemar $p$ \\
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.85\columnwidth]{figures/fig_diagnosis.png}
+\includegraphics[width=\columnwidth]{figures/fig_diagnosis.png}
 \caption{(a) Diagnosis accuracy, local vs.\ API model, Wilson 95\% CIs. (b) Paired diagnosis difference with bootstrap 95\% CIs against reference margins ($-10$pp, $-5$pp).}
 \label{fig:diag}
 \end{figure}
@@ -442,7 +442,7 @@ Tool selection is where the deployment tiers differ most---in \emph{style} befor
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.8\columnwidth]{figures/fig_tools.png}
+\includegraphics[width=\columnwidth]{figures/fig_tools.png}
 \caption{Strict-specific tool-selection accuracy (reference required set). Exact counts in Table~\ref{tab:results}.}
 \label{fig:tools}
 \end{figure}
@@ -473,7 +473,7 @@ Any-tag hallucinated rows are rare for both models under the automated judge: %G
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.85\columnwidth]{figures/fig_halluc_latency.png}
+\includegraphics[width=\columnwidth]{figures/fig_halluc_latency.png}
 \caption{Response-level any-tag hallucination (automated rule-based judge) and latency (log scale). Exact denominators in Table~\ref{tab:results}.}
 \label{fig:halluc}
 \end{figure}
