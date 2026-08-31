@@ -1,0 +1,26 @@
+{
+  "api": {
+    "power_flow": {
+      "n": 291,
+      "required": 103,
+      "pct": 35.4
+    },
+    "contingency": {
+      "n": 244,
+      "required": 174,
+      "pct": 71.3
+    }
+  },
+  "local": {
+    "power_flow": {
+      "n": 49,
+      "required": 12,
+      "pct": 24.5
+    },
+    "contingency": {
+      "n": 327,
+      "required": 255,
+      "pct": 78.0
+    }
+  }
+}

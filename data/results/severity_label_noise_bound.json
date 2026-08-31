@@ -1,0 +1,275 @@
+{
+  "ieee14": {
+    "scenarios": 3000,
+    "scenario_tool_judgments": 30000,
+    "scoring_relevant_flips": 0,
+    "scoring_relevant_flip_pct": 0.0,
+    "per_tool_scoring_flips": {
+      "power_flow": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "state_estimation": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "contingency": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "n1_security": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "opf": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_topology": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_limits": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_equipment": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_bess": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_renewable": {
+        "n": 0,
+        "pct": 0.0
+      }
+    },
+    "per_tool_any_tier_change": {
+      "power_flow": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "state_estimation": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "contingency": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "n1_security": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "opf": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_topology": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_limits": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_equipment": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_bess": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_renewable": {
+        "n": 0,
+        "pct": 0.0
+      }
+    },
+    "spearman_rho_est_vs_true": 0.7644
+  },
+  "case39": {
+    "scenarios": 5000,
+    "scenario_tool_judgments": 50000,
+    "scoring_relevant_flips": 31,
+    "scoring_relevant_flip_pct": 0.062,
+    "per_tool_scoring_flips": {
+      "power_flow": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "state_estimation": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "contingency": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "n1_security": {
+        "n": 30,
+        "pct": 0.6
+      },
+      "opf": {
+        "n": 1,
+        "pct": 0.02
+      },
+      "grid_query_topology": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_limits": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_equipment": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_bess": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_renewable": {
+        "n": 0,
+        "pct": 0.0
+      }
+    },
+    "per_tool_any_tier_change": {
+      "power_flow": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "state_estimation": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "contingency": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "n1_security": {
+        "n": 30,
+        "pct": 0.6
+      },
+      "opf": {
+        "n": 1,
+        "pct": 0.02
+      },
+      "grid_query_topology": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_limits": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_equipment": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_bess": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_renewable": {
+        "n": 0,
+        "pct": 0.0
+      }
+    },
+    "spearman_rho_est_vs_true": 0.9682
+  },
+  "case118": {
+    "scenarios": 7000,
+    "scenario_tool_judgments": 70000,
+    "scoring_relevant_flips": 0,
+    "scoring_relevant_flip_pct": 0.0,
+    "per_tool_scoring_flips": {
+      "power_flow": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "state_estimation": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "contingency": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "n1_security": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "opf": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_topology": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_limits": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_equipment": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_bess": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_renewable": {
+        "n": 0,
+        "pct": 0.0
+      }
+    },
+    "per_tool_any_tier_change": {
+      "power_flow": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "state_estimation": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "contingency": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "n1_security": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "opf": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_topology": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_limits": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_equipment": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_bess": {
+        "n": 0,
+        "pct": 0.0
+      },
+      "grid_query_renewable": {
+        "n": 0,
+        "pct": 0.0
+      }
+    },
+    "spearman_rho_est_vs_true": 0.823
+  }
+}

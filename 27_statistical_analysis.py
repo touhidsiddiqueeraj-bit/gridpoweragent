@@ -7,7 +7,10 @@ import pandas as pd, numpy as np
 from scipy.stats import wilcoxon
 
 RESULTS_DIR=Path("data/results")
-df=pd.read_csv(RESULTS_DIR/"agent_runs.csv")
+import sys
+IN_FILE=sys.argv[1] if len(sys.argv)>1 else "agent_runs.csv"
+df=pd.read_csv(RESULTS_DIR/IN_FILE)
+print(f"input: {IN_FILE} ({len(df)} rows)")
 
 print("="*80)
 print("STAGE 27 — STATISTICAL ANALYSIS")
@@ -48,4 +51,5 @@ print(f"\nBootstrap 95% CI E4 diagnosis accuracy: {e4.mean()*100:.1f}% [{ci_low*
 print("\nECE (from Stage19): E1 0.166, E2 0.127, E3 0.159, E4 0.174")
 # Save
 pd.DataFrame([{"comparison":"E4 vs E1 McNemar","p":res.pvalue if 'res' in locals() else 0.001,"effect_g":effect,"ece_E4":0.174,"bootstrap_low":ci_low,"bootstrap_high":ci_high}]).to_csv("data/results/statistical_significance.csv", index=False)
+print(f"[INFO] saved data/results/statistical_significance.csv (input {IN_FILE})")
 print("[PASS] Stage 27 complete")

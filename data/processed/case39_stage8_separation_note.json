@@ -1,0 +1,55 @@
+{
+  "any_excursion": 2227,
+  "scored_violations": 2227,
+  "unscored_gen_reactive": 0,
+  "binary_classification": {
+    "TN": 2762,
+    "FP": 11,
+    "FN": 12,
+    "TP": 2215,
+    "accuracy": 0.9954
+  },
+  "severity": {
+    "boundaries": [
+      0.0263,
+      0.0526,
+      0.1053
+    ],
+    "fractions": "1/38, 2/38, 4/38",
+    "candidates": {
+      "A": [
+        0.02,
+        0.04,
+        0.08
+      ],
+      "B": [
+        0.025,
+        0.05,
+        0.1
+      ],
+      "C": [
+        0.0263,
+        0.0526,
+        0.1053
+      ],
+      "D": [
+        0.03,
+        0.06,
+        0.12
+      ],
+      "E": [
+        0.05,
+        0.1,
+        0.2
+      ]
+    },
+    "rho": 0.9681697249553055,
+    "objective": "max Spearman + class balance 20-30%",
+    "validation": "2-fold CV (1500 train, 1500 test)",
+    "est_source": "WLS state-estimate bus voltages (Stage 7 est_vm_bus_*)",
+    "note": "rho = Spearman(severity_true, severity_est): voltage term of severity_est from WLS state-estimate bus voltages; thermal term from true loading (SE estimates bus state only)"
+  },
+  "equation": "S = 0.6*min(1, max(0,|V-1|-0.02)/0.06) + 0.4*min(1, max(0, loading-3)/10)",
+  "units": "pu and percent, normalized [0,1]",
+  "operational_meaning": "Normal<0.0263 mild, 0.0263-0.0526 low, 0.0526-0.1053 moderate, 0.1053-0.20 high, >0.20 critical"
+}

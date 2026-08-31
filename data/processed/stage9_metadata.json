@@ -1,0 +1,105 @@
+{
+  "stage": 9,
+  "n_records": 3000,
+  "tools": [
+    "power_flow",
+    "state_estimation",
+    "contingency",
+    "n1_security",
+    "opf",
+    "grid_query_topology",
+    "grid_query_limits",
+    "grid_query_equipment",
+    "grid_query_bess",
+    "grid_query_renewable"
+  ],
+  "tier_counts": {
+    "power_flow": {
+      "required": 1801,
+      "strongly_appropriate": 1199,
+      "conditional": 0,
+      "unnecessary": 0,
+      "incorrect": 0
+    },
+    "state_estimation": {
+      "required": 965,
+      "strongly_appropriate": 0,
+      "conditional": 2035,
+      "unnecessary": 0,
+      "incorrect": 0
+    },
+    "contingency": {
+      "required": 1200,
+      "strongly_appropriate": 301,
+      "conditional": 1499,
+      "unnecessary": 0,
+      "incorrect": 0
+    },
+    "n1_security": {
+      "required": 3000,
+      "strongly_appropriate": 0,
+      "conditional": 0,
+      "unnecessary": 0,
+      "incorrect": 0
+    },
+    "opf": {
+      "required": 305,
+      "strongly_appropriate": 360,
+      "conditional": 1735,
+      "unnecessary": 600,
+      "incorrect": 0
+    },
+    "grid_query_topology": {
+      "required": 3000,
+      "strongly_appropriate": 0,
+      "conditional": 0,
+      "unnecessary": 0,
+      "incorrect": 0
+    },
+    "grid_query_limits": {
+      "required": 965,
+      "strongly_appropriate": 0,
+      "conditional": 0,
+      "unnecessary": 2035,
+      "incorrect": 0
+    },
+    "grid_query_equipment": {
+      "required": 0,
+      "strongly_appropriate": 0,
+      "conditional": 3000,
+      "unnecessary": 0,
+      "incorrect": 0
+    },
+    "grid_query_bess": {
+      "required": 0,
+      "strongly_appropriate": 693,
+      "conditional": 1220,
+      "unnecessary": 1087,
+      "incorrect": 0
+    },
+    "grid_query_renewable": {
+      "required": 300,
+      "strongly_appropriate": 0,
+      "conditional": 0,
+      "unnecessary": 2700,
+      "incorrect": 0
+    }
+  },
+  "varying_tools": [
+    "power_flow",
+    "state_estimation",
+    "contingency",
+    "opf",
+    "grid_query_limits",
+    "grid_query_bess",
+    "grid_query_renewable"
+  ],
+  "constant_tools": [
+    "n1_security",
+    "grid_query_topology",
+    "grid_query_equipment"
+  ],
+  "terminology": "rule-based reference policy labels (not external ground truth)",
+  "rules": "formal per-tool definitions in 09_reference_labels.py assign_tier()",
+  "sensitivity": "\u00b10.01 boundary shift flips 4.2% tiers"
+}

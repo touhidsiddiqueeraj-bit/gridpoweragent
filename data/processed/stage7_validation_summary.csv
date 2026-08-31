@@ -1,0 +1,7 @@
+check,passed
+s7_3000_converged,True
+s7_iters_4_6,True
+s7_rmse_v_0_000702,True
+s7_chi2_calibrated,True
+s7_rank_full,True
+s7_jacobian_4e-10,True

@@ -1,0 +1,22 @@
+{
+  "ids": [
+    "topology_bus_1.md",
+    "topology_line_1_2.md",
+    "topology_line_9_14.md",
+    "equipment_gen_G2.md",
+    "equipment_bess.md",
+    "operational_voltage.md",
+    "operational_thermal.md",
+    "procedure_contingency.md"
+  ],
+  "texts": [
+    "# Bus 1 (Slack)\nIEEE 14 bus 1, 135kV, slack, vm 1.06 pu, connected to lines 1-2,1-5, gen slack",
+    "# Line 1-2\nFrom bus 1 to 2, 135kV, rating 3% loading (tuned), type ol, critical corridor; outage drives 2.37% loading on line_1_5",
+    "# Line 9-14\nWeak line, outage drops bus14 to 0.9425 pu, E6 ladder target",
+    "# Generator G2 @ bus2\nPmax 140MW, vm 1.02 pu, type synchronous, outage tested E4",
+    "# BESS @ bus9\n20MW/40MWh SOC 10-90% eta 0.95, cid gen_BESS9, max discharge depends on SOC",
+    "# Voltage Limits\nMin 0.94 pu, max 1.05 pu (slack 1.06), violations flagged by Stage8",
+    "# Thermal Limits\nLine 3% trafo 4% (tuned from 100% to make IEEE14 stressed), overload >limit",
+    "# Contingency Procedure\nIf overload or undervoltage, run power_flow then contingency then OPF; pattern C requires low SOC check"
+  ]
+}

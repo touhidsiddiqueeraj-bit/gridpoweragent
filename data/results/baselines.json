@@ -1,0 +1,27 @@
+{
+  "n_pilot_scenarios": 20,
+  "classes_present": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E9"
+  ],
+  "majority_class": {
+    "class": "E9",
+    "acc": 0.2
+  },
+  "random_uniform": {
+    "mean": 0.125,
+    "sd": 0.074
+  },
+  "random_tool_8": {
+    "mean": 0.532,
+    "sd": 0.104
+  },
+  "degenerate_always_power_flow_tool_acc": 1.0,
+  "note": "always answering power_flow yields 100% tool acceptance by construction (power_flow is required or strongly_appropriate in every reference label)"
+}

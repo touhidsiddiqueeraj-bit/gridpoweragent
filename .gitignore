@@ -9,3 +9,31 @@ data/processed/*_load_*.csv
 *.log
 heavy.log
 .DS_Store
+
+# session tooling
+.palimpsest/
+.zcode/
+
+# internal documents (double-blind; not for the public repo)
+*.docx
+
+# large per-scenario corpus artifacts (regenerate deterministically from seeds)
+data/processed/*
+!data/processed/*_validation_summary.csv
+!data/processed/*_metadata.json
+!data/processed/*_separation_note.json
+!data/processed/FINAL_VALIDATION_REPORT.md
+
+# internal archives and checkpoints
+data/results/ARCHIVE_*
+data/results/archived_moe_attempt/
+data/results/*checkpoint*.json
+
+# generated texflow serialization
+paper/texflow_document.tex
+
+# latex build artifacts
+paper/*.aux
+paper/*.blg
+paper/*.out
+paper/figures/fig_generalization.png

@@ -42,7 +42,7 @@ def throttle(rpm):
         time.sleep(wait + random.uniform(0, 0.5))
     _last_call = time.time()
 
-def call_gemini(prompt, api_key, model="gemini-3.5-flash-lite", rpm=15, max_retries=5, timeout=45):
+def call_gemini(prompt, api_key, model="gemini-3.5-flash-lite", rpm=15, max_retries=8, timeout=45):
     # ponytail: raw REST, no google-generativeai dep
     # gemini-flash-lite-latest -> pin to gemini-3.5-flash-lite per user
     model_id = model
@@ -277,7 +277,7 @@ def simulate_config(cfg_name, cfg, scen, ref, model_label="mock"):
         rows.append({"scenario_id":s.scenario_id,"event_class":s.event_class,"config":cfg_name,"model":model_label,"correct_diag":correct_diag,"correct_tool":correct_tool,"grounded":grounded,"halluc":halluc_flags,"recommendation":rec,"latency":lat,"confidence":conf,"is_correct":correct_diag})
     return pd.DataFrame(rows)
 
-def run_real_gemini(scen, ref, api_key, model, rpm, n_test, resume_path, out_csv):
+def run_real_gemini(scen, ref, api_key, model, rpm, n_test, resume_path, out_csv, configs=None):
     # load RAG docs
     try:
         with open(KB_DOCS) as f:
@@ -335,6 +335,9 @@ def run_real_gemini(scen, ref, api_key, model, rpm, n_test, resume_path, out_csv
                 if not correct_diag and random.random()<0.05:
                     halluc_flags["H-TOP"]=True
             except Exception as e:
+                if "429" in str(e) or "quota" in str(e).lower() or "RESOURCE_EXHAUSTED" in str(e):
+                    print(f"[STOP] quota exhausted at {s.scenario_id} {cfg_name} — stopping cleanly; rows stay checkpointed")
+                    raise
                 print(f"[ERR] {s.scenario_id} {cfg_name}: {e}")
                 correct_diag=False; correct_tool=False; grounded=False
                 halluc_flags={k: False for k in ["H-NUM","H-TOP","H-EQP","H-PHY","H-TOOL","H-ACT"]}
@@ -376,7 +379,12 @@ def main():
     p.add_argument("--compare", action="store_true", help="run gemini + muse-spark + mock (+ local gemma if --real) for comparison")
     p.add_argument("--interval", type=float, default=5.0, help="local model interval seconds (pace to avoid crash, default 5)")
     p.add_argument("--out", default=None)
+    p.add_argument("--configs", default=None, help="comma list, e.g. E1_LLM,E2_LLM_RAG (default all)")
+    p.add_argument("--force-api", action="store_true", help="route to Gemini REST even for gemma-* model strings")
     args=p.parse_args()
+    _sel = None
+    if args.configs:
+        _sel = {k: v for k, v in CONFIGS.items() if k in args.configs.split(",")}
     print("="*80); print("STAGES 19-22 — FOUR CONFIGS (E1-E4) dual-model"); print("="*80)
     scen=pd.read_csv(SCENARIOS_CSV)
     ref=pd.read_csv(REF_CSV)
@@ -420,7 +428,7 @@ def main():
             out_gem=RESULTS_DIR/"agent_runs_gemini-3.5-flash-lite.csv"
             ckpt=Path("data/results/gemini_checkpoint.json")
             try:
-                gem_df=run_real_gemini(scen, ref, key, model, args.rpm, args.n_test, ckpt, out_gem)
+                gem_df=run_real_gemini(scen, ref, key, model, args.rpm, args.n_test, ckpt, out_gem, configs=_sel)
                 gem_df.to_csv(out_gem,index=False)
                 outs.append((model, gem_df))
                 print(f"[INFO] Gemini saved {out_gem}")
@@ -474,7 +482,7 @@ def main():
 
     if args.real:
         # local gemma/qwen path — no API key, gentle pacing
-        if any(x in args.model.lower() for x in ["gemma","qwen","local","ornith"]):
+        if not getattr(args, "force_api", False) and any(x in args.model.lower() for x in ["gemma","qwen","local","ornith"]):
             model = args.model if args.model!="mock" else "gemma-4-E4B-it-Q4_0.gguf"
             out=Path(args.out) if args.out else RESULTS_DIR/f"agent_runs_{model.replace('/','_').replace('.','_')}.csv"
             ckpt=Path(f"data/results/local_{model.replace('/','_')}_checkpoint.json")
@@ -490,7 +498,7 @@ def main():
             out=Path(args.out) if args.out else RESULTS_DIR/f"agent_runs_{model.replace('/','_')}.csv"
             ckpt=Path("data/results/gemini_checkpoint.json")
             print(f"[INFO] Real Gemini {model} RPM {args.rpm} n_test {args.n_test} -> {out}")
-            df=run_real_gemini(scen, ref, key, model, args.rpm, args.n_test, ckpt, out)
+            df=run_real_gemini(scen, ref, key, model, args.rpm, args.n_test, ckpt, out, configs=_sel)
         df.to_csv(out,index=False)
         print(f"[INFO] Saved {out} ({len(df)} rows)")
         # also save halluc breakdown — halluc may be dict or json string

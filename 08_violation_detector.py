@@ -45,6 +45,15 @@ def severity_score(row, limit=3.0):
     t_term = min(1.0, max(0, row.post_peak_loading_percent - limit)/10.0) *0.4
     return float(v_term + t_term)
 
+def severity_from_state(v_min, v_max, peak_loading, limit=3.0):
+    # estimated severity: voltage term from WLS state-estimate bus voltages
+    # (Stage 7 est_vm_bus_*), thermal term from true post-event loading
+    # (the synthetic SE estimates bus state only, not branch flows)
+    v_dev = max(0.0, abs(v_min-1.0)-0.02, abs(v_max-1.0)-0.02)
+    v_term = min(1.0, v_dev/0.06) *0.6
+    t_term = min(1.0, max(0.0, peak_loading-limit)/10.0) *0.4
+    return float(v_term + t_term)
+
 def categorize(s):
     if s < BOUNDARIES[0]: return "Normal"
     if s < BOUNDARIES[1]: return "Low"
@@ -113,8 +122,21 @@ def main():
         _lim=float(_n2.line.max_loading_percent.iloc[0]) if len(_n2.line) else 3.0
     except: _lim=3.0
     scen["severity_true"] = scen.apply(lambda r: severity_score(r, _lim), axis=1)
-    # Estimated severity: add small noise
-    scen["severity_est"] = scen.severity_true + rng.normal(0,0.005, len(scen))
+    # Estimated severity: propagate WLS state-estimate voltages through S
+    # (voltage term from est_vm_bus_*; thermal term unchanged, documented above)
+    if has_est:
+        est_cols=[c for c in est.columns if c.startswith("est_vm_bus_")]
+        est_v=est[["scenario_id"]+est_cols].copy()
+        est_v["est_v_min"]=est_v[est_cols].min(axis=1)
+        est_v["est_v_max"]=est_v[est_cols].max(axis=1)
+        scen=scen.merge(est_v[["scenario_id","est_v_min","est_v_max"]], on="scenario_id", how="left")
+        scen["severity_est"]=scen.apply(
+            lambda r: severity_from_state(r.est_v_min, r.est_v_max, r.post_peak_loading_percent, _lim), axis=1)
+        est_src="WLS state-estimate bus voltages (Stage 7 est_vm_bus_*)"
+    else:
+        # no state estimates available: fall back to true severity (rho undefined)
+        scen["severity_est"]=scen.severity_true
+        est_src="true (fallback — no state estimates)"
     scen["severity_est"] = scen.severity_est.clip(0,1)
     scen["cat_true"] = scen.severity_true.apply(categorize)
     scen["cat_est"] = scen.severity_est.apply(categorize)
@@ -138,7 +160,8 @@ def main():
             "scored_violations": int(true_scored.sum()),
             "unscored_gen_reactive": 0,
             "binary_classification": {"TN":TN,"FP":FP,"FN":FN,"TP":TP,"accuracy":acc},
-            "severity": {"boundaries":BOUNDARIES,"fractions":BOUNDARY_FRACTIONS,"candidates":CANDIDATES,"rho":float(rho),"objective":"max Spearman + class balance 20-30%","validation":"2-fold CV (1500 train, 1500 test)"},
+            "severity": {"boundaries":BOUNDARIES,"fractions":BOUNDARY_FRACTIONS,"candidates":CANDIDATES,"rho":float(rho),"objective":"max Spearman + class balance 20-30%","validation":"2-fold CV (1500 train, 1500 test)","est_source":est_src,
+                        "note":"rho = Spearman(severity_true, severity_est): voltage term of severity_est from WLS state-estimate bus voltages; thermal term from true loading (SE estimates bus state only)"},
             "equation":"S = 0.6*min(1, max(0,|V-1|-0.02)/0.06) + 0.4*min(1, max(0, loading-3)/10)",
             "units":"pu and percent, normalized [0,1]",
             "operational_meaning":"Normal<0.0263 mild, 0.0263-0.0526 low, 0.0526-0.1053 moderate, 0.1053-0.20 high, >0.20 critical"

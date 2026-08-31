@@ -1,0 +1,287 @@
+{
+  "stage": 5,
+  "stage_name": "STAGE 5 \u2014 EVENT GENERATOR",
+  "network": "case39_re",
+  "generated_at": "2026-08-30T05:36:05",
+  "elapsed_seconds": 1654.217,
+  "generation_seconds": 1650.375,
+  "environment": {
+    "python": "3.14.6",
+    "platform": "Linux-7.1.4-1-cachyos-x86_64-with-glibc2.44",
+    "pandapower": "3.5.4",
+    "pandas": "2.3.3",
+    "numpy": "2.4.6",
+    "numba": true
+  },
+  "parent_re_layout_hash_sha256": "8ded83311651f443759177a75b261385e52f88b79abc2a2596b34646c1384cfe",
+  "corpus": {
+    "n_scenarios": 5000,
+    "n_per_class_target": 500,
+    "seed": 20260821,
+    "id_format": "CASE39_SCN_NNNNNN",
+    "classes": {
+      "E0": "Normal",
+      "E1": "Load Surge",
+      "E2": "Load Drop",
+      "E3": "Transmission-Line Outage",
+      "E4": "Generator Outage",
+      "E5": "Renewable Ramp",
+      "E6": "Undervoltage",
+      "E7": "Overvoltage",
+      "E8": "Thermal Overload",
+      "E9": "Compound Event"
+    },
+    "class_counts": {
+      "E0": 500,
+      "E1": 500,
+      "E2": 500,
+      "E3": 500,
+      "E4": 500,
+      "E5": 500,
+      "E6": 500,
+      "E7": 500,
+      "E8": 500,
+      "E9": 500
+    },
+    "distinct_operating_points_used": 3074
+  },
+  "event_magnitudes": {
+    "load_surge_percent": [
+      10.0,
+      20.0,
+      30.0,
+      40.0
+    ],
+    "load_drop_percent": [
+      -10.0,
+      -20.0,
+      -30.0
+    ],
+    "ramp_severity": {
+      "small": 0.1,
+      "medium": 0.3,
+      "large": 0.6
+    },
+    "regions": {
+      "hv_load_centre": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "lv_north": [
+        6,
+        11,
+        12,
+        13
+      ],
+      "lv_south": [
+        9,
+        10,
+        14
+      ]
+    }
+  },
+  "outcome_search": {
+    "E6": {
+      "mean_attempts": 4.0,
+      "max_attempts": 4
+    },
+    "E7": {
+      "mean_attempts": 1.996,
+      "max_attempts": 2
+    },
+    "E8": {
+      "mean_attempts": 1.096,
+      "max_attempts": 5
+    }
+  },
+  "mechanism_outcome_overlap": {
+    "n_mechanism_scenarios": 2500,
+    "pct_with_any_violation": 16.8,
+    "pct_undervoltage": 2.88,
+    "pct_overvoltage": 0.0,
+    "pct_overload": 16.2
+  },
+  "class_summary": [
+    {
+      "event_class": "E0",
+      "event_name": "Normal",
+      "n_scenarios": 500,
+      "n_with_violations": 0,
+      "pct_with_violations": 0.0,
+      "pct_undervoltage": 0.0,
+      "pct_overvoltage": 0.0,
+      "pct_overload": 0.0,
+      "worst_v_min_pu": 1.0053,
+      "worst_v_max_pu": 1.0777,
+      "worst_loading_percent": 99.63,
+      "mean_delta_slack_mw": 0.0
+    },
+    {
+      "event_class": "E1",
+      "event_name": "Load Surge",
+      "n_scenarios": 500,
+      "n_with_violations": 36,
+      "pct_with_violations": 7.2,
+      "pct_undervoltage": 3.8,
+      "pct_overvoltage": 0.0,
+      "pct_overload": 7.2,
+      "worst_v_min_pu": 0.8227,
+      "worst_v_max_pu": 1.0778,
+      "worst_loading_percent": 195.71,
+      "mean_delta_slack_mw": 228.913
+    },
+    {
+      "event_class": "E2",
+      "event_name": "Load Drop",
+      "n_scenarios": 500,
+      "n_with_violations": 83,
+      "pct_with_violations": 16.6,
+      "pct_undervoltage": 0.0,
+      "pct_overvoltage": 0.0,
+      "pct_overload": 16.6,
+      "worst_v_min_pu": 0.9932,
+      "worst_v_max_pu": 1.0782,
+      "worst_loading_percent": 196.5,
+      "mean_delta_slack_mw": -251.088
+    },
+    {
+      "event_class": "E3",
+      "event_name": "Transmission-Line Outage",
+      "n_scenarios": 500,
+      "n_with_violations": 167,
+      "pct_with_violations": 33.4,
+      "pct_undervoltage": 0.0,
+      "pct_overvoltage": 0.0,
+      "pct_overload": 33.4,
+      "worst_v_min_pu": 0.9574,
+      "worst_v_max_pu": 1.0792,
+      "worst_loading_percent": 162.72,
+      "mean_delta_slack_mw": 35.323
+    },
+    {
+      "event_class": "E4",
+      "event_name": "Generator Outage",
+      "n_scenarios": 500,
+      "n_with_violations": 128,
+      "pct_with_violations": 25.6,
+      "pct_undervoltage": 10.6,
+      "pct_overvoltage": 0.0,
+      "pct_overload": 22.6,
+      "worst_v_min_pu": 0.7355,
+      "worst_v_max_pu": 1.0799,
+      "worst_loading_percent": 144.97,
+      "mean_delta_slack_mw": 608.125
+    },
+    {
+      "event_class": "E5",
+      "event_name": "Renewable Ramp",
+      "n_scenarios": 500,
+      "n_with_violations": 6,
+      "pct_with_violations": 1.2,
+      "pct_undervoltage": 0.0,
+      "pct_overvoltage": 0.0,
+      "pct_overload": 1.2,
+      "worst_v_min_pu": 1.0051,
+      "worst_v_max_pu": 1.0776,
+      "worst_loading_percent": 101.59,
+      "mean_delta_slack_mw": -0.573
+    },
+    {
+      "event_class": "E6",
+      "event_name": "Undervoltage",
+      "n_scenarios": 500,
+      "n_with_violations": 500,
+      "pct_with_violations": 100.0,
+      "pct_undervoltage": 100.0,
+      "pct_overvoltage": 0.0,
+      "pct_overload": 42.8,
+      "worst_v_min_pu": 0.8857,
+      "worst_v_max_pu": 1.0712,
+      "worst_loading_percent": 122.6,
+      "mean_delta_slack_mw": 652.152
+    },
+    {
+      "event_class": "E7",
+      "event_name": "Overvoltage",
+      "n_scenarios": 500,
+      "n_with_violations": 500,
+      "pct_with_violations": 100.0,
+      "pct_undervoltage": 0.0,
+      "pct_overvoltage": 100.0,
+      "pct_overload": 0.0,
+      "worst_v_min_pu": 1.0312,
+      "worst_v_max_pu": 1.1056,
+      "worst_loading_percent": 97.58,
+      "mean_delta_slack_mw": -2.356
+    },
+    {
+      "event_class": "E8",
+      "event_name": "Thermal Overload",
+      "n_scenarios": 500,
+      "n_with_violations": 500,
+      "pct_with_violations": 100.0,
+      "pct_undervoltage": 84.2,
+      "pct_overvoltage": 0.0,
+      "pct_overload": 100.0,
+      "worst_v_min_pu": 0.7912,
+      "worst_v_max_pu": 1.0712,
+      "worst_loading_percent": 201.08,
+      "mean_delta_slack_mw": 1320.379
+    },
+    {
+      "event_class": "E9",
+      "event_name": "Compound Event",
+      "n_scenarios": 500,
+      "n_with_violations": 307,
+      "pct_with_violations": 61.4,
+      "pct_undervoltage": 25.8,
+      "pct_overvoltage": 0.0,
+      "pct_overload": 60.4,
+      "worst_v_min_pu": 0.7354,
+      "worst_v_max_pu": 1.0796,
+      "worst_loading_percent": 292.09,
+      "mean_delta_slack_mw": 1059.879
+    }
+  ],
+  "design_notes": [
+    "The injected event and its consequences are stored in separate fields and are never merged. Nothing in the injected_* columns names an outcome.",
+    "E6, E7 and E8 are never assigned. A disturbance is applied, the power flow is solved, and the outcome is detected. The corpus keeps the mildest disturbance from an escalating ladder that provably produced the target outcome.",
+    "E1-E5 label the injected MECHANISM; E6-E8 label the resulting OUTCOME. The two axes overlap by construction and the overlap is measured in mechanism_outcome_overlap.",
+    "Low load and high distributed generation cannot produce overvoltage on this network: the measured ceiling is 1.0347 p.u. against a 1.05 limit, because four synchronous machines hold their buses at 1.02-1.03. E7 therefore uses explicit reactive mechanisms (raised excitation setpoints, capacitor over-compensation). This is a property of the IEEE 14-bus system and belongs in the paper's limitations.",
+    "No single line outage islands this network; all 15 converge.",
+    "Every stored event is replayable: re-applying it to the restored pre-event state reproduces the recorded post-event state exactly.",
+    "The network is fully restored from a snapshot before every scenario, so no disturbance can leak into the next one."
+  ],
+  "artefacts": {
+    "scenarios_csv": "data/processed/case39_scenarios.csv",
+    "scenarios_jsonl": "data/processed/case39_scenarios.jsonl",
+    "post_voltages": "data/processed/case39_scenario_post_voltages.csv",
+    "post_loading": "data/processed/case39_scenario_post_loading.csv",
+    "class_summary": "data/processed/case39_scenario_class_summary.csv"
+  },
+  "validation": {
+    "s5_parent_hash_match": true,
+    "s5_pool_consistent": true,
+    "s5_ids_unique": true,
+    "s5_id_format": true,
+    "s5_op_ids_valid": true,
+    "s5_no_nan": false,
+    "s5_all_classes_present": true,
+    "s5_class_balance": true,
+    "s5_e0_verified_normal": true,
+    "s5_e0_no_injection": true,
+    "s5_e1_load_increased": true,
+    "s5_e2_load_decreased": true,
+    "s5_e3_valid_lines": true,
+    "s5_e4_valid_generators": true,
+    "s5_e5_valid_ramps": true,
+    "s5_e6_caused": true,
+    "s5_e7_caused": true,
+    "s5_e8_caused": true,
+    "s5_e9_compound": true,
+    "s5_no_outcome_leakage": true,
+    "s5_events_replayable": true
+  }
+}

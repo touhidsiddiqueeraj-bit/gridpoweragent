@@ -1,0 +1,4 @@
+check,passed
+s6_case118_replayed,True
+s6_sigma_from_true,True
+s6_max_z_reported,True
