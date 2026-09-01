@@ -22,14 +22,15 @@
 \BIBdecl
 
 \bibitem{majumder2024joule}
-S.~Majumder, G.~Hug, R.~Ponnaganti \emph{et~al.}, ``Exploring the capabilities
-  and limitations of large language models in the electric energy sector,''
-  \emph{Joule}, vol.~8, pp. 1544--1549, 2024.
+S.~Majumder, L.~Dong, F.~Doudi, Y.~Cai, C.~Tian, D.~Kalathil, K.~Ding, A.~A.
+  Thatte, N.~Li, and L.~Xie, ``Exploring the capabilities and limitations of
+  large language models in the electric energy sector,'' \emph{Joule}, vol.~8,
+  pp. 1544--1549, 2024.
 
 \bibitem{cheng2025gaia}
-Y.~Cheng, H.~Zhao, X.~Zhou, J.~Zhao, Y.~Cao, C.~Yang, and X.~Cai, ``A large
-  language model for advanced power dispatch,'' \emph{Scientific Reports},
-  vol.~15, p. 8925, 2025.
+Y.~Cheng, H.~Zhao, X.~Zhou, J.~Zhao, Y.~Cao, and C.~Yang, ``A large language
+  model for advanced power dispatch,'' \emph{Scientific Reports}, vol.~15, p.
+  8925, 2025.
 
 \bibitem{zhang2025gridagent}
 Y.~Zhang, A.~M. Saber, A.~Youssef, and D.~Kundur, ``Grid-agent: An
@@ -42,9 +43,9 @@ Y.~Wen and X.~Chen, ``{X-GridAgent}: An {LLM}-powered agentic {AI} system for
   2025.
 
 \bibitem{zhou2024elecbench}
-X.~Zhou, B.~Xu, Y.~Zhang, J.~Sun, B.~Zhu \emph{et~al.}, ``{ElecBench}: A power
-  dispatch evaluation benchmark for large language models,'' \emph{arXiv
-  preprint arXiv:2407.05365}, 2024.
+X.~Zhou, H.~Zhao, Y.~Cheng, Y.~Cao, G.~Liang, G.~Liu, W.~Liu, Y.~Xu, and
+  J.~Zhao, ``{ElecBench}: A power dispatch evaluation benchmark for large
+  language models,'' \emph{arXiv preprint arXiv:2407.05365}, 2024.
 
 \bibitem{lewis2020rag}
 P.~Lewis, E.~Perez, A.~Piktus, F.~Petroni, V.~Karpukhin, N.~Goyal,
