@@ -214,6 +214,21 @@ if _rq3_files:
         RQ3["total_pairs"] += tot
         RQ3["executed_ok_total"] += ok
 
+# ---- severity-boundary sensitivity (Stage 36 output; paper claims invariance,
+# so fail the build loudly if the data ever stops being invariant) ----
+SEVSENS_A = SEVSENS_L = None
+_sevsens_path = RESULTS / "severity_sensitivity.csv"
+if _sevsens_path.exists():
+    _ss = pd.read_csv(_sevsens_path)
+    def _ss_total(model):
+        sub = _ss[_ss.model == model]
+        assert len(sub) >= 2, f"severity_sensitivity: expected >=2 boundary sets for {model}"
+        assert sub.strict_ok.nunique() == 1, f"severity_sensitivity: {model} strict_ok varies across boundary sets"
+        assert sub.n.nunique() == 1, f"severity_sensitivity: {model} n varies across boundary sets"
+        return f"{int(sub.strict_ok.iloc[0])}/{int(sub.n.iloc[0])}"
+    SEVSENS_A = _ss_total("API")
+    SEVSENS_L = _ss_total("Local")
+
 tr = gem_df[(gem_df.event_class == "E9") & (gem_df.config == "E4_Full")]
 tr = tr.iloc[0] if len(tr) else gem_df[gem_df.config == "E4_Full"].iloc[0]
 TRACE_ID = tr.scenario_id
@@ -312,11 +327,11 @@ power system operation, large language models, LLM agent, tool orchestration, re
 
 Power-system operators are surrounded by analytical tools---power flow, state estimation, contingency analysis, optimal power flow---yet the work of interpreting their outputs, relating them to operating procedures, and deciding what to do next remains manual and expertise-bound. Large language models (LLMs) are candidates for an \emph{intelligent coordination layer} in this workflow: not replacing conventional analysis, but reading grid states, retrieving the right procedures, invoking the right tools, and explaining the results \cite{majumder2024joule,cheng2025gaia}. Recent agentic systems move in this direction \cite{zhang2025gridagent,wen2025xgridagent}, but published evaluations rarely state what the labels are, where they come from, or how the scoring could be reproduced.
 
-This paper presents GridPowerAgent and its evaluation under five research questions: (RQ1) how accurately can an LLM identify normal, abnormal, and critical operating conditions; (RQ2) can it determine which engineering tool a given event requires; (RQ3) can it construct valid tool calls; (RQ4) does grid-specific retrieval improve operational reasoning; and (RQ5) does tool grounding reduce hallucination. RQ3---constructing valid tool calls---requires tool execution, which the pilot does not perform; it is deferred to the powered sweep. This pilot answers RQ1, RQ2, RQ4, and RQ5. We answer them on a corpus built for the purpose: a seeded, headless-resumable pipeline that materializes 16,000 operating points and 15,000 scenarios across the IEEE 14, 39, and 118 bus systems---ten disturbance classes (E0--E9), each scenario carrying pre/post power-flow truth, noisy measurements, state estimates, severity, and rule-based reference labels for retrieval and tool supervision---together with a FAISS knowledge base of operating procedures and four validated physics tools. Four agent configurations (E1 LLM-only, E2 +RAG, E3 +Tools, E4 Full) instantiate the ablation.
+This paper presents GridPowerAgent and its evaluation under five research questions: (RQ1) how accurately can an LLM identify normal, abnormal, and critical operating conditions; (RQ2) can it determine which engineering tool a given event requires; (RQ3) can it construct valid tool calls; (RQ4) does grid-specific retrieval improve operational reasoning; and (RQ5) does tool grounding reduce hallucination. RQ3---constructing valid tool calls---is answered here at its execution level: stated tools are executed against the scenario's post-event network after the run and their execution scored (Sec.~\ref{sec:rq3exec}). This pilot answers RQ1, RQ2, RQ4, and RQ5, and RQ3 at the tool-name/execution level; argument-level validity is deferred to the powered sweep. We answer them on a corpus built for the purpose: a seeded, headless-resumable pipeline that materializes 16,000 operating points and 15,000 scenarios across the IEEE 14, 39, and 118 bus systems---ten disturbance classes (E0--E9), each scenario carrying pre/post power-flow truth, noisy measurements, state estimates, severity, and rule-based reference labels for retrieval and tool supervision---together with a FAISS knowledge base of operating procedures and four validated physics tools. Four agent configurations (E1 LLM-only, E2 +RAG, E3 +Tools, E4 Full) instantiate the ablation.
 
 The evaluation compares two deployment tiers under identical paired prompts---a 4-bit-quantized small model served locally, and a lightweight API model---so that conclusions do not depend on one provider. All accuracy figures carry exact denominators and Wilson confidence intervals; statistical power is stated alongside every null result; and one finding receives particular attention: both models systematically fail on two outcome-labeled disturbance classes, for a reason we trace to the label taxonomy itself rather than to either model.
 
-Contributions: (i) a grid-aware agent that couples grid-state observation, procedure retrieval, and validated physics tools; (ii) a seeded, hashed, fully regenerable 16k/15k/9.5M-measurement corpus with rule-based tool supervision and a quantified label-noise bound under estimation uncertainty; (iii) a dual-definition tool-scoring protocol that exposes and removes a degenerate answer strategy; (iv) a paired, exactly-denominated pilot across two deployment tiers with an identified label-axis failure mode; and (v) a per-check validation disclosure including unresolved IEEE-39 islanding cases with their scenario identifiers shipped alongside the corpus.
+Contributions: (i) a grid-aware agent that couples grid-state observation, procedure retrieval, and validated physics tools; (ii) a seeded, hashed, fully regenerable 16k/15k/9.5M-measurement corpus with rule-based tool supervision and a quantified label-noise bound under estimation uncertainty; (iii) a dual-definition tool-scoring protocol that exposes and removes a degenerate answer strategy; (iv) a paired, exactly-denominated pilot across two deployment tiers with an identified label-axis failure mode; and (v) a per-check validation disclosure---including unresolved IEEE-39 islanding cases with their scenario identifiers shipped alongside the corpus---together with a seeded IEEE-39 replication of the full paired protocol (Sec.~\ref{sec:crosssystem}).
 
 \section{Related Work}
 LLMs have been explored for power-system analysis assistance, dispatch, and contingency response \cite{majumder2024joule,cheng2025gaia}, including agentic orchestrators \cite{zhang2025gridagent,wen2025xgridagent} and dispatch benchmarks \cite{zhou2024elecbench}. Published evaluations seldom disclose how reference labels are produced; our corpus couples per-scenario power-flow truth, noisy measurements, state estimates, and rule-based tool supervision across three IEEE sizes under one seeded pipeline, and scores against it with exact denominators. Foundational RAG \cite{lewis2020rag} and tool-augmented LLMs \cite{yao2023react,schick2023toolformer,achiam2023gpt4} motivate the agent design. State estimation and measurement modeling follow classical formulations \cite{abur2004power,monticelli1999state}; contingency (N--1) and AC-OPF are standard tools \cite{wood2014power,frank2012opf,zimmerman2011matpower}; calibration via ECE \cite{guo2017calibration}; hallucination taxonomy \cite{ji2023surveyhalluc}. Synthetic scenarios inherit the spirit of grid-ML benchmarks \cite{marot2020l2rpn,donnot2020grid2op}; pandapower \cite{thurner2018pandapower} supplies AC power flow; FAISS \cite{johnson2021faiss} with sentence-transformers \cite{reimers2019sentencebert} supplies retrieval. On quantization: 4-bit precision is near-optimal for inference scaling \cite{dettmers2023fourbit} and post-training quantization to 3--4 bits is standard \cite{frantar2023gptq}, though it measurably degrades small models---a conservative bias in our local deployment (Sec.~\ref{sec:limits}).
@@ -331,7 +346,7 @@ Fig.~\ref{fig:methodology} overviews the pipeline. Stages 03--05 build networks,
 \label{fig:methodology}
 \end{figure}
 
-\textbf{Agent workflow.} The agent follows an observe--diagnose--retrieve--plan--execute--interpret loop: it receives the post-event structured grid state (voltage magnitudes, branch loadings, outages, storage state of charge); optionally receives the top-$k$ retrieved operating procedures (E2/E4) and a tool manifest (E3/E4); and must return the disturbance class, a tool selection, and a recommendation with confidence, as JSON. The harness scores the response against the rule-based reference labels; it does not execute tools on the model's behalf in this pilot.
+\textbf{Agent workflow.} The agent follows an observe--diagnose--retrieve--plan--execute--interpret loop: it receives the post-event structured grid state (voltage magnitudes, branch loadings, outages, storage state of charge); optionally receives the top-$k$ retrieved operating procedures (E2/E4) and a tool manifest (E3/E4); and must return the disturbance class, a tool selection, and a recommendation with confidence, as JSON. The harness scores the response against the rule-based reference labels; it does not execute tools inside the agent loop in this pilot---stated tools are executed post hoc for an execution-validity check (Sec.~\ref{sec:rq3exec}).
 
 \textbf{Networks and scenarios.} Networks use pandapower IEEE 14/39/118 cases with tuned thermal limits to make compound events observable (14: 3\% line / 4\% transformer; 118: 6\%; 39: nameplate). Limits are disclosed per system and deliberately \emph{not} comparable across systems (Sec.~\ref{sec:limits}). Operating points sweep load $0.70$--$1.10\times$ with $\pm5\%$ bus-local noise, renewable fractions, and storage state of charge $0.15$--$0.85$ (20 MW/40 MWh at bus 9 on IEEE-14). Topology hashes pin the networks (IEEE-14 \texttt{2580e77e}, IEEE-39 \texttt{8ded83}, IEEE-118 \texttt{c0d6ab}). Ten classes are injected: E0 Normal; E1 load surge, E2 load drop, E3 line outage, E4 generator outage, E5 renewable ramp (cause classes); E6 undervoltage, E7 overvoltage, E8 thermal overload (outcome classes, physically iterated to target severity); E9 compound. The cause/outcome split of E6--E8 matters for the evaluation and is analyzed in Sec.~\ref{sec:axis}.
 
@@ -378,7 +393,7 @@ z = h(x) + \epsilon,\quad \epsilon_V \sim \mathcal{N}(0,0.003^2)
 S = 0.6\,\min\!\Big(1,\tfrac{\max(0,\,|V-1|-0.02)}{0.06}\Big) + 0.4\,\min\!\Big(1,\tfrac{\max(0,\,\ell-L)}{10}\Big),
 \label{eq:sev}
 \end{equation}
-with boundaries $0.0263/0.0526/0.1053$ selected by grid search over five candidate sets \emph{on this corpus}---a circularity we return to in Sec.~\ref{sec:limits}.
+with boundaries $0.0263/0.0526/0.1053$ selected by grid search over five candidate sets \emph{on this corpus}---a circularity we return to in Sec.~\ref{sec:limits}. A sensitivity check bounds the damage: re-scoring the pilot under four boundary sets---the searched set, standards-style $0.05/0.10/0.15$, a tighter $0.02/0.04/0.08$, and empirical severity tertiles---leaves strict tool-selection accuracy exactly unchanged (%SEVSENS_A% vs.\ %SEVSENS_L% strict hits in every set), so the headline tool-selection gap does not depend on the searched boundaries.
 
 \textbf{Label noise under estimation uncertainty.} Reference labels gate two tools on severity. Recomputing severity with estimated bus voltages yields rank agreement $\rho=%RHO14%$ (14), $%RHO39%$ (39), $%RHO118%$ (118)---the voltage term sits near its deadband for most scenarios, so noise reorders ranks without crossing thresholds. The operationally relevant quantity is accepted-set membership: scoring-relevant label flips affect \textbf{%NOISE14%/30{,}000} scenario--tool judgments on IEEE-14 (the pilot system) and \textbf{%NOISEALL%/150{,}000} (%NOISEPCT%\%) corpus-wide. The binary violation detector reconciles 99.23\%/99.54\%/99.67\% on 14/39/118.
 
@@ -444,8 +459,9 @@ Class & Obs. & Diag. & Tool (strict) \\
 \end{table}
 
 
-\subsection{Cross-System Check: IEEE-39 (RQ7, begun)}
-A seeded 140-scenario draw from the IEEE-39 corpus (excluding the 41 islanding-NaN scenarios) runs the same paired protocol. Per configuration (E1--E4), the API model diagnoses %G39_DIAG% scenarios and the local model %M39_DIAG%; strict tool selection: %G39S% (API) vs.\ %M39S% (Local). Transferring between corpora changes the network topology, load patterns, and label instances while the agent, prompt, and scoring pipeline remain untouched---the strongest test this pilot size permits. %GEN_NOTE%
+\subsection{Cross-System Check: IEEE-39 (RQ7: Cross-System Transfer, Begun)}
+\label{sec:crosssystem}
+A seeded 140-scenario draw from the IEEE-39 corpus (excluding the 41 islanding-NaN scenarios) runs the same paired protocol. The API model diagnoses %G39_DIAG% scenarios in \emph{every} configuration (E1--E4); the local model diagnoses %M39_DIAG% across configurations. Strict tool selection declines monotonically for the API model---%G39S% of 140 across E1--E4---while the local model stays flat at %M39S%. The API decline extends the IEEE-14 pattern (%G14S% of 140 there) but is steeper on the larger network and does not plateau by E4, while the local model is flat on both corpora: accumulating retrieved context and tool manifests appears to progressively disrupt the API tier's strict tool selection---a configuration effect we flag for the powered sweep. Transferring between corpora changes the network topology, load patterns, and label instances while the agent, prompt, and scoring pipeline remain untouched---the strongest test this pilot size permits. %GEN_NOTE%
 
 \subsection{RQ1/RQ4: Event Diagnosis and the Effect of Retrieval}
 Table~\ref{tab:results} reports exact counts with Wilson 95\% CIs. The API model diagnoses 109/140 (77.9\%) in \emph{every} configuration; the local model 105--108/140 (75.0--77.1\%). All diagnosis discordances are one-directional (2/1/4/2 across E1--E4: wherever the models disagree, the API model is right), and exact McNemar tests detect no significant difference (Table~\ref{tab:ni})---as expected at this power: the minimum detectable difference is %MDE_TXT%\,pp. Configuration additions (retrieved procedures, tool manifests) changed not a single diagnosis for either model: the structured grid state in the prompt already carries the discriminating information, which answers RQ4 negatively \emph{for diagnosis} at this corpus scale.
@@ -499,7 +515,7 @@ Cfg & Pairs & Diff (pp) & 95\% CI & McNemar $p$ \\
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{figures/fig_diagnosis.png}
-\caption{(a) Diagnosis accuracy, local vs.\ API model, Wilson 95\% CIs. (b) Paired diagnosis difference with bootstrap 95\% CIs against reference margins ($-10$pp, $-5$pp).}
+\caption{(a) Diagnosis accuracy, local vs.\ API model, Wilson 95\% CIs. (b) Paired diagnosis difference (Local $-$ API) with bootstrap 95\% CIs.}
 \label{fig:diag}
 \end{figure}
 
@@ -513,7 +529,8 @@ Tool selection is where the deployment tiers differ most---in \emph{style} befor
 \label{fig:tools}
 \end{figure}
 \subsection{RQ3: Tool-Call Execution Validity}
-The harness executes every stated tool on the scenario's post-event network and scores the call. Execution is a property of the tool and scenario, not the model, so pairs are pooled across models and configurations: %RQ3_TOTAL% stated-tool pairs, of which %RQ3_EXEC% are executable (the remainder specified no tool) and every executable call succeeds---power flow converges on every reconstructed network, contingency executions converge and reproduce the scenario's recorded overload, N-1 sweeps complete all line outages, and OPF solves. RQ3 is therefore answered affirmatively at the tool-name level: no stated tool fails to execute. Argument-level validity (component identifiers, subcommands) requires an extended prompt schema and is deferred to the powered sweep.
+\label{sec:rq3exec}
+The harness executes every stated tool on the scenario's post-event network and scores the call. Execution is a property of the tool and scenario, not the model, so pairs are pooled across models and configurations: %RQ3_TOTAL% stated-tool pairs, of which %RQ3_EXEC% are executable (the remainder specified no tool) and every executable call succeeds---power flow converges on every reconstructed network, contingency executions converge and reproduce the scenario's recorded overload, N-1 sweeps complete all line outages, and OPF solves. RQ3 is therefore answered affirmatively at the tool-name/execution level: every stated tool executes without error. Execution is, however, only a necessary condition for the valid tool-call construction RQ3 asks about: whether arguments are correct and the call targets the right contingency element is not checked. Argument-level validity (component identifiers, subcommands) requires an extended prompt schema and remains deferred to the powered sweep.
 
 \subsection{RQ5: Hallucination and the Cost of Local Inference}
 Any-tag hallucinated rows are rare for both models under the automated judge: %GHSEQ% (API) and %GEMMA_HALL% (Local) across E1--E4. These rates mean ``the rule-based judge flagged no row''; they are not expert-annotated ground truth. Latency is the deployment trade-off: local inference averages %GEMMA_LAT{} per call versus %GLAT{} for the API round-trip---roughly a %LATRATIO$\times$ difference---while carrying zero marginal API cost, no rate-limit dependency, and no grid data leaving the premises. For always-on monitoring this may be acceptable; for closed-loop use neither model's latency profile is appropriate (Sec.~\ref{sec:limits}).
@@ -527,7 +544,7 @@ Any-tag hallucinated rows are rare for both models under the automated judge: %G
 
 \textbf{Harness oracle (integration test, not evidence).} On the seeded 600-scenario oracle run the E1$\to$E4 ladder moves 55.7\%$\to$88.5\% diagnosis (McNemar $p=3.1\times10^{-32}$). These statistics validate that the harness can \emph{detect} configuration differences; because the oracle is programmed to respond differently when RAG/tools are present, they carry no evidence about real LLMs.
 
-\textbf{Qualitative trace (from the raw log).} Table~\ref{tab:trace} quotes the actual logged response for scenario %TRACE_ID% (%TRACE_POST%). The pilot does not execute tool calls; the ``tool'' field is the model's stated choice.
+\textbf{Qualitative trace (from the raw log).} Table~\ref{tab:trace} quotes the actual logged response for scenario %TRACE_ID% (%TRACE_POST%). The agent loop does not execute tool calls; the ``tool'' field is the model's stated choice, whose execution validity is checked post hoc (Sec.~\ref{sec:rq3exec}).
 
 \begin{table}[tbp]
 \centering
@@ -551,7 +568,7 @@ Judge & diag correct (E9); tool = power\_flow $\in$ accepted set; no H-TOP/H-TOO
 
 \textbf{Scope.} The evidence covers \emph{one model pair} (a 4-bit small local model; a lightweight API tier) on \emph{one corpus}, one prompt template, temperature 0, single runs. The API tier is deliberately lightweight; results do not speak to frontier API models, and nothing here claims that local models match API models in general. The minimum detectable difference at this sample size is ${\sim}3$pp (Sec.~\ref{sec:proto}); the powered 600-scenario sweep is the inferential step.
 
-\textbf{Label circularity.} Disturbances, labels, and prompts derive from the same rule family: the evaluation measures \emph{recovery of the synthetic labeling policy}, not open-ended operator reasoning---and the severity boundaries of Eq.~\eqref{eq:sev} were themselves tuned on this corpus. Required remedies, all future work: expert-reviewed labels ($2\times80$, target $\kappa\ge0.8$), acceptance of multiple valid tool sequences, blind scoring of final recommendations, an evaluator independent of the label generator, and severity boundaries anchored to an external operating standard.
+\textbf{Label circularity.} Disturbances, labels, and prompts derive from the same rule family: the evaluation measures \emph{recovery of the synthetic labeling policy}, not open-ended operator reasoning---and the severity boundaries of Eq.~\eqref{eq:sev} were themselves tuned on this corpus, though the strict-metric comparison is invariant across four boundary sets, two of them not derived from this corpus (Sec.~IV). Required remedies, all future work: expert-reviewed labels ($2\times80$, target $\kappa\ge0.8$), acceptance of multiple valid tool sequences, blind scoring of final recommendations, an evaluator independent of the label generator, and severity boundaries anchored to an external operating standard.
 
 \textbf{Taxonomy design.} The E6/E8 label-axis failure (Sec.~\ref{sec:axis}) is a benchmark-design finding: outcome-labeled classes injected via cause mechanisms make cause-correct answers score zero. The next corpus revision separates the axes explicitly.
 
@@ -657,18 +674,29 @@ tex = (tex
        .replace("%TRACE_RAW%", TRACE_RAW.replace("%", "\\%").replace("_", "\\_")))
 
 # cross-system + RQ3 values
+def and_list(vals):
+    vals = [str(v) for v in vals]
+    if len(vals) > 1:
+        return ", ".join(vals[:-1]) + ", and " + vals[-1]
+    return vals[0]
+
 if G39 is not None:
     g39_diag = [G39[c]["diag_k"] for c in CFGS]
     g39_strict = [G39[c]["strict_k"] for c in CFGS]
     g39n = G39["E1_LLM"]["n"]
-    tex = tex.replace("%G39_DIAG%", "/".join(f"{G39[c]['diag_k']}/{G39[c]['n']}" for c in CFGS))
-    tex = tex.replace("%G39S%", "/".join(f"{G39[c]['strict_k']}/{G39[c]['n']}" for c in CFGS))
+    assert all(G39[c]["n"] == g39n for c in CFGS)
+    tex = tex.replace("%G39_DIAG%", f"{g39_diag[0]}/{g39n}" if len(set(g39_diag)) == 1 else and_list(g39_diag))
+    tex = tex.replace("%G39S%", and_list(g39_strict))
+    tex = tex.replace("%G14S%", and_list(g_strict))
 else:
-    tex = tex.replace("%G39_DIAG%", "--").replace("%G39S%", "--")
+    tex = tex.replace("%G39_DIAG%", "--").replace("%G39S%", "--").replace("%G14S%", "--")
 if M39 is not None and local39_done:
     m39n = M39["E1_LLM"]["n"]
-    tex = tex.replace("%M39_DIAG%", f"{cnt(M39['E1_LLM']['diag_k'], m39n)}--{cnt(M39['E4_Full']['diag_k'], m39n)}")
-    tex = tex.replace("%M39S%", f"{min(M[c]['strict_k'] for c in CFGS)}/{m39n}--{max(M[c]['strict_k'] for c in CFGS)}/{m39n}")
+    m39_diag = [M39[c]["diag_k"] for c in CFGS]
+    m39_strict = [M39[c]["strict_k"] for c in CFGS]
+    assert all(M39[c]["n"] == m39n for c in CFGS)
+    tex = tex.replace("%M39_DIAG%", f"{min(m39_diag)}--{max(m39_diag)}/{m39n}")
+    tex = tex.replace("%M39S%", f"{min(m39_strict)}--{max(m39_strict)}/{m39n}")
 else:
     tex = tex.replace("%M39_DIAG%", "--").replace("%M39S%", "--")
 gen_note = ""
@@ -676,11 +704,14 @@ if M39 is None or not local39_done:
     gen_note = ("The local model's IEEE-39 evaluation is running; its results are reported with the same protocol when complete.")
 tex = tex.replace("%GEN_NOTE%", gen_note)
 
+tex = tex.replace("%SEVSENS_A%", SEVSENS_A or "--").replace("%SEVSENS_L%", SEVSENS_L or "--")
+
 if RQ3:
     tex = tex.replace("%RQ3_TOTAL%", str(RQ3["total_pairs"]))
     tex = tex.replace("%RQ3_EXEC%", str(RQ3["executed_ok_total"]))
     tex = tex.replace("%RQ3_OK%", f"{100.0*RQ3['executed_ok_total']/max(1,RQ3['total_pairs']):.0f}")
-    tex = tex.replace("%RQ3_EXEC%", "--").replace("%RQ3_OK%", "--")
+else:
+    tex = tex.replace("%RQ3_TOTAL%", "--").replace("%RQ3_EXEC%", "--").replace("%RQ3_OK%", "--")
 
 out = PAPER / "GridPowerAgent_IEEE_Conference.tex"
 out = PAPER / "GridPowerAgent_IEEE_Conference.tex"

@@ -34,15 +34,21 @@ tex = (ROOT / "paper/GridPowerAgent_IEEE_Conference.tex").read_text()
 _bbl = (ROOT / "paper/GridPowerAgent_IEEE_Conference.bbl").read_text()
 CITES = re.findall(r"\\bibitem\{([^}]*)\}", _bbl)
 
-REFS = {
-    "fig:methodology": "Fig. 1", "fig:scenarios": "Fig. 2", "fig:arch": "Fig. 3",
-    "fig:diag": "Fig. 4", "fig:tools": "Fig. 5", "fig:halluc": "Fig. 6",
-    "fig:generalization": "Fig. 7", "fig:tradeoff": "Fig. 8",
-    "tab:corpus": "Table I", "tab:pilot": "Table II", "tab:results": "Table III",
-    "tab:tools": "Table IV", "tab:ni": "Table V", "tab:perclass": "Table VI", "tab:trace": "Table VII",
-    "sec:proto": "Sec. VI", "sec:limits": "Sec. VIII", "sec:axis": "Sec. VII-C",
-    "eq:meas": "(1)", "eq:wls": "(2)", "eq:wlsobj": "(3)", "eq:sev": "(4)",
-}
+# cross-reference strings parsed from the compiled .aux (single source of truth;
+# the aux stores the typeset form, e.g. "IV", "VII-A", so a layout change can
+# never silently inline stale numbers again)
+REFS = {}
+for _name, _num in re.findall(r"\\newlabel\{([^}]*)\}\{\{(?:\\mbox\s*\{)?([^{}]*)\}",
+                              (ROOT / "paper/GridPowerAgent_IEEE_Conference.aux").read_text()):
+    if _name.startswith("fig:"):
+        REFS[_name] = f"Fig. {_num}"
+    elif _name.startswith("tab:"):
+        REFS[_name] = f"Table {_num}"
+    elif _name.startswith("sec:"):
+        REFS[_name] = f"Sec. {_num}"
+    elif _name.startswith("eq:"):
+        REFS[_name] = f"({_num})"
+print(f"REFS from aux: {len(REFS)} labels -> {sorted(REFS.items())}")
 
 def cite_repl(m):
     keys = [k.strip() for k in m.group(1).split(",")]
