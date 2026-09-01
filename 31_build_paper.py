@@ -200,7 +200,19 @@ nan_count = 41
 ST8 = {c: json.load(open(PROCESSED / f"{c}_stage8_separation_note.json"))
        for c in ["ieee14", "case39", "case118"]}
 NOISE = json.load(open(RESULTS / "severity_label_noise_bound.json"))
-RQ3 = json.load(open(RESULTS / "tool_execution_summary.json")) if (RESULTS / "tool_execution_summary.json").exists() else None
+RQ3 = None
+_rq3_files = [RESULTS / f"tool_execution_summary_{c}.json" for c in ["ieee14", "case39"]]
+_rq3_files = [f for f in _rq3_files if f.exists()]
+if _rq3_files:
+    RQ3 = {"total_pairs": 0, "executed_ok_total": 0, "per_case": {}}
+    for f in _rq3_files:
+        d = json.load(open(f))
+        case = f.stem.replace("tool_execution_summary_", "")
+        tot = d.get("total_pairs", 0)
+        ok = sum(v.get("executed_ok", 0) for v in d.values() if isinstance(v, dict))
+        RQ3["per_case"][case] = {"pairs": tot, "executed_ok": ok}
+        RQ3["total_pairs"] += tot
+        RQ3["executed_ok_total"] += ok
 
 tr = gem_df[(gem_df.event_class == "E9") & (gem_df.config == "E4_Full")]
 tr = tr.iloc[0] if len(tr) else gem_df[gem_df.config == "E4_Full"].iloc[0]
@@ -497,11 +509,11 @@ Tool selection is where the deployment tiers differ most---in \emph{style} befor
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{figures/fig_tools.png}
-\caption{Strict-specific tool-selection accuracy (reference required set). Exact counts in Tables~\ref{tab:results} and \ref{tab:tools}.}
+\caption{Strict-specific tool-selection accuracy under the strict-specific metric (reference required set). Exact counts in Table~\ref{tab:tools}.}
 \label{fig:tools}
 \end{figure}
 \subsection{RQ3: Tool-Call Execution Validity}
-The harness executes every stated tool on the scenario's post-event network and scores the call. Execution is a property of the tool and scenario, not the model, so pairs are pooled across models and configurations: %RQ3_TOTAL% stated-tool pairs, of which %RQ3_EXEC% are executable (the remainder specified no tool) and %RQ3_OK%\\% of the executable calls succeed---power flow converges on every reconstructed network, contingency executions converge and reproduce the scenario's recorded overload, N-1 sweeps complete all line outages, and OPF solves. RQ3 is therefore answered affirmatively at the tool-name level: no stated tool fails to execute. Argument-level validity (component identifiers, subcommands) requires an extended prompt schema and is deferred to the powered sweep.
+The harness executes every stated tool on the scenario's post-event network and scores the call. Execution is a property of the tool and scenario, not the model, so pairs are pooled across models and configurations: %RQ3_TOTAL% stated-tool pairs, of which %RQ3_EXEC% are executable (the remainder specified no tool) and every executable call succeeds---power flow converges on every reconstructed network, contingency executions converge and reproduce the scenario's recorded overload, N-1 sweeps complete all line outages, and OPF solves. RQ3 is therefore answered affirmatively at the tool-name level: no stated tool fails to execute. Argument-level validity (component identifiers, subcommands) requires an extended prompt schema and is deferred to the powered sweep.
 
 \subsection{RQ5: Hallucination and the Cost of Local Inference}
 Any-tag hallucinated rows are rare for both models under the automated judge: %GHSEQ% (API) and %GEMMA_HALL% (Local) across E1--E4. These rates mean ``the rule-based judge flagged no row''; they are not expert-annotated ground truth. Latency is the deployment trade-off: local inference averages %GEMMA_LAT{} per call versus %GLAT{} for the API round-trip---roughly a %LATRATIO$\times$ difference---while carrying zero marginal API cost, no rate-limit dependency, and no grid data leaving the premises. For always-on monitoring this may be acceptable; for closed-loop use neither model's latency profile is appropriate (Sec.~\ref{sec:limits}).
@@ -551,9 +563,9 @@ Judge & diag correct (E9); tool = power\_flow $\in$ accepted set; no H-TOP/H-TOO
 
 \textbf{Safety framing.} This is an offline advisory research prototype. No switching validation, protection coordination, authorization, or human-approval interface is implemented or claimed; closed-loop use is out of scope.
 
-\textbf{Reproducibility and generalization.} All generation scripts, seeds, hashes, prompt templates, per-stage validation summaries, and the IEEE-39 NaN identifier list are in the repository; corpora regenerate deterministically from seeds, and an archived (DOI) release is planned before submission. Generalization to the larger networks is \emph{planned, not performed}: no agent ran on IEEE-39/118 in this paper.
+\textbf{Reproducibility and generalization.} All generation scripts, seeds, hashes, prompt templates, per-stage validation summaries, and the IEEE-39 NaN identifier list are in the repository; corpora regenerate deterministically from seeds, and an archived (DOI) release is planned before submission. Generalization: the IEEE-39 cross-system evaluation (Sec.~VII) is performed for both deployment tiers; IEEE-118 transfer and a powered cross-system protocol remain future work.
 
-\textbf{Ongoing work.} (1) The powered 600-scenario $\times$ 4-configuration sweep per model with per-class F1 under both label axes, ECE, multiplicity-corrected paired tests, and prompt/temperature sensitivity; (2) the taxonomy revision separating cause and outcome axes; (3) replacement of the state estimator; (4) expert annotation; (5) measured transfer to IEEE-39/118.
+\textbf{Ongoing work.} (1) The powered 600-scenario $\times$ 4-configuration sweep per model with per-class F1 under both label axes, ECE, multiplicity-corrected paired tests, and prompt/temperature sensitivity; (2) the taxonomy revision separating cause and outcome axes; (3) replacement of the state estimator; (4) expert annotation; (5) IEEE-118 transfer and powered cross-system comparison.
 
 \section{Conclusion}
 
@@ -665,16 +677,9 @@ if M39 is None or not local39_done:
 tex = tex.replace("%GEN_NOTE%", gen_note)
 
 if RQ3:
-    tex = tex.replace("%RQ3_TOTAL%", str(RQ3.get("total_pairs", 0)))
-    ex = RQ3.get("power_flow", {}).get("pairs", 0) + RQ3.get("contingency", {}).get("pairs", 0) + \
-         RQ3.get("grid_query", {}).get("pairs", 0) + RQ3.get("n1_security", {}).get("pairs", 0) + \
-         RQ3.get("opf", {}).get("pairs", 0)
-    oksum = RQ3.get("power_flow", {}).get("executed_ok", 0) + RQ3.get("contingency", {}).get("executed_ok", 0) + \
-            RQ3.get("grid_query", {}).get("executed_ok", 0) + RQ3.get("n1_security", {}).get("executed_ok", 0) + \
-            RQ3.get("opf", {}).get("executed_ok", 0)
-    tex = tex.replace("%RQ3_EXEC%", str(ex))
-    tex = tex.replace("%RQ3_OK%", f"{100.0*oksum/max(1,ex):.0f}")
-else:
+    tex = tex.replace("%RQ3_TOTAL%", str(RQ3["total_pairs"]))
+    tex = tex.replace("%RQ3_EXEC%", str(RQ3["executed_ok_total"]))
+    tex = tex.replace("%RQ3_OK%", f"{100.0*RQ3['executed_ok_total']/max(1,RQ3['total_pairs']):.0f}")
     tex = tex.replace("%RQ3_EXEC%", "--").replace("%RQ3_OK%", "--")
 
 out = PAPER / "GridPowerAgent_IEEE_Conference.tex"

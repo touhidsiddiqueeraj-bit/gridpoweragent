@@ -1,0 +1,267 @@
+scenario_id,stated_tool,executed_ok,converged,informative,detail,case
+CASE39_SCN_000089,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000089,power_flow,True,True,True,vmin=1.010 maxload=92.9,case39
+CASE39_SCN_000112,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000112,power_flow,True,True,True,vmin=1.011 maxload=97.2,case39
+CASE39_SCN_000120,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000120,power_flow,True,True,True,vmin=1.009 maxload=80.5,case39
+CASE39_SCN_000158,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000158,none,False,False,False,unknown tool,case39
+CASE39_SCN_000158,power_flow,True,True,True,vmin=1.009 maxload=75.6,case39
+CASE39_SCN_000328,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000328,power_flow,True,True,True,vmin=1.006 maxload=76.7,case39
+CASE39_SCN_000544,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000544,power_flow,True,True,True,vmin=1.008 maxload=75.7,case39
+CASE39_SCN_000584,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000584,power_flow,True,True,True,vmin=0.988 maxload=101.6,case39
+CASE39_SCN_000615,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000615,power_flow,True,True,True,vmin=1.010 maxload=82.0,case39
+CASE39_SCN_000634,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000634,power_flow,True,True,True,vmin=1.007 maxload=75.5,case39
+CASE39_SCN_000654,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000654,power_flow,True,True,True,vmin=1.009 maxload=76.6,case39
+CASE39_SCN_000677,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000677,none,False,False,False,unknown tool,case39
+CASE39_SCN_000677,power_flow,True,True,True,vmin=1.006 maxload=77.0,case39
+CASE39_SCN_000810,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000810,power_flow,True,True,True,vmin=1.011 maxload=97.4,case39
+CASE39_SCN_000854,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000854,power_flow,True,True,True,vmin=1.009 maxload=78.0,case39
+CASE39_SCN_000856,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000856,power_flow,True,True,True,vmin=1.011 maxload=94.5,case39
+CASE39_SCN_000863,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000863,power_flow,True,True,True,vmin=1.009 maxload=75.0,case39
+CASE39_SCN_000893,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000893,power_flow,True,True,True,vmin=0.946 maxload=131.6,case39
+CASE39_SCN_000920,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_000920,none,False,False,False,unknown tool,case39
+CASE39_SCN_000920,power_flow,True,True,True,vmin=1.002 maxload=90.9,case39
+CASE39_SCN_001060,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001060,none,False,False,False,unknown tool,case39
+CASE39_SCN_001060,power_flow,True,True,True,vmin=1.007 maxload=77.0,case39
+CASE39_SCN_001093,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001093,power_flow,True,True,True,vmin=1.007 maxload=75.7,case39
+CASE39_SCN_001124,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001124,power_flow,True,True,True,vmin=1.006 maxload=76.9,case39
+CASE39_SCN_001134,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001134,power_flow,True,True,True,vmin=1.010 maxload=100.0,case39
+CASE39_SCN_001145,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001145,power_flow,True,True,True,vmin=1.012 maxload=107.2,case39
+CASE39_SCN_001213,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001213,power_flow,True,True,True,vmin=1.010 maxload=91.3,case39
+CASE39_SCN_001218,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001218,power_flow,True,True,True,vmin=1.008 maxload=75.5,case39
+CASE39_SCN_001223,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001223,power_flow,True,True,True,vmin=1.011 maxload=155.7,case39
+CASE39_SCN_001250,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001250,power_flow,True,True,True,vmin=1.007 maxload=75.5,case39
+CASE39_SCN_001356,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001356,power_flow,True,True,True,vmin=1.010 maxload=81.1,case39
+CASE39_SCN_001405,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001405,power_flow,True,True,True,vmin=1.007 maxload=76.0,case39
+CASE39_SCN_001407,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001407,power_flow,True,True,True,vmin=1.007 maxload=77.0,case39
+CASE39_SCN_001500,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_001500,power_flow,True,True,True,vmin=1.003 maxload=184.4,case39
+CASE39_SCN_001549,contingency,True,True,True,vmin=1.009 maxload=104.8 ol=1,case39
+CASE39_SCN_001567,contingency,True,True,True,vmin=0.985 maxload=113.6 ol=2,case39
+CASE39_SCN_001586,contingency,True,True,True,vmin=1.002 maxload=94.7 ol=0,case39
+CASE39_SCN_001616,contingency,True,True,True,vmin=0.982 maxload=97.8 ol=0,case39
+CASE39_SCN_001646,contingency,True,True,True,vmin=1.010 maxload=88.9 ol=0,case39
+CASE39_SCN_001649,contingency,True,True,True,vmin=1.008 maxload=85.1 ol=0,case39
+CASE39_SCN_001679,contingency,True,True,True,vmin=1.010 maxload=92.5 ol=0,case39
+CASE39_SCN_001679,power_flow,True,True,True,vmin=1.010 maxload=92.5,case39
+CASE39_SCN_001706,contingency,True,True,True,vmin=1.007 maxload=114.4 ol=2,case39
+CASE39_SCN_001735,contingency,True,True,True,vmin=1.009 maxload=97.6 ol=0,case39
+CASE39_SCN_001752,contingency,True,True,True,vmin=1.008 maxload=76.1 ol=0,case39
+CASE39_SCN_001762,contingency,True,True,True,vmin=1.007 maxload=75.8 ol=0,case39
+CASE39_SCN_001882,contingency,True,True,True,vmin=1.009 maxload=113.2 ol=1,case39
+CASE39_SCN_001888,contingency,True,True,True,vmin=1.007 maxload=127.5 ol=1,case39
+CASE39_SCN_001915,contingency,True,True,True,vmin=1.009 maxload=80.9 ol=0,case39
+CASE39_SCN_002014,contingency,True,True,True,vmin=0.974 maxload=76.3 ol=0,case39
+CASE39_SCN_002014,power_flow,True,True,True,vmin=0.974 maxload=76.3,case39
+CASE39_SCN_002028,contingency,True,True,True,vmin=0.967 maxload=80.8 ol=0,case39
+CASE39_SCN_002054,contingency,True,True,True,vmin=0.953 maxload=84.2 ol=0,case39
+CASE39_SCN_002054,power_flow,True,True,True,vmin=0.953 maxload=84.2,case39
+CASE39_SCN_002147,contingency,True,True,True,vmin=0.963 maxload=84.7 ol=0,case39
+CASE39_SCN_002147,power_flow,True,True,True,vmin=0.963 maxload=84.7,case39
+CASE39_SCN_002256,contingency,True,True,True,vmin=0.967 maxload=83.5 ol=0,case39
+CASE39_SCN_002256,power_flow,True,True,True,vmin=0.967 maxload=83.5,case39
+CASE39_SCN_002267,contingency,True,True,True,vmin=0.917 maxload=100.2 ol=1,case39
+CASE39_SCN_002267,power_flow,True,True,True,vmin=0.917 maxload=100.2,case39
+CASE39_SCN_002272,contingency,True,True,True,vmin=1.007 maxload=81.6 ol=0,case39
+CASE39_SCN_002285,contingency,True,True,True,vmin=0.988 maxload=118.7 ol=4,case39
+CASE39_SCN_002288,contingency,True,True,True,vmin=0.954 maxload=78.5 ol=0,case39
+CASE39_SCN_002288,power_flow,True,True,True,vmin=0.954 maxload=78.5,case39
+CASE39_SCN_002349,contingency,True,True,True,vmin=1.009 maxload=77.6 ol=0,case39
+CASE39_SCN_002349,power_flow,True,True,True,vmin=1.009 maxload=77.6,case39
+CASE39_SCN_002378,contingency,True,True,True,vmin=1.008 maxload=76.1 ol=0,case39
+CASE39_SCN_002378,power_flow,True,True,True,vmin=1.008 maxload=76.1,case39
+CASE39_SCN_002396,contingency,True,True,True,vmin=1.005 maxload=81.6 ol=0,case39
+CASE39_SCN_002396,power_flow,True,True,True,vmin=1.005 maxload=81.6,case39
+CASE39_SCN_002409,contingency,True,True,True,vmin=1.010 maxload=84.4 ol=0,case39
+CASE39_SCN_002409,power_flow,True,True,True,vmin=1.010 maxload=84.4,case39
+CASE39_SCN_002468,contingency,True,True,True,vmin=1.008 maxload=81.8 ol=0,case39
+CASE39_SCN_002468,power_flow,True,True,True,vmin=1.008 maxload=81.8,case39
+CASE39_SCN_002558,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002558,power_flow,True,True,True,vmin=1.007 maxload=75.6,case39
+CASE39_SCN_002576,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002576,power_flow,True,True,True,vmin=1.010 maxload=83.6,case39
+CASE39_SCN_002687,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002687,power_flow,True,True,True,vmin=1.007 maxload=77.3,case39
+CASE39_SCN_002714,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002714,power_flow,True,True,True,vmin=1.006 maxload=76.4,case39
+CASE39_SCN_002718,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002718,power_flow,True,True,True,vmin=1.010 maxload=92.5,case39
+CASE39_SCN_002732,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002732,power_flow,True,True,True,vmin=1.009 maxload=74.8,case39
+CASE39_SCN_002791,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002791,power_flow,True,True,True,vmin=1.009 maxload=83.1,case39
+CASE39_SCN_002810,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002810,power_flow,True,True,True,vmin=1.008 maxload=75.4,case39
+CASE39_SCN_002838,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002838,power_flow,True,True,True,vmin=1.008 maxload=76.5,case39
+CASE39_SCN_002842,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002842,power_flow,True,True,True,vmin=1.010 maxload=82.6,case39
+CASE39_SCN_002863,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002863,power_flow,True,True,True,vmin=1.009 maxload=76.9,case39
+CASE39_SCN_002865,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002865,none,False,False,False,unknown tool,case39
+CASE39_SCN_002865,power_flow,True,True,True,vmin=1.008 maxload=75.1,case39
+CASE39_SCN_002910,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002910,power_flow,True,True,True,vmin=1.006 maxload=77.1,case39
+CASE39_SCN_002918,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002918,power_flow,True,True,True,vmin=1.010 maxload=80.9,case39
+CASE39_SCN_002928,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002928,power_flow,True,True,True,vmin=1.007 maxload=76.1,case39
+CASE39_SCN_002945,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002945,power_flow,True,True,True,vmin=1.008 maxload=76.1,case39
+CASE39_SCN_002965,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002965,power_flow,True,True,True,vmin=1.009 maxload=79.1,case39
+CASE39_SCN_002969,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002969,power_flow,True,True,True,vmin=1.008 maxload=75.7,case39
+CASE39_SCN_002982,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002982,power_flow,True,True,True,vmin=1.007 maxload=76.3,case39
+CASE39_SCN_002986,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002986,power_flow,True,True,True,vmin=1.007 maxload=76.5,case39
+CASE39_SCN_002997,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_002997,power_flow,True,True,True,vmin=1.008 maxload=75.8,case39
+CASE39_SCN_003038,contingency,True,True,True,vmin=0.932 maxload=89.1 ol=0,case39
+CASE39_SCN_003047,contingency,True,True,True,vmin=0.930 maxload=89.8 ol=0,case39
+CASE39_SCN_003047,power_flow,True,True,True,vmin=0.930 maxload=89.8,case39
+CASE39_SCN_003127,contingency,True,True,True,vmin=0.926 maxload=92.4 ol=0,case39
+CASE39_SCN_003127,power_flow,True,True,True,vmin=0.926 maxload=92.4,case39
+CASE39_SCN_003202,contingency,True,True,True,vmin=0.911 maxload=105.3 ol=1,case39
+CASE39_SCN_003206,contingency,True,True,True,vmin=0.913 maxload=103.9 ol=1,case39
+CASE39_SCN_003206,power_flow,True,True,True,vmin=0.913 maxload=103.9,case39
+CASE39_SCN_003231,contingency,True,True,True,vmin=0.932 maxload=89.3 ol=0,case39
+CASE39_SCN_003231,power_flow,True,True,True,vmin=0.932 maxload=89.3,case39
+CASE39_SCN_003240,contingency,True,True,True,vmin=0.904 maxload=111.2 ol=1,case39
+CASE39_SCN_003240,power_flow,True,True,True,vmin=0.904 maxload=111.2,case39
+CASE39_SCN_003265,contingency,True,True,True,vmin=0.907 maxload=109.1 ol=1,case39
+CASE39_SCN_003265,power_flow,True,True,True,vmin=0.907 maxload=109.1,case39
+CASE39_SCN_003276,contingency,True,True,True,vmin=0.914 maxload=102.8 ol=1,case39
+CASE39_SCN_003276,power_flow,True,True,True,vmin=0.914 maxload=102.8,case39
+CASE39_SCN_003280,contingency,True,True,True,vmin=0.916 maxload=101.6 ol=1,case39
+CASE39_SCN_003280,power_flow,True,True,True,vmin=0.916 maxload=101.6,case39
+CASE39_SCN_003341,contingency,True,True,True,vmin=0.935 maxload=85.5 ol=0,case39
+CASE39_SCN_003341,power_flow,True,True,True,vmin=0.935 maxload=85.5,case39
+CASE39_SCN_003378,contingency,True,True,True,vmin=0.923 maxload=95.8 ol=0,case39
+CASE39_SCN_003406,contingency,True,True,True,vmin=0.911 maxload=103.9 ol=1,case39
+CASE39_SCN_003406,power_flow,True,True,True,vmin=0.911 maxload=103.9,case39
+CASE39_SCN_003430,contingency,True,True,True,vmin=0.929 maxload=91.0 ol=0,case39
+CASE39_SCN_003430,power_flow,True,True,True,vmin=0.929 maxload=91.0,case39
+CASE39_SCN_003432,contingency,True,True,True,vmin=0.924 maxload=96.0 ol=0,case39
+CASE39_SCN_003432,power_flow,True,True,True,vmin=0.924 maxload=96.0,case39
+CASE39_SCN_003480,contingency,True,True,True,vmin=0.926 maxload=92.7 ol=0,case39
+CASE39_SCN_003480,power_flow,True,True,True,vmin=0.926 maxload=92.7,case39
+CASE39_SCN_003549,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_003549,power_flow,True,True,True,vmin=1.036 maxload=85.9,case39
+CASE39_SCN_003596,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_003596,power_flow,True,True,True,vmin=1.037 maxload=91.0,case39
+CASE39_SCN_003612,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_003612,power_flow,True,True,True,vmin=1.036 maxload=84.8,case39
+CASE39_SCN_003696,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_003696,power_flow,True,True,True,vmin=1.036 maxload=82.9,case39
+CASE39_SCN_003726,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_003726,power_flow,True,True,True,vmin=1.037 maxload=94.6,case39
+CASE39_SCN_003775,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_003775,power_flow,True,True,True,vmin=1.036 maxload=93.4,case39
+CASE39_SCN_003815,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_003815,power_flow,True,True,True,vmin=1.036 maxload=82.8,case39
+CASE39_SCN_003829,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_003829,power_flow,True,True,True,vmin=1.036 maxload=87.5,case39
+CASE39_SCN_003890,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_003890,power_flow,True,True,True,vmin=1.037 maxload=96.9,case39
+CASE39_SCN_003983,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_003983,power_flow,True,True,True,vmin=1.037 maxload=88.0,case39
+CASE39_SCN_004007,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004007,power_flow,True,True,True,vmin=0.953 maxload=131.4,case39
+CASE39_SCN_004020,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004020,power_flow,True,True,True,vmin=0.870 maxload=174.0,case39
+CASE39_SCN_004035,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004035,power_flow,True,True,True,vmin=0.925 maxload=148.1,case39
+CASE39_SCN_004075,contingency,True,True,True,vmin=0.997 maxload=132.7 ol=3,case39
+CASE39_SCN_004100,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004100,power_flow,True,True,True,vmin=0.850 maxload=178.2,case39
+CASE39_SCN_004132,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004132,power_flow,True,True,True,vmin=0.939 maxload=140.8,case39
+CASE39_SCN_004153,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004153,power_flow,True,True,True,vmin=0.943 maxload=135.1,case39
+CASE39_SCN_004155,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004155,power_flow,True,True,True,vmin=0.828 maxload=190.9,case39
+CASE39_SCN_004191,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004191,power_flow,True,True,True,vmin=0.893 maxload=161.2,case39
+CASE39_SCN_004208,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004208,power_flow,True,True,True,vmin=0.857 maxload=179.4,case39
+CASE39_SCN_004225,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004225,power_flow,True,True,True,vmin=0.909 maxload=154.5,case39
+CASE39_SCN_004226,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004226,power_flow,True,True,True,vmin=0.943 maxload=138.6,case39
+CASE39_SCN_004292,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004292,power_flow,True,True,True,vmin=0.933 maxload=145.3,case39
+CASE39_SCN_004385,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004385,power_flow,True,True,True,vmin=0.945 maxload=130.2,case39
+CASE39_SCN_004409,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004409,power_flow,True,True,True,vmin=0.877 maxload=166.6,case39
+CASE39_SCN_004410,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004410,power_flow,True,True,True,vmin=0.905 maxload=157.2,case39
+CASE39_SCN_004461,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004461,power_flow,True,True,True,vmin=0.942 maxload=136.9,case39
+CASE39_SCN_004507,contingency,True,True,True,vmin=1.004 maxload=78.4 ol=0,case39
+CASE39_SCN_004507,power_flow,True,True,True,vmin=1.004 maxload=78.4,case39
+CASE39_SCN_004513,contingency,True,True,True,vmin=0.976 maxload=112.4 ol=4,case39
+CASE39_SCN_004533,contingency,True,True,True,vmin=0.957 maxload=84.2 ol=0,case39
+CASE39_SCN_004533,power_flow,True,True,True,vmin=0.957 maxload=84.2,case39
+CASE39_SCN_004616,contingency,True,True,True,vmin=0.964 maxload=102.3 ol=2,case39
+CASE39_SCN_004616,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004616,power_flow,True,True,True,vmin=0.964 maxload=102.3,case39
+CASE39_SCN_004714,contingency,True,True,True,vmin=0.977 maxload=111.3 ol=4,case39
+CASE39_SCN_004714,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004762,contingency,True,True,True,vmin=1.009 maxload=82.3 ol=0,case39
+CASE39_SCN_004762,power_flow,True,True,True,vmin=1.009 maxload=82.3,case39
+CASE39_SCN_004772,contingency,True,True,True,vmin=1.006 maxload=86.5 ol=0,case39
+CASE39_SCN_004772,power_flow,True,True,True,vmin=1.006 maxload=86.5,case39
+CASE39_SCN_004785,contingency,True,True,True,vmin=0.860 maxload=167.1 ol=10,case39
+CASE39_SCN_004785,power_flow,True,True,True,vmin=0.860 maxload=167.1,case39
+CASE39_SCN_004803,contingency,True,True,True,vmin=1.005 maxload=111.0 ol=2,case39
+CASE39_SCN_004803,power_flow,True,True,True,vmin=1.005 maxload=111.0,case39
+CASE39_SCN_004806,contingency,True,True,True,vmin=0.973 maxload=76.4 ol=0,case39
+CASE39_SCN_004806,power_flow,True,True,True,vmin=0.973 maxload=76.4,case39
+CASE39_SCN_004819,contingency,True,True,True,vmin=0.981 maxload=103.1 ol=4,case39
+CASE39_SCN_004819,power_flow,True,True,True,vmin=0.981 maxload=103.1,case39
+CASE39_SCN_004829,contingency,True,True,True,vmin=0.910 maxload=105.0 ol=1,case39
+CASE39_SCN_004829,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004829,power_flow,True,True,True,vmin=0.910 maxload=105.0,case39
+CASE39_SCN_004875,contingency,True,True,True,vmin=0.863 maxload=169.3 ol=11,case39
+CASE39_SCN_004879,contingency,True,True,True,vmin=0.917 maxload=242.7 ol=7,case39
+CASE39_SCN_004879,power_flow,True,True,True,vmin=0.917 maxload=242.7,case39
+CASE39_SCN_004901,contingency,True,True,True,vmin=0.996 maxload=86.9 ol=0,case39
+CASE39_SCN_004901,power_flow,True,True,True,vmin=0.996 maxload=86.9,case39
+CASE39_SCN_004946,contingency,True,True,True,vmin=0.813 maxload=195.4 ol=11,case39
+CASE39_SCN_004946,grid_query,True,True,True,query on post-event net: vmin=1.008,case39
+CASE39_SCN_004946,power_flow,True,True,True,vmin=0.813 maxload=195.4,case39
+CASE39_SCN_004953,contingency,True,True,True,vmin=1.006 maxload=79.8 ol=0,case39
+CASE39_SCN_004953,power_flow,True,True,True,vmin=1.006 maxload=79.8,case39
+CASE39_SCN_004981,contingency,True,True,True,vmin=1.010 maxload=79.0 ol=0,case39
+CASE39_SCN_004981,power_flow,True,True,True,vmin=1.010 maxload=79.0,case39

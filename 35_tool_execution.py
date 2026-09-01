@@ -88,7 +88,7 @@ for jf in [PROCESSED / ("case39_scenarios.jsonl" if CASE == "case39" else "case1
                 _recs[r["scenario_id"]] = r
 
 # ---- reconstruction (mirrors 10_power_flow_tool.run_power_flow) ----
-import importlib
+heavy = _load("heavy05", "05_heavy.py")
 stage3 = pf_tool.load_stage3()
 
 def reconstruct(scenario_id):
@@ -114,44 +114,7 @@ def reconstruct(scenario_id):
     base_p = net.load.p_mw.values.copy()
     base_q = net.load.q_mvar.values.copy()
 
-    def apply(net, ev):
-        m = ev["mechanism"]
-        if m == "none":
-            return
-        if m == "compound":
-            for c in ev["components"]:
-                apply(net, c)
-            return
-        if m == "load_change":
-            f = 1 + ev["magnitude_percent"] / 100
-            mask = net.load.cid.isin(ev["targets"]).values
-            net.load.loc[mask, "p_mw"] *= f
-            net.load.loc[mask, "q_mvar"] *= f
-        elif m == "line_outage":
-            net.line.loc[net.line.cid.isin(ev["targets"]).values, "in_service"] = False
-        elif m == "generator_outage":
-            net.gen.loc[net.gen.cid.isin(ev["targets"]).values, "in_service"] = False
-        elif m == "renewable_ramp":
-            d = ev["delta_availability"]
-            mask = net.sgen.cid.isin(ev["targets"]).values
-            rated = net.sgen.loc[mask, "rated_mw"].values.astype(float)
-            cur = net.sgen.loc[mask, "p_mw"].values.astype(float)
-            net.sgen.loc[mask, "p_mw"] = rated * np.clip(cur / rated + d, 0, 1)
-        elif m == "avr_setpoint_shift":
-            d = ev["delta_vm_pu"]
-            mask = net.gen.cid.isin(ev["targets"]).values
-            net.gen.loc[mask, "vm_pu"] += d
-            m2 = net.ext_grid.cid.isin(ev["targets"]).values
-            if m2.any():
-                net.ext_grid.loc[m2, "vm_pu"] += d
-        elif m == "shunt_overcompensation":
-            net.shunt["q_mvar"] *= ev["factor"]
-        elif m == "bess_dispatch":
-            net.storage["p_mw"] = float(ev["p_mw"])
-        else:
-            raise ValueError(m)
-
-    apply(net, rec["injected_event"])
+    heavy.apply_injected_event(net, rec["injected_event"])
     return net
 
 def net_summary(net):
@@ -211,12 +174,8 @@ for i, (sid, tool) in enumerate(pairs):
                         collect(c)
             collect(rec["injected_event"])
             net2 = copy.deepcopy(net)
-            tg = [t for t in targets if t in set(net2.line.cid.values) or t in set(net2.gen.cid.values)]
-            if tg:
-                mask_l = net2.line.cid.isin(tg).values
-                mask_g = net2.gen.cid.isin(tg).values
-                net2.line.loc[mask_l, "in_service"] = False
-                net2.gen.loc[mask_g, "in_service"] = False
+            for t in targets:
+                heavy.apply_injected_event(net2, {"mechanism": "generator_outage" if t.startswith("gen_") else "line_outage", "targets": [t]})
             pp.runpp(net2, numba=True)
             summ = net_summary(net2)
             rec_ol = rec.get("has_overload", False)

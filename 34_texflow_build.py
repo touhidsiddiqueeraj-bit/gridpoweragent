@@ -39,7 +39,7 @@ REFS = {
     "fig:diag": "Fig. 4", "fig:tools": "Fig. 5", "fig:halluc": "Fig. 6",
     "fig:generalization": "Fig. 7", "fig:tradeoff": "Fig. 8",
     "tab:corpus": "Table I", "tab:pilot": "Table II", "tab:results": "Table III",
-    "tab:ni": "Table IV", "tab:perclass": "Table V", "tab:trace": "Table VI",
+    "tab:tools": "Table IV", "tab:ni": "Table V", "tab:perclass": "Table VI", "tab:trace": "Table VII",
     "sec:proto": "Sec. VI", "sec:limits": "Sec. VIII", "sec:axis": "Sec. VII-C",
     "eq:meas": "(1)", "eq:wls": "(2)", "eq:wlsobj": "(3)", "eq:sev": "(4)",
 }
@@ -57,8 +57,6 @@ def conv(s: str) -> str:
     s = re.sub(r"~\\(ref|eqref)\{([^}]*)\}",
                lambda m: "~" + REFS.get(m.group(2), m.group(2)), s)
     s = re.sub(r"\\(ref|eqref)\{([^}]*)\}", lambda m: REFS.get(m.group(2), m.group(2)), s)
-    s = re.sub(r"~\\cite\{([^}]*)\}", cite_repl, s)
-    s = re.sub(r"\\cite\{([^}]*)\}", cite_repl, s)
     s = re.sub(r"\\textbf\{([^{}]*)\}", r"**\1**", s)
     s = re.sub(r"\\emph\{([^{}]*)\}", r"*\1*", s)
     s = re.sub(r"\\texttt\{([^{}]*)\}", r"`\1`", s)
@@ -101,6 +99,7 @@ def parse_tex_blocks():
     body = re.sub(r"\\begin\{IEEEkeywords\}.*?\\end\{IEEEkeywords\}", "", body, flags=re.DOTALL)
     body = re.sub(r"\\hypersetup\{[^}]*\}", "", body)
     blocks = []
+    raw_labels = set()
     # tokenise on environments and sectioning
     pat = re.compile(
         r"(\\section\{[^}]*\})|(\\subsection\{[^}]*\})|"
@@ -135,6 +134,7 @@ def parse_tex_blocks():
             blocks.append(("figure", path, cap))
         elif m.group(4):
             blocks.append(("rawtable", m.group(0)))
+            raw_labels.update(re.findall(r"\\label\{([^}]*)\}", m.group(0)))
         elif m.group(5):
             eq = m.group(0)
             eq = re.sub(r"\\begin\{equation\}|\\end\{equation\}", "", eq)
@@ -173,7 +173,12 @@ count = {"section": 0, "p": 0, "figure": 0, "table": 0, "equation": 0, "raw": 0}
 for b in blocks:
     kind = b[0]
     if kind == "section":
-        t.call("edit", {"action": "insert", "block_type": "section", "title": b[1], "level": 1})
+        sec_lbl = {"Evaluation Protocol": "sec:proto",
+                   "Discussion, Limitations and Ongoing Work": "sec:limits"}.get(b[1], "")
+        ins = {"action": "insert", "block_type": "section", "title": b[1], "level": 1}
+        if sec_lbl:
+            ins["label"] = sec_lbl
+        t.call("edit", ins)
         cur_section = b[1]
         count["section"] += 1
     elif kind == "subsection":
@@ -189,8 +194,11 @@ for b in blocks:
                         "path": b[1], "caption": b[2], "width": "0.72\\columnwidth"})
         count["figure"] += 1
     elif kind == "equation":
-        t.call("edit", {"action": "insert", "block_type": "equation", "section": cur_section,
-                        "content": b[1]})
+        ins = {"action": "insert", "block_type": "equation", "section": cur_section,
+               "content": b[1]}
+        if len(b) > 2 and b[2]:
+            ins["label"] = b[2]
+        t.call("edit", ins)
         count["equation"] += 1
     elif kind == "rawtable":
         raw = re.sub(r"(\\begin\{tabular\}\{[^}]*\})",
