@@ -144,7 +144,7 @@ def bars_with_ci(ax, key, offset, data, color, hatch):
 print("Stage 29 — paper figures (native column width, readable fonts)")
 
 # ---------- Fig: diagnosis (bars + paired-difference forest) ----------
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(3.5, 2.1), gridspec_kw={"width_ratios": [1.1, 1]})
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(3.5, 1.9), gridspec_kw={"width_ratios": [1.1, 1]})
 for i, (name, data, color, hatch) in enumerate(SERIES):
     bars_with_ci(ax1, "diag", i, data, color, hatch)
 import matplotlib.patches as mpatches
@@ -170,7 +170,7 @@ plt.close()
 print("  fig_diagnosis.png saved")
 
 # ---------- Fig: strict tool selection ----------
-plt.figure(figsize=(3.5, 2.2))
+plt.figure(figsize=(3.5, 2.0))
 for i, (name, data, color, hatch) in enumerate(SERIES):
     bars_with_ci(plt.gca(), "strict", i, data, color, hatch)
 import matplotlib.patches as mpatches
@@ -182,7 +182,6 @@ plt.text(3.55, 100 * 0.532 + 0.012, "random tool 53%", fontsize=6, color="#7f8c8
 plt.xticks(range(len(CFGS)), CFG_LABELS)
 plt.ylabel("Strict-specific tool accuracy")
 plt.ylim(0, 0.6)
-plt.legend(loc="upper left", handlelength=1.2, borderpad=0.3)
 plt.grid(axis="y", alpha=0.25, lw=0.4)
 plt.tight_layout(pad=0.4)
 plt.savefig(FIGDIR / "fig_tools.png", dpi=300)
@@ -190,7 +189,7 @@ plt.close()
 print("  fig_tools.png saved")
 
 # ---------- Fig: hallucination + latency (log) ----------
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(3.5, 2.0))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(3.5, 1.8))
 x = np.arange(len(CFGS))
 w = 0.36
 for i, (name, data, color, hatch) in enumerate(SERIES):
@@ -217,7 +216,7 @@ plt.close()
 print("  fig_halluc_latency.png saved")
 
 # ---------- Fig: architecture (layered, rounded, column-sized) ----------
-fig, ax = plt.subplots(figsize=(3.5, 2.05))
+fig, ax = plt.subplots(figsize=(3.5, 1.9))
 
 def rbox(bx, by, bw, bh, fc, ec="#4a5568"):
     ax.add_patch(matplotlib.patches.FancyBboxPatch(
@@ -229,30 +228,30 @@ def arrow(x0, y0, x1, y1, c="#4a5568"):
                 arrowprops=dict(arrowstyle="-|>", lw=1.0, color=c))
 
 # left: grid simulation feeding structured state
-rbox(0.015, 0.40, 0.155, 0.34, "#eaf2f8")
-ax.text(0.0925, 0.615, "Power-grid", ha="center", va="center", fontsize=7, fontweight="bold")
-ax.text(0.0925, 0.545, "simulation", ha="center", va="center", fontsize=7, fontweight="bold")
-ax.text(0.0925, 0.462, "(pandapower)", ha="center", va="center", fontsize=6, color="#555")
-rbox(0.015, 0.08, 0.155, 0.22, "#f5f7fa")
-ax.text(0.0925, 0.19, "10 classes", ha="center", va="center", fontsize=6.2)
-ax.text(0.0925, 0.125, "E0-E9", ha="center", va="center", fontsize=6.2, color="#555")
+rbox(0.015, 0.40, 0.17, 0.34, "#eaf2f8")
+ax.text(0.10, 0.625, "Power-grid", ha="center", va="center", fontsize=6.5, fontweight="bold")
+ax.text(0.10, 0.555, "simulation", ha="center", va="center", fontsize=6.5, fontweight="bold")
+ax.text(0.10, 0.465, "pandapower", ha="center", va="center", fontsize=5.8, color="#555")
+rbox(0.015, 0.08, 0.17, 0.22, "#f5f7fa")
+ax.text(0.10, 0.19, "10 classes", ha="center", va="center", fontsize=6.2)
+ax.text(0.10, 0.125, "E0-E9", ha="center", va="center", fontsize=6.2, color="#555")
 
-# middle: agent core (LLM + RAG above + tools below)
+# middle: agent core (title band on top, LLM/RAG/Tools/Grid state below)
 rbox(0.225, 0.02, 0.52, 0.80, "#fbfcfd", ec="#2c3e50")
-ax.text(0.255, 0.755, "GridPowerAgent", ha="left", va="center",
+ax.text(0.485, 0.775, "GridPowerAgent", ha="center", va="center",
         fontsize=7.5, fontweight="bold")
-rbox(0.265, 0.385, 0.21, 0.24, "#e8f6f3", ec="#16a085")
-ax.text(0.37, 0.545, "LLM core", ha="center", va="center", fontsize=7, fontweight="bold")
-ax.text(0.37, 0.44, "diagnose", ha="center", va="center", fontsize=6, color="#555")
-rbox(0.505, 0.545, 0.21, 0.24, "#fdf3e3", ec="#e67e22")
-ax.text(0.61, 0.705, "RAG", ha="center", va="center", fontsize=7, fontweight="bold")
-ax.text(0.61, 0.595, "8 procedure docs", ha="center", va="center", fontsize=6, color="#555")
-rbox(0.505, 0.085, 0.21, 0.24, "#fdf3e3", ec="#e67e22")
-ax.text(0.61, 0.245, "Tools", ha="center", va="center", fontsize=7, fontweight="bold")
-ax.text(0.61, 0.145, "PF - N-1 - OPF", ha="center", va="center", fontsize=6, color="#555")
-rbox(0.265, 0.085, 0.21, 0.24, "#eaf2f8", ec="#5d6d7e")
-ax.text(0.37, 0.245, "Grid state", ha="center", va="center", fontsize=6.5)
-ax.text(0.37, 0.145, "V - load - outages", ha="center", va="center", fontsize=5.8, color="#555")
+rbox(0.258, 0.385, 0.20, 0.24, "#e8f6f3", ec="#16a085")
+ax.text(0.358, 0.545, "LLM core", ha="center", va="center", fontsize=7, fontweight="bold")
+ax.text(0.358, 0.44, "diagnose", ha="center", va="center", fontsize=6, color="#555")
+rbox(0.515, 0.505, 0.20, 0.215, "#fdf3e3", ec="#e67e22")
+ax.text(0.615, 0.66, "RAG", ha="center", va="center", fontsize=7, fontweight="bold")
+ax.text(0.615, 0.565, "8 procedure docs", ha="center", va="center", fontsize=6, color="#555")
+rbox(0.515, 0.085, 0.20, 0.24, "#fdf3e3", ec="#e67e22")
+ax.text(0.615, 0.245, "Tools", ha="center", va="center", fontsize=7, fontweight="bold")
+ax.text(0.615, 0.145, "PF - N-1 - OPF", ha="center", va="center", fontsize=6, color="#555")
+rbox(0.258, 0.085, 0.20, 0.24, "#eaf2f8", ec="#5d6d7e")
+ax.text(0.358, 0.245, "Grid state", ha="center", va="center", fontsize=6.5)
+ax.text(0.358, 0.145, "V - load - outages", ha="center", va="center", fontsize=5.8, color="#555")
 
 # right: output
 rbox(0.80, 0.36, 0.185, 0.44, "#e8f6f3", ec="#16a085")
@@ -261,17 +260,17 @@ ax.text(0.8925, 0.555, "support", ha="center", va="center", fontsize=7, fontweig
 ax.text(0.8925, 0.44, "class - tool -", ha="center", va="center", fontsize=6, color="#555")
 ax.text(0.8925, 0.375, "advice (JSON)", ha="center", va="center", fontsize=6, color="#555")
 
-# arrows: grid -> state -> agent core; agent -> output
-arrow(0.0925, 0.51, 0.26, 0.40)
-arrow(0.475, 0.50, 0.505, 0.50)
-arrow(0.475, 0.38, 0.505, 0.24)
-arrow(0.475, 0.68, 0.505, 0.68)
-arrow(0.715, 0.655, 0.75, 0.62)
-arrow(0.71, 0.24, 0.75, 0.42)
-arrow(0.775, 0.52, 0.795, 0.52)
+# arrows: grid -> agent core; state -> LLM; LLM <-> RAG/Tools; agent -> output
+arrow(0.185, 0.50, 0.251, 0.44)
+arrow(0.358, 0.328, 0.358, 0.382)
+arrow(0.461, 0.58, 0.512, 0.58)
+arrow(0.461, 0.42, 0.512, 0.22)
+arrow(0.718, 0.64, 0.77, 0.55)
+arrow(0.718, 0.20, 0.77, 0.42)
+arrow(0.748, 0.51, 0.795, 0.51)
 
-# E1-E4 ablation strip
-ax.text(0.485, 0.005, "E1 LLM -  E2 +RAG -  E3 +Tools -  E4 Full",
+# E1-E4 ablation strip (inside container, clear of the border and the boxes)
+ax.text(0.485, 0.048, "E1 LLM -  E2 +RAG -  E3 +Tools -  E4 Full",
         ha="center", va="center", fontsize=6, color="#555", style="italic")
 
 ax.set_xlim(0, 1)
@@ -283,7 +282,7 @@ plt.close()
 print("  fig_architecture.png saved (overlap fixed)")
 
 # ---------- Fig: methodology pipeline (de-staled, column width) ----------
-fig, ax = plt.subplots(figsize=(3.4, 2.9))
+fig, ax = plt.subplots(figsize=(3.4, 2.35))
 stages = [
     ("03  Networks & hashes", "IEEE 14/39/118 - hash-pinned"),
     ("04  Operating points", "16k - load 0.70-1.10x"),
@@ -308,7 +307,7 @@ for i, (title, sub) in enumerate(stages):
         ax.annotate("", xy=(0.545, y - gap), xytext=(0.545, y),
                     arrowprops=dict(arrowstyle="-|>", lw=0.8, color="#555"))
 ax.set_xlim(0, 1)
-ax.set_ylim(0, 1)
+ax.set_ylim(-0.015, 1.005)
 ax.axis("off")
 plt.tight_layout(pad=0.2)
 plt.savefig(FIGDIR / "fig_methodology_tree.png", dpi=300)
