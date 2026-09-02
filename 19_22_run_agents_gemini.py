@@ -346,24 +346,80 @@ def run_local(scen, ref, model, interval, n_test, resume_path, out_csv):
         df.to_csv(out_csv, index=False)
     return df
 
-def build_prompt(row, config_name, rag_docs=None, tools_hint=False, include_description=True):
+def _fmt(row, col, spec="+.2f", unit=" MW"):
+    v = getattr(row, col, 0.0)
+    try:
+        v = float(v)
+    except (TypeError, ValueError):
+        v = 0.0
+    if pd.isna(v):
+        v = 0.0
+    return f"{v:{spec}}{unit}"
+
+def observed_evidence_block(row):
+    """EMS-grade observed evidence: switching telemetry + system-wide pre->post
+    deltas. Observable facts only — no injected intent, no natural-language
+    event description."""
+    tgt = [t for t in str(row.injected_targets).split(";") if t and t.lower() != "nan"]
+    branch = [t for t in tgt if t.startswith("line") or t.startswith("trafo")]
+    gens = [t for t in tgt if t.startswith("gen")]
+    loads = [t for t in tgt if t.startswith("load")]
+    renew = [t for t in tgt if t.startswith("sgen") or t.startswith("wind") or t.startswith("solar")]
+
+    def d(col, spec="+.2f", unit=" MW"):
+        v = getattr(row, col, 0.0)
+        try:
+            v = float(v)
+        except (TypeError, ValueError):
+            v = 0.0
+        if pd.isna(v):
+            v = 0.0
+        return f"{v:{spec}}{unit}"
+
+    lines = [
+        f"Switching: " + (f"branches OPEN: {', '.join(branch)}" if branch else "no branches opened")
+        + " | " + (f"generators OFFLINE: {', '.join(gens)}" if gens else "no generators offline"),
+        f"Changed demand elements: " + (", ".join(loads) if loads else "none"),
+        f"Changed renewable elements: " + (", ".join(renew) if renew else "none"),
+        f"Delta load: {d('delta_load_mw')} | Delta slack generation: {d('delta_slack_p_mw')} | Delta losses: {d('delta_losses_mw')}",
+        f"Delta V_min: {d('delta_v_min_pu','+.4f',' pu')} | Delta V_max: {d('delta_v_max_pu','+.4f',' pu')} | Delta peak loading: {d('delta_peak_loading_percent','+.3f',' pp')}",
+    ]
+    return "Observed evidence (from telemetry):\n" + "\n".join(lines) + "\n"
+
+def build_prompt(row, config_name, rag_docs=None, tools_hint=False, include_description=True, evidence=False):
     # Taxonomy v2 (37_relabel_taxonomy): cause axis only — E6/E8 were rekeyed to
     # their injected mechanisms (outage->E3/E4, compound->E9); E7 overvoltage is
     # the sole remaining outcome class (its ladder mechanisms match the reading).
     tax = "E0 Normal (no disturbance), E1 Load Surge (+% demand), E2 Load Drop (-% demand), E3 Transmission-Line Outage, E4 Generator Outage, E5 Renewable Ramp, E7 Overvoltage (V>1.05), E9 Compound (2 mechanisms)"
-    # physics-only ablation: omit the injected-event sentences so the model must
-    # infer the class from the measured grid state alone
-    inj_block = (f"Injected mechanism: {row.injected_mechanism} scope {row.injected_scope} targets {row.injected_targets}\n"
-                 f"Injected description: {row.injected_description}\n"
-                 f"Effect: {row.effect_summary}\n") if include_description else ""
-    base = f"""You are a grid-aware LLM operator. Diagnose the INJECTED EVENT CLASS (cause axis).
-Taxonomy: {tax}
-Rules:
-- E1 vs E2 differ by direction of injected_magnitude_percent (+ vs -).
+    if evidence:
+        # evidence mode: injected-event sentences hidden; the model must compose
+        # the observed telemetry (switching + deltas) into a cause
+        rules = """- E0 Normal: no switching, no demand/renewable change, no violations.
+- E1 Load Surge: demand elements changed and Delta load is positive, no switching.
+- E2 Load Drop: demand elements changed and Delta load is negative, no switching.
+- E3: a branch is OPEN and demand is unchanged.
+- E4: a generator is OFFLINE and demand is unchanged.
+- E5 Renewable Ramp: a renewable element changed output, no switching, demand unchanged.
+- E7 Overvoltage: only when post-event shows overvoltage (V>1.05).
+- E9 Compound: a switching event AND a demand change appear together."""
+        header = "Diagnose the INJECTED EVENT CLASS (cause axis) from the observed evidence."
+        inj_block = observed_evidence_block(row)
+    else:
+        rules = """- E1 vs E2 differ by direction of injected_magnitude_percent (+ vs -).
 - E3 is single line outage, E4 single generator outage (never slack).
 - E5 is renewable ramp (delta_availability).
 - E7 Overvoltage: choose only when post-event shows overvoltage (V>1.05).
-- E9 is compound (2 mechanisms joined by '+').
+- E9 is compound (2 mechanisms joined by '+')."""
+        header = "Diagnose the INJECTED EVENT CLASS (cause axis)."
+        # physics-only ablation: omit the injected-event sentences so the model must
+        # infer the class from the measured grid state alone
+        inj_block = (f"Injected mechanism: {row.injected_mechanism} scope {row.injected_scope} targets {row.injected_targets}\n"
+                     f"Injected description: {row.injected_description}\n"
+                     f"Effect: {row.effect_summary}\n") if include_description else ""
+    base = f"""You are a grid-aware LLM operator. {header}
+Taxonomy: {tax}
+Rules:
+{rules}
 Scenario {row.scenario_id}
 Pre: load {row.pre_load_scale:.2f} solar {row.pre_solar_fraction:.2f} wind {row.pre_wind_fraction:.2f} SOC {row.pre_bess_soc:.2f}
 Post: V {row.post_v_min_pu:.4f}-{row.post_v_max_pu:.4f} pu peak {row.post_peak_loading_percent:.2f}% viol {row.n_violations} under {row.has_undervoltage} over {row.has_overvoltage} overload {row.has_overload}
@@ -425,7 +481,7 @@ def simulate_config(cfg_name, cfg, scen, ref, model_label="mock"):
         rows.append({"scenario_id":s.scenario_id,"event_class":s.event_class,"config":cfg_name,"model":model_label,"correct_diag":correct_diag,"correct_tool":correct_tool,"grounded":grounded,"halluc":halluc_flags,"recommendation":rec,"latency":lat,"confidence":conf,"is_correct":correct_diag})
     return pd.DataFrame(rows)
 
-def run_real_gemini(scen, ref, api_keys, model, rpm, n_test, resume_path, out_csv, configs=None, physics_only=False):
+def run_real_gemini(scen, ref, api_keys, model, rpm, n_test, resume_path, out_csv, configs=None, physics_only=False, evidence=False):
     # api_keys: list of credentials (a single key string is accepted for compat)
     if isinstance(api_keys, str):
         api_keys = [api_keys]
@@ -464,7 +520,7 @@ def run_real_gemini(scen, ref, api_keys, model, rpm, n_test, resume_path, out_cs
             if key in done:
                 continue
             prompt=build_prompt(s, cfg_name, rag_docs=rag, tools_hint=tools,
-                                include_description=not physics_only)
+                                include_description=not physics_only, evidence=evidence)
             try:
                 text, lat = call_gemini_pooled(prompt, pool, model=model)
                 pred_ec, conf, pred_tool, reason = parse_pred(text)
@@ -543,6 +599,8 @@ def main():
     p.add_argument("--api-keys", default=None, help="comma-separated Gemini credentials (default: GEMINI_API_KEYS env, then GEMINI_API_KEY)")
     p.add_argument("--physics-only", action="store_true",
                    help="ablation: omit injected-mechanism/description/effect lines — diagnose from measured grid state only")
+    p.add_argument("--evidence", action="store_true",
+                   help="enriched observation: injected lines hidden, EMS-grade telemetry (switching + deltas) shown instead")
     args=p.parse_args()
     case_tag = "" if args.case == "ieee14" else f"_{args.case}"
     _sel = None
@@ -679,7 +737,7 @@ def main():
             print(f"[INFO] Real Gemini {model} keys={len(keys)} RPM {args.rpm} (aggregate) n_test {args.n_test} -> {out}"
                   + (" [PHYSICS-ONLY ablation]" if args.physics_only else ""))
             df=run_real_gemini(scen, ref, keys, model, args.rpm, args.n_test, ckpt, out, configs=_sel,
-                               physics_only=args.physics_only)
+                               physics_only=args.physics_only, evidence=args.evidence)
         df.to_csv(out,index=False)
         print(f"[INFO] Saved {out} ({len(df)} rows)")
         tag = out.stem.replace("agent_runs_", "")

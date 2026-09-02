@@ -1,0 +1,268 @@
+scenario_id,event_class,config,model,correct_diag,correct_tool,grounded,halluc,recommendation,latency,confidence,is_correct,raw
+IEEE14_SCN_000755,E2,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0427143573760986,1.0,True,"```json
+{""event_class"": ""E2"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Demand elements changed with a negative Delta load of -27.31 MW and no branch switching, matching an E2 Load Drop event.""}
+```"
+IEEE14_SCN_001001,E3,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1097867488861084,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""A transmission line is open while demand and generation status remain unchanged.""}
+```"
+IEEE14_SCN_002945,E9,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,9.463176727294922,0.95,True,"```json
+{""event_class"": ""E9"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""A transmission line is open (line_3_4) and multiple load elements are simultaneously changed with a positive delta load (+40.28 MW), indicating a compound event.""}
+```"
+IEEE14_SCN_001338,E4,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.3086137771606443,1.0,True,"```json
+{""event_class"": ""E4"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Generator gen_G2 is offline with no change in demand or branch switching, representing a generator outage.""}
+```"
+IEEE14_SCN_001027,E3,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,10.374908685684204,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""A branch (line_2_5) is observed open while demand and generation profiles remain unchanged, matching a transmission-line outage event.""}
+```"
+IEEE14_SCN_002781,E9,E1_LLM,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,7.670698404312134,0.95,False,"```json
+{""event_class"": ""E4"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Generator G2 went offline while demand remained unchanged, leading to a significant increase in slack generation.""}
+```"
+IEEE14_SCN_001803,E3,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,7.679290056228638,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""The observed telemetry shows a transmission line outage (line_6_13 opened) with no changes in demand or generation status, characteristic of a single line outage.""}
+```"
+IEEE14_SCN_000636,E2,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,7.750243902206421,0.95,True,"{""event_class"": ""E2"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Demand changed negatively (Delta load: -3.73 MW) with no branch or generator switching, corresponding to a Load Drop.""}"
+IEEE14_SCN_001535,E5,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0488908290863037,1.0,True,"```json
+{""event_class"": ""E5"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""A renewable element (sgen_PV14) changed its output without any switching or demand changes, indicating a renewable ramp event.""}
+```"
+IEEE14_SCN_001668,E5,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,6.290738105773926,0.95,True,"```json
+{""event_class"": ""E5"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Renewable elements changed output without any switching or demand changes, consistent with a renewable ramp event.""}
+```"
+IEEE14_SCN_000512,E1,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.4152002334594729,1.0,True,"```json
+{""event_class"": ""E1"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Demand at load_bus_5 increased with positive delta load (+0.63 MW) and no branch or generator switching occurred.""}
+```"
+IEEE14_SCN_002976,E9,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,4.77178430557251,0.95,True,"{""event_class"": ""E9"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Observed both a transmission line outage (line_10_11 OPEN) and a significant positive demand change (+67.92 MW across multiple loads) occurring simultaneously.""}"
+IEEE14_SCN_001766,E5,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,4.649127006530762,0.95,True,"```json
+{""event_class"": ""E5"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""A renewable element changed output with no switching or demand changes, characteristic of a renewable ramp.""}
+```"
+IEEE14_SCN_001918,E3,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,5.610738515853882,1.0,True,"{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""A transmission line (line_6_13) opened without any changes to demand, generation, or renewables, perfectly matching a Transmission-Line Outage (E3).""}"
+IEEE14_SCN_002621,E9,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,10.183376550674438,0.99,True,"```json
+{""event_class"":""E9"",""confidence"":0.99,""tool"":""power_flow"",""reason"":""Observed both transmission line switching (line_1_2 is open) and a simultaneous demand increase (+50.88 MW across multiple loads), classifying this as a compound event.""}
+```"
+IEEE14_SCN_001060,E3,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.940314531326294,1.0,True,"```json
+{""event_class"":""E3"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""A transmission line was opened (line_6_13) while demand and renewable elements remained unchanged, which classifies this as a transmission-line outage.""}
+```"
+IEEE14_SCN_002166,E7,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,6.413316965103149,0.95,True,"```json
+{""event_class"":""E7"",""confidence"":0.95,""tool"":""power_flow"",""reason"":""The post-event telemetry shows voltage exceeding 1.05 pu (peak 1.0800 pu with overvoltage violation True), which classifies the event as E7 Overvoltage based on the taxonomy rules.""}
+```"
+IEEE14_SCN_001981,E3,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,4.020679712295532,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Telemetry shows line_6_13 is OPEN with no demand changes or generator outages, which matches a transmission-line outage event.""}
+```"
+IEEE14_SCN_001828,E3,E1_LLM,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.9863605499267578,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""A transmission line (line_6_13) opened without any changes to demand, generation, or renewable sources.""}
+```"
+IEEE14_SCN_001428,E4,E1_LLM,gemini-3.5-flash-lite,True,False,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,2.8966917991638184,1.0,True,"```json
+{""event_class"": ""E4"", ""confidence"": 1.0, ""tool"": ""state_estimation"", ""reason"": ""Generator G2 is offline with no demand changes or switching of transmission lines.""}
+```"
+IEEE14_SCN_000755,E2,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.491138935089111,1.0,True,"```json
+{""event_class"": ""E2"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Demand elements changed with a negative Delta load of -27.31 MW and no switching events observed.""}
+```"
+IEEE14_SCN_001001,E3,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0001177787780762,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""A transmission line (line_1_2) is OPEN while demand and renewable outputs remain unchanged.""}
+```"
+IEEE14_SCN_002945,E9,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1213068962097168,1.0,True,"```json
+{""event_class"": ""E9"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Both a transmission line outage (line_3_4) and a simultaneous demand change (Delta load: +40.28 MW across multiple loads) are observed.""}
+```"
+IEEE14_SCN_001338,E4,E2_LLM_RAG,gemini-3.5-flash-lite,True,False,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,0.9784941673278807,1.0,True,"```json
+{""event_class"": ""E4"", ""confidence"": 1.0, ""tool"": ""state_estimation"", ""reason"": ""Generator gen_G2 is OFFLINE while demand and renewable elements remain unchanged, indicating a generator outage.""}
+```"
+IEEE14_SCN_001027,E3,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,2.935457706451416,1.0,True,"{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""A branch (line_2_5) was opened while demand and generation profiles remained unchanged, representing a transmission-line outage.""}"
+IEEE14_SCN_002781,E9,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,6.311935186386108,0.95,True,"```json
+{""event_class"": ""E9"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""A generator went offline (gen_G2) while renewable elements changed output (sgen_PV14, sgen_WIND6), representing a compound event.""}
+```"
+IEEE14_SCN_001803,E3,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,7.19596266746521,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""A transmission line is open (line_6_13) with no changes in demand, generation, or renewables, perfectly matching a Transmission-Line Outage (E3).""}
+```"
+IEEE14_SCN_000636,E2,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,6.516264200210571,1.0,True,"```json
+{""event_class"": ""E2"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Demand elements changed (load_bus_4) with a negative delta load (-3.73 MW) and no switching events.""}
+```"
+IEEE14_SCN_001535,E5,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.9791865348815918,0.95,True,"```json
+{""event_class"": ""E5"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Renewable generation element sgen_PV14 changed output without any switching or demand changes.""}
+```"
+IEEE14_SCN_001668,E5,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,4.278002738952637,0.95,True,"```json
+{""event_class"": ""E5"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Renewable elements sgen_PV14 and sgen_WIND6 changed output with no switching or demand changes, corresponding to a renewable ramp event.""}
+```"
+IEEE14_SCN_000512,E1,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0694587230682373,0.95,True,"```json
+{""event_class"": ""E1"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Demand increased at load_bus_5 with positive delta load (+0.63 MW), no switching events, and no renewable changes.""}
+```"
+IEEE14_SCN_002976,E9,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0040442943572998,1.0,True,"```json
+{""event_class"": ""E9"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Observed a transmission-line outage (line_10_11) combined with a simultaneous positive load surge (+67.92 MW), satisfying the compound event criteria.""}
+```"
+IEEE14_SCN_001766,E5,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.020493507385254,0.95,True,"```json
+{""event_class"": ""E5"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Renewable element sgen_WIND6 changed output without any switching or demand changes, classifying the event as a renewable ramp.""}
+```"
+IEEE14_SCN_001918,E3,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.084880828857422,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""A transmission line is open (line_6_13) with no changes in demand, generation, or renewable output, constituting a standard line outage.""}
+```"
+IEEE14_SCN_002621,E9,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.091123104095459,0.95,True,"```json
+{""event_class"": ""E9"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Observed evidence indicates both a branch opening (line_1_2) and a demand change across multiple buses (Delta load +50.88 MW), which classifies this as a compound event (E9).""}
+```"
+IEEE14_SCN_001060,E3,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0750420093536377,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""A transmission line is open (line_6_13) while demand and renewable elements remain unchanged, satisfying the E3 Transmission-Line Outage criteria.""}
+```"
+IEEE14_SCN_002166,E7,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0535943508148191,0.95,True,"```json
+{""event_class"":""E7"",""confidence"":0.95,""tool"":""power_flow"",""reason"":""Post-event telemetry reveals overvoltage conditions with voltage reaching 1.0800 pu and overvoltage violations flagged as true while no switching or load changes occurred.""}
+```"
+IEEE14_SCN_001981,E3,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1264066696166992,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""A transmission line is open (line_6_13) with no changes in demand, generation, or renewable output, constituting a standard line outage event.""}
+```"
+IEEE14_SCN_001828,E3,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0905563831329346,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Branch line_6_13 is observed OPEN with no demand changes or generator outages, which directly corresponds to a transmission-line outage event.""}
+```"
+IEEE14_SCN_001428,E4,E2_LLM_RAG,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.9123187065124512,1.0,True,"```json
+{""event_class"": ""E4"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Generator gen_G2 is observed OFFLINE with unchanged demand and switching.""}
+```"
+IEEE14_SCN_000755,E2,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0147418975830078,1.0,True,"```json
+{""event_class"": ""E2"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Demand elements changed with a negative Delta load (-27.31 MW) and no switching events, indicating a load drop.""}
+```"
+IEEE14_SCN_001001,E3,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1090853214263916,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""Telemetry shows branch line_1_2 is OPEN with no demand change or generator outage, identifying a Transmission-Line Outage.""}
+```"
+IEEE14_SCN_002945,E9,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0562872886657717,1.0,True,"```json
+{""event_class"": ""E9"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Observed a transmission line outage (line_3_4) combined with a simultaneous demand increase across multiple loads (+40.28 MW), satisfying the compound event criteria.""}
+```"
+IEEE14_SCN_001338,E4,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0017008781433103,1.0,True,"```json
+{""event_class"": ""E4"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""A generator (gen_G2) is offline while demand remains unchanged and no lines are switched.""}
+```"
+IEEE14_SCN_001027,E3,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0099797248840332,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""A transmission line (line_2_5) is observed open in the post-event state while demand and generation counts remain unchanged, indicating a single transmission-line outage.""}
+```"
+IEEE14_SCN_002781,E9,E3_LLM_Tools,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.2370238304138184,0.95,False,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 0.95,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Generator gen_G2 is offline with no demand changes or switching of branches, indicating a generator outage.""
+}
+```"
+IEEE14_SCN_001803,E3,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0703911781311035,1.0,True,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Branch line_6_13 is observed OPEN while demand and generation status remain unchanged, indicating a transmission-line outage.""
+}
+```"
+IEEE14_SCN_000636,E2,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1038753986358645,1.0,True,"```json
+{""event_class"":""E2"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Demand at load_bus_4 decreased by 3.73 MW with no switching or renewable changes, classifying this as a load drop event.""}
+```"
+IEEE14_SCN_001535,E5,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.011389970779419,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""A renewable generation element (sgen_PV14) changed its output without any switching or demand changes, constituting a renewable ramp event.""}
+```"
+IEEE14_SCN_001668,E5,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.022573471069336,0.95,True,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 0.95,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Renewable elements sgen_PV14 and sgen_WIND6 changed output with no switching or demand changes, indicating a renewable ramp.""
+}
+```"
+IEEE14_SCN_000512,E1,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.006568431854248,1.0,True,"```json
+{""event_class"": ""E1"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Demand increased at load_bus_5 with positive delta load and no switching events.""}
+```"
+IEEE14_SCN_002976,E9,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.6929173469543457,0.95,True,"```json
+{""event_class"": ""E9"", ""confidence"": 0.95, ""tool"": ""grid_query"", ""reason"": ""Observed evidence indicates both a branch opening (line_10_11) and widespread changes in demand elements with a positive delta load (+67.92 MW), satisfying the criteria for a compound event.""}
+```"
+IEEE14_SCN_001766,E5,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.9606683254241944,0.95,True,"```json
+{""event_class"": ""E5"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Renewable element sgen_WIND6 changed output with no switching or demand changes.""}
+```"
+IEEE14_SCN_001918,E3,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1272170543670654,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""Branch line_6_13 is observed as OPEN while demand and renewables remain unchanged, matching a transmission-line outage event.""}
+```"
+IEEE14_SCN_002621,E9,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1474125385284424,0.95,True,"```json
+{""event_class"": ""E9"", ""confidence"": 0.95, ""tool"": ""grid_query"", ""reason"": ""Observed a transmission line outage (line_1_2 OPEN) combined with a positive demand change (Delta load: +50.88 MW), classifying this as a compound event (E9).""}
+```"
+IEEE14_SCN_001060,E3,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0172951221466064,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""A transmission line (line_6_13) opened without any changes to demand or generation.""}
+```"
+IEEE14_SCN_002166,E7,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.2732481956481934,0.95,True,"```json
+{""event_class"":""E7"",""confidence"":0.95,""tool"":""grid_query"",""reason"":""Post-event telemetry reveals voltage magnitudes reaching 1.0800 pu with active overvoltage violations (V>1.05), classifying the event as E7 Overvoltage.""}
+```"
+IEEE14_SCN_001981,E3,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0806338787078855,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""grid_query"", ""reason"": ""The observed evidence shows a branch is OPEN (line_6_13) with no changes in demand, generation, or renewable output, which matches the criteria for a Transmission-Line Outage.""}
+```"
+IEEE14_SCN_001828,E3,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.954914093017578,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""contingency"", ""reason"": ""Branch line_6_13 is OPEN while demand and renewables remain unchanged, matching a transmission-line outage.""}
+```"
+IEEE14_SCN_001428,E4,E3_LLM_Tools,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.9841158390045166,1.0,True,"```json
+{""event_class"": ""E4"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Generator G2 is offline with no demand changes or switching of branches, indicating a generator outage.""}
+```"
+IEEE14_SCN_000755,E2,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0336058139801023,0.95,True,"```json
+{""event_class"": ""E2"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Demand elements at buses 2, 3, 4, and 5 changed with a negative Delta load of -27.31 MW, and no switching actions occurred.""}
+```"
+IEEE14_SCN_001001,E3,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0066769123077393,1.0,True,"```json
+{""event_class"":""E3"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""A transmission line (line_1_2) is observed as OPEN with no concurrent demand or generation changes, directly matching the criteria for a transmission-line outage.""}
+```"
+IEEE14_SCN_002945,E9,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0522544384002686,1.0,True,"```json
+{""event_class"": ""E9"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""The observed evidence shows both a branch outage (line_3_4 OPEN) and multiple demand changes (Delta load +40.28 MW), satisfying the compound event criteria.""}
+```"
+IEEE14_SCN_001338,E4,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.107499361038208,1.0,True,"```json
+{""event_class"": ""E4"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Generator gen_G2 is offline with no demand changes or switching actions, corresponding to a generator outage.""}
+```"
+IEEE14_SCN_001027,E3,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0951554775238037,0.95,True,"```json
+{""event_class"": ""E3"", ""confidence"": 0.95, ""tool"": ""grid_query"", ""reason"": ""Branch line_2_5 is OPEN while demand and renewables remain unchanged, matching a transmission-line outage.""}
+```"
+IEEE14_SCN_002781,E9,E4_Full,gemini-3.5-flash-lite,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,1.0484037399291992,0.95,False,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 0.95,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Generator gen_G2 went offline without any demand changes or branch switching, causing increased slack generation.""
+}
+```"
+IEEE14_SCN_001803,E3,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1009902954101562,1.0,True,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Observed evidence indicates a branch is OPEN (line_6_13) with no changes in demand, generation status, or renewable output, which matches the criteria for a Transmission-Line Outage.""
+}
+```"
+IEEE14_SCN_000636,E2,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0716004371643066,0.95,True,"```json
+{""event_class"": ""E2"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Demand decreased at load_bus_4 with a negative Delta load (-3.73 MW) and no switching events.""}
+```"
+IEEE14_SCN_001535,E5,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.9546542167663574,1.0,True,"```json
+{""event_class"":""E5"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Only renewable element sgen_PV14 changed output without any switching or demand change.""}
+```"
+IEEE14_SCN_001668,E5,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0020194053649902,0.95,True,"```json
+{""event_class"":""E5"",""confidence"":0.95,""tool"":""power_flow"",""reason"":""Renewable elements sgen_PV14 and sgen_WIND6 changed output with no switching or demand changes, constituting a renewable ramp event.""}
+```"
+IEEE14_SCN_000512,E1,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0487642288208008,0.95,True,"```json
+{""event_class"": ""E1"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Demand at load_bus_5 increased with positive Delta load (+0.63 MW) and no switching events.""}
+```"
+IEEE14_SCN_002976,E9,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.1086578369140625,0.95,True,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 0.95,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Observed a transmission line outage (line_10_11) combined with significant positive demand changes across multiple buses (+67.92 MW), satisfying the criteria for a compound event (E9).""
+}
+```"
+IEEE14_SCN_001766,E5,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.2099077701568604,0.95,True,"```json
+{""event_class"": ""E5"", ""confidence"": 0.95, ""tool"": ""power_flow"", ""reason"": ""Renewable element sgen_WIND6 changed output with no switching or demand changes, fitting the renewable ramp taxonomy.""}
+```"
+IEEE14_SCN_001918,E3,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.047302484512329,1.0,True,"```json
+{""event_class"":""E3"",""confidence"":1.0,""tool"":""power_flow"",""reason"":""Observed evidence indicates a branch (line_6_13) is OPEN with no demand changes or generator outages, matching a transmission-line outage event.""}
+```"
+IEEE14_SCN_002621,E9,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.224938154220581,0.99,True,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 0.99,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Observed evidence shows both a transmission-line outage (line_1_2 OPEN) and significant demand changes across multiple load buses (+50.88 MW Delta load), which classifies this as a compound event.""
+}
+```"
+IEEE14_SCN_001060,E3,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.8857283592224121,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Telemetry shows branch line_6_13 is OPEN with no generator outages or demand changes.""}
+```"
+IEEE14_SCN_002166,E7,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0601401329040527,0.95,True,"```json
+{""event_class"": ""E7"", ""confidence"": 0.95, ""tool"": ""grid_query"", ""reason"": ""Post-event voltage reaches a peak of 1.0800 pu, exceeding the 1.05 pu overvoltage threshold.""}
+```"
+IEEE14_SCN_001981,E3,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.0637731552124023,0.95,True,"```json
+{""event_class"":""E3"",""confidence"":0.95,""tool"":""power_flow"",""reason"":""Branch line_6_13 is OPEN without any demand change or generator outage, classifying this as a transmission line outage.""}
+```"
+IEEE14_SCN_001828,E3,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1.158923625946045,1.0,True,"```json
+{""event_class"": ""E3"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Branch line_6_13 is OPEN with no demand changes or generator outages, which directly corresponds to a Transmission-Line Outage (E3).""}
+```"
+IEEE14_SCN_001428,E4,E4_Full,gemini-3.5-flash-lite,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,0.9963676929473876,1.0,True,"```json
+{""event_class"": ""E4"", ""confidence"": 1.0, ""tool"": ""power_flow"", ""reason"": ""Generator G2 is offline with no demand changes or switching actions, corresponding to a generator outage.""}
+```"
