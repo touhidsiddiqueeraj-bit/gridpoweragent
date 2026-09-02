@@ -346,11 +346,16 @@ def run_local(scen, ref, model, interval, n_test, resume_path, out_csv):
         df.to_csv(out_csv, index=False)
     return df
 
-def build_prompt(row, config_name, rag_docs=None, tools_hint=False):
+def build_prompt(row, config_name, rag_docs=None, tools_hint=False, include_description=True):
     # Taxonomy v2 (37_relabel_taxonomy): cause axis only — E6/E8 were rekeyed to
     # their injected mechanisms (outage->E3/E4, compound->E9); E7 overvoltage is
     # the sole remaining outcome class (its ladder mechanisms match the reading).
     tax = "E0 Normal (no disturbance), E1 Load Surge (+% demand), E2 Load Drop (-% demand), E3 Transmission-Line Outage, E4 Generator Outage, E5 Renewable Ramp, E7 Overvoltage (V>1.05), E9 Compound (2 mechanisms)"
+    # physics-only ablation: omit the injected-event sentences so the model must
+    # infer the class from the measured grid state alone
+    inj_block = (f"Injected mechanism: {row.injected_mechanism} scope {row.injected_scope} targets {row.injected_targets}\n"
+                 f"Injected description: {row.injected_description}\n"
+                 f"Effect: {row.effect_summary}\n") if include_description else ""
     base = f"""You are a grid-aware LLM operator. Diagnose the INJECTED EVENT CLASS (cause axis).
 Taxonomy: {tax}
 Rules:
@@ -362,10 +367,7 @@ Rules:
 Scenario {row.scenario_id}
 Pre: load {row.pre_load_scale:.2f} solar {row.pre_solar_fraction:.2f} wind {row.pre_wind_fraction:.2f} SOC {row.pre_bess_soc:.2f}
 Post: V {row.post_v_min_pu:.4f}-{row.post_v_max_pu:.4f} pu peak {row.post_peak_loading_percent:.2f}% viol {row.n_violations} under {row.has_undervoltage} over {row.has_overvoltage} overload {row.has_overload}
-Injected mechanism: {row.injected_mechanism} scope {row.injected_scope} targets {row.injected_targets}
-Injected description: {row.injected_description}
-Effect: {row.effect_summary}
-Respond JSON only: {{"event_class":"E0-E5|E7|E9","confidence":0.0-1.0,"tool":"power_flow|contingency|opf|grid_query|state_estimation|n1_security","reason":"one sentence"}}"""
+{inj_block}Respond JSON only: {{"event_class":"E0-E5|E7|E9","confidence":0.0-1.0,"tool":"power_flow|contingency|opf|grid_query|state_estimation|n1_security","reason":"one sentence"}}"""
     if rag_docs:
         base += "\nRAG context:\n" + "\n".join(rag_docs[:3])
     if tools_hint:
@@ -423,7 +425,7 @@ def simulate_config(cfg_name, cfg, scen, ref, model_label="mock"):
         rows.append({"scenario_id":s.scenario_id,"event_class":s.event_class,"config":cfg_name,"model":model_label,"correct_diag":correct_diag,"correct_tool":correct_tool,"grounded":grounded,"halluc":halluc_flags,"recommendation":rec,"latency":lat,"confidence":conf,"is_correct":correct_diag})
     return pd.DataFrame(rows)
 
-def run_real_gemini(scen, ref, api_keys, model, rpm, n_test, resume_path, out_csv, configs=None):
+def run_real_gemini(scen, ref, api_keys, model, rpm, n_test, resume_path, out_csv, configs=None, physics_only=False):
     # api_keys: list of credentials (a single key string is accepted for compat)
     if isinstance(api_keys, str):
         api_keys = [api_keys]
@@ -461,7 +463,8 @@ def run_real_gemini(scen, ref, api_keys, model, rpm, n_test, resume_path, out_cs
             key=(s.scenario_id,cfg_name)
             if key in done:
                 continue
-            prompt=build_prompt(s, cfg_name, rag_docs=rag, tools_hint=tools)
+            prompt=build_prompt(s, cfg_name, rag_docs=rag, tools_hint=tools,
+                                include_description=not physics_only)
             try:
                 text, lat = call_gemini_pooled(prompt, pool, model=model)
                 pred_ec, conf, pred_tool, reason = parse_pred(text)
@@ -538,6 +541,8 @@ def main():
     p.add_argument("--labels-csv", default=None, help="override reference-labels CSV (e.g. ieee14_reference_labels_taxonomy2.csv)")
     p.add_argument("--ids-from", default=None, help="runs CSV whose unique scenario_ids define the test set (exact pilot reuse)")
     p.add_argument("--api-keys", default=None, help="comma-separated Gemini credentials (default: GEMINI_API_KEYS env, then GEMINI_API_KEY)")
+    p.add_argument("--physics-only", action="store_true",
+                   help="ablation: omit injected-mechanism/description/effect lines — diagnose from measured grid state only")
     args=p.parse_args()
     case_tag = "" if args.case == "ieee14" else f"_{args.case}"
     _sel = None
@@ -671,8 +676,10 @@ def main():
             if model=="mock": model="gemini-3.5-flash-lite"
             out=Path(args.out) if args.out else RESULTS_DIR/f"agent_runs_{model.replace('/','_').replace('.','_')}{case_tag}.csv"
             ckpt=Path(str(out).replace(".csv", "_checkpoint.json"))
-            print(f"[INFO] Real Gemini {model} keys={len(keys)} RPM {args.rpm} (aggregate) n_test {args.n_test} -> {out}")
-            df=run_real_gemini(scen, ref, keys, model, args.rpm, args.n_test, ckpt, out, configs=_sel)
+            print(f"[INFO] Real Gemini {model} keys={len(keys)} RPM {args.rpm} (aggregate) n_test {args.n_test} -> {out}"
+                  + (" [PHYSICS-ONLY ablation]" if args.physics_only else ""))
+            df=run_real_gemini(scen, ref, keys, model, args.rpm, args.n_test, ckpt, out, configs=_sel,
+                               physics_only=args.physics_only)
         df.to_csv(out,index=False)
         print(f"[INFO] Saved {out} ({len(df)} rows)")
         tag = out.stem.replace("agent_runs_", "")
