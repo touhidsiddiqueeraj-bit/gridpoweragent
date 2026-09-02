@@ -108,21 +108,29 @@ def main():
     ap.add_argument("--n-test", type=int, default=20)
     ap.add_argument("--case", default="ieee14", help="ieee14 | case39 | case118")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--scenarios-csv", default=None, help="override scenarios CSV (e.g. ieee14_scenarios_taxonomy2.csv)")
+    ap.add_argument("--labels-csv", default=None, help="override reference-labels CSV")
+    ap.add_argument("--ids-from", default=None, help="runs CSV whose unique scenario_ids define the test set (exact pilot reuse)")
     args = ap.parse_args()
 
     case_tag = "" if args.case == "ieee14" else f"_{args.case}"
     out_csv = Path(args.out) if args.out else RESULTS_DIR / f"agent_runs_{args.model.replace('.', '_').replace('/', '_')}{case_tag}.csv"
 
     case = args.case
-    scen_path = HERE / "data/processed" / (f"{case}_scenarios.csv" if case != "ieee14" else "ieee14_scenarios.csv")
-    ref_path = HERE / "data/processed" / (f"{case}_reference_labels.csv" if case != "ieee14" else "ieee14_reference_labels.csv")
+    scen_path = Path(args.scenarios_csv) if args.scenarios_csv else HERE / "data/processed" / (f"{case}_scenarios.csv" if case != "ieee14" else "ieee14_scenarios.csv")
+    ref_path = Path(args.labels_csv) if args.labels_csv else HERE / "data/processed" / (f"{case}_reference_labels.csv" if case != "ieee14" else "ieee14_reference_labels.csv")
     scen = pd.read_csv(scen_path)
     ref = pd.read_csv(ref_path)
+    print(f"[INFO] scenarios: {scen_path} | labels: {ref_path}", flush=True)
     if case == "case39":
         nan_ids = set(pd.read_csv(HERE / "data/case39_nan_scenarios.csv").scenario_id)
         n0 = len(scen)
         scen = scen[~scen.scenario_id.isin(nan_ids)].reset_index(drop=True)
         print(f"[INFO] case39: excluded {n0-len(scen)} islanding-NaN scenarios")
+    if args.ids_from:
+        ids = set(pd.read_csv(args.ids_from).scenario_id.unique())
+        scen = scen[scen.scenario_id.isin(ids)].reset_index(drop=True)
+        print(f"[INFO] ids-from: test set restricted to {len(scen)} scenarios from {args.ids_from}", flush=True)
     ref_map = {r.scenario_id: r for _, r in ref.iterrows()}
     try:
         kb = json.load(open(runner.KB_DOCS))

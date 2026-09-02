@@ -37,3 +37,7 @@ paper/*.aux
 paper/*.blg
 paper/*.out
 paper/figures/fig_generalization.png
+
+# credentials (never commit)
+secrets.env
+*.key

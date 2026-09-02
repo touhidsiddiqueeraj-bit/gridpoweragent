@@ -89,6 +89,149 @@ def call_gemini(prompt, api_key, model="gemini-3.5-flash-lite", rpm=15, max_retr
             time.sleep(wait)
     raise RuntimeError("Gemini max retries exceeded")
 
+# ---------------- Gemini credential pool (multi-key free tier) ----------------
+# Free tier: 15 RPM and ~500 requests/day PER KEY. A pool of N keys is rotated
+# per request so the aggregate rate is N x per-key RPM; keys that hit 428/429
+# are cooled individually (Retry-After or 60s) while others keep working, and
+# keys rejected on auth (400/401/403 on both ?key= and Bearer styles) are
+# excluded. The run stops cleanly only when every key is dead/exhausted.
+
+def _mask(key):
+    return f"{key[:8]}...{key[-4:]}" if len(key) > 16 else key[:4] + "..."
+
+def _model_id(model):
+    if model in ("gemini-flash-lite-latest", "gemini-3.5-flash-lite-latest"):
+        return "gemini-3.5-flash-lite"
+    return model
+
+def _gemini_post(prompt, key, style, model_id, timeout, api_version="v1beta"):
+    url = f"https://generativelanguage.googleapis.com/{api_version}/models/{model_id}:generateContent"
+    payload = {"contents": [{"role": "user", "parts": [{"text": prompt}]}],
+               "generationConfig": {"temperature": 0, "maxOutputTokens": 512}}
+    if style == "bearer":
+        return requests.post(url, json=payload, timeout=timeout,
+                             headers={"Authorization": f"Bearer {key}"})
+    return requests.post(url, json=payload, timeout=timeout, params={"key": key})
+
+class GeminiKey:
+    def __init__(self, key):
+        self.key = key.strip()
+        self.style = None          # finalized by preflight ("query" | "bearer")
+        self.next_free = 0.0       # per-key pacing
+        self.cooldown_until = 0.0  # 428/429 backoff
+        self.dead = False
+        self.ok = 0
+
+class GeminiKeyPool:
+    def __init__(self, keys, rpm_aggregate):
+        self.keys = [GeminiKey(k) for k in keys if k and k.strip()]
+        self.rpm = max(1, rpm_aggregate)
+        self.rr = 0
+
+    def live(self):
+        return [k for k in self.keys if not k.dead]
+
+    def acquire(self):
+        """Next live, cooled key (rotating). Sleeps while all keys are cooling;
+        raises RuntimeError('quota...') only when every key is dead or the whole
+        pool is daily-capped (cooldown > 30 min out)."""
+        while True:
+            now = time.time()
+            live = self.live()
+            if not live:
+                raise RuntimeError("all Gemini credentials dead — quota exhausted")
+            ready = [k for k in live if now >= max(k.next_free, k.cooldown_until)]
+            if ready:
+                k = ready[self.rr % len(ready)]
+                self.rr += 1
+                k.next_free = time.time() + 60.0 * len(live) / self.rpm
+                return k
+            soonest = min(max(k.next_free, k.cooldown_until) for k in live)
+            if soonest - now > 1800:
+                raise RuntimeError("all Gemini credentials quota-exhausted "
+                                   f"(next retry in {(soonest-now)/60:.0f} min)")
+            time.sleep(min(30, max(0.5, soonest - now)))
+
+def preflight_keys(pool, model):
+    """Validate each credential once (try ?key= then Bearer); excludes dead keys.
+    A 429 during preflight means the key is VALID but rate-limited — kept with a
+    short cooldown. Fails hard if no key survives."""
+    model_id = _model_id(model)
+    for k in pool.keys:
+        for style in ("query", "bearer"):
+            try:
+                resp = _gemini_post("Reply with the single word OK.", k.key, style, model_id, 20)
+            except Exception as e:
+                print(f"[PREFLIGHT] {_mask(k.key)} {style}: request error {e}")
+                continue
+            if resp.status_code == 200:
+                k.style = style
+                break
+            if resp.status_code in (429, 428):
+                k.style = style
+                k.cooldown_until = time.time() + 60
+                print(f"[PREFLIGHT] {_mask(k.key)} {style}: valid but rate-limited (429) — usable after cooldown")
+                break
+            print(f"[PREFLIGHT] {_mask(k.key)} {style}: HTTP {resp.status_code}")
+        if k.style is None:
+            k.dead = True
+            print(f"[PREFLIGHT] {_mask(k.key)}: failed both auth styles — EXCLUDED")
+        else:
+            print(f"[PREFLIGHT] {_mask(k.key)}: OK via {k.style}")
+    live = pool.live()
+    if not live:
+        raise SystemExit("[FAIL] no working Gemini credentials — check GEMINI_API_KEYS")
+    print(f"[PREFLIGHT] {len(live)}/{len(pool.keys)} credentials usable "
+          f"(aggregate budget {pool.rpm} RPM, {500*len(live)} req/day)")
+
+def call_gemini_pooled(prompt, pool, model="gemini-3.5-flash-lite", timeout=45):
+    model_id = _model_id(model)
+    api_version = "v1beta"
+    while True:
+        k = pool.acquire()
+        t0 = time.time()
+        try:
+            resp = _gemini_post(prompt, k.key, k.style, model_id, timeout, api_version)
+        except requests.exceptions.RequestException as e:
+            print(f"[WARN] {_mask(k.key)} request error {e} — retrying")
+            k.cooldown_until = time.time() + 5
+            continue
+        if resp.status_code == 404 and api_version == "v1beta":
+            api_version = "v1"
+            continue
+        if resp.status_code in (429, 428):
+            retry_after = resp.headers.get("Retry-After")
+            try:
+                wait = int(retry_after) if retry_after else 60
+            except Exception:
+                wait = 60
+            wait = max(60, wait)  # per user: retry after a minute
+            k.cooldown_until = time.time() + wait
+            print(f"[WARN] {_mask(k.key)} rate limited — cooling {wait}s ({len(pool.live())} keys live)")
+            continue
+        if resp.status_code in (401, 403):
+            other = "bearer" if k.style == "query" else "query"
+            try:
+                resp2 = _gemini_post(prompt, k.key, other, model_id, timeout, api_version)
+            except Exception:
+                resp2 = None
+            if resp2 is not None and resp2.status_code == 200:
+                print(f"[WARN] {_mask(k.key)} switched auth style to {other}")
+                k.style = other
+                k.ok += 1
+                return resp2.json()["candidates"][0]["content"]["parts"][0]["text"], time.time() - t0
+            print(f"[WARN] {_mask(k.key)} rejected ({resp.status_code}) on both auth styles — EXCLUDING key")
+            k.dead = True
+            continue
+        if resp.status_code >= 500:
+            print(f"[WARN] {_mask(k.key)} server error {resp.status_code} — cooling 10s")
+            k.cooldown_until = time.time() + 10
+            continue
+        resp.raise_for_status()
+        text = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+        k.ok += 1
+        return text, time.time() - t0
+
 # ponytail: local Gemma 4B via polaris http://127.0.0.1:9090/v1/chat/completions — pace to avoid crash
 _local_last = 0
 def throttle_local(interval=5.0):
@@ -189,6 +332,7 @@ def run_local(scen, ref, model, interval, n_test, resume_path, out_csv):
                     try:
                         prev=pd.read_csv(out_csv)
                         df_tmp=pd.concat([prev, df_tmp], ignore_index=True)
+                        df_tmp=df_tmp.drop_duplicates(subset=["scenario_id","config"], keep="last")
                     except: pass
                 df_tmp.to_csv(out_csv, index=False)
                 ckpt.write_text(json.dumps({"done": len(done)+len(all_rows)}))
@@ -203,15 +347,17 @@ def run_local(scen, ref, model, interval, n_test, resume_path, out_csv):
     return df
 
 def build_prompt(row, config_name, rag_docs=None, tools_hint=False):
-    # Taxonomy for diagnosis — explicit to avoid E0 bias
-    tax = "E0 Normal (no disturbance), E1 Load Surge (+% demand), E2 Load Drop (-% demand), E3 Transmission-Line Outage, E4 Generator Outage, E5 Renewable Ramp, E6 Undervoltage (V<0.94), E7 Overvoltage (V>1.05), E8 Thermal Overload (loading>limit), E9 Compound (2 mechanisms)"
-    base = f"""You are a grid-aware LLM operator. Diagnose the INJECTED EVENT CLASS (cause axis, not outcome).
+    # Taxonomy v2 (37_relabel_taxonomy): cause axis only — E6/E8 were rekeyed to
+    # their injected mechanisms (outage->E3/E4, compound->E9); E7 overvoltage is
+    # the sole remaining outcome class (its ladder mechanisms match the reading).
+    tax = "E0 Normal (no disturbance), E1 Load Surge (+% demand), E2 Load Drop (-% demand), E3 Transmission-Line Outage, E4 Generator Outage, E5 Renewable Ramp, E7 Overvoltage (V>1.05), E9 Compound (2 mechanisms)"
+    base = f"""You are a grid-aware LLM operator. Diagnose the INJECTED EVENT CLASS (cause axis).
 Taxonomy: {tax}
 Rules:
 - E1 vs E2 differ by direction of injected_magnitude_percent (+ vs -).
 - E3 is single line outage, E4 single generator outage (never slack).
 - E5 is renewable ramp (delta_availability).
-- E6/E7/E8 are outcome classes — only choose if post-event has under/overvoltage/overload AND injected was ladder (regional surge/AVR/shunt). If post has violations but injected is outage, still E3/E4 (mechanism axis).
+- E7 Overvoltage: choose only when post-event shows overvoltage (V>1.05).
 - E9 is compound (2 mechanisms joined by '+').
 Scenario {row.scenario_id}
 Pre: load {row.pre_load_scale:.2f} solar {row.pre_solar_fraction:.2f} wind {row.pre_wind_fraction:.2f} SOC {row.pre_bess_soc:.2f}
@@ -219,7 +365,7 @@ Post: V {row.post_v_min_pu:.4f}-{row.post_v_max_pu:.4f} pu peak {row.post_peak_l
 Injected mechanism: {row.injected_mechanism} scope {row.injected_scope} targets {row.injected_targets}
 Injected description: {row.injected_description}
 Effect: {row.effect_summary}
-Respond JSON only: {{"event_class":"E0-E9","confidence":0.0-1.0,"tool":"power_flow|contingency|opf|grid_query|state_estimation|n1_security","reason":"one sentence"}}"""
+Respond JSON only: {{"event_class":"E0-E5|E7|E9","confidence":0.0-1.0,"tool":"power_flow|contingency|opf|grid_query|state_estimation|n1_security","reason":"one sentence"}}"""
     if rag_docs:
         base += "\nRAG context:\n" + "\n".join(rag_docs[:3])
     if tools_hint:
@@ -277,7 +423,12 @@ def simulate_config(cfg_name, cfg, scen, ref, model_label="mock"):
         rows.append({"scenario_id":s.scenario_id,"event_class":s.event_class,"config":cfg_name,"model":model_label,"correct_diag":correct_diag,"correct_tool":correct_tool,"grounded":grounded,"halluc":halluc_flags,"recommendation":rec,"latency":lat,"confidence":conf,"is_correct":correct_diag})
     return pd.DataFrame(rows)
 
-def run_real_gemini(scen, ref, api_key, model, rpm, n_test, resume_path, out_csv, configs=None):
+def run_real_gemini(scen, ref, api_keys, model, rpm, n_test, resume_path, out_csv, configs=None):
+    # api_keys: list of credentials (a single key string is accepted for compat)
+    if isinstance(api_keys, str):
+        api_keys = [api_keys]
+    pool = GeminiKeyPool(api_keys, rpm)
+    preflight_keys(pool, model)
     # load RAG docs
     try:
         with open(KB_DOCS) as f:
@@ -312,7 +463,7 @@ def run_real_gemini(scen, ref, api_key, model, rpm, n_test, resume_path, out_csv
                 continue
             prompt=build_prompt(s, cfg_name, rag_docs=rag, tools_hint=tools)
             try:
-                text, lat = call_gemini(prompt, api_key, model=model, rpm=rpm)
+                text, lat = call_gemini_pooled(prompt, pool, model=model)
                 pred_ec, conf, pred_tool, reason = parse_pred(text)
                 correct_diag = (pred_ec==s.event_class)
                 # tool scoring vs ref: pred_tool in ref row's required/strongly_appropriate?
@@ -347,11 +498,12 @@ def run_real_gemini(scen, ref, api_key, model, rpm, n_test, resume_path, out_csv
             # checkpoint every 10
             if len(all_rows)%10==0:
                 df_tmp=pd.DataFrame(all_rows)
-                # merge with existing
+                # merge with existing (dedup: resume + incremental saves can overlap)
                 if len(done)>0:
                     try:
                         prev=pd.read_csv(out_csv)
                         df_tmp=pd.concat([prev, df_tmp], ignore_index=True)
+                        df_tmp=df_tmp.drop_duplicates(subset=["scenario_id","config"], keep="last")
                     except: pass
                 df_tmp.to_csv(out_csv, index=False)
                 ckpt.write_text(json.dumps({"done": len(done)+len(all_rows)}))
@@ -382,22 +534,31 @@ def main():
     p.add_argument("--configs", default=None, help="comma list, e.g. E1_LLM,E2_LLM_RAG (default all)")
     p.add_argument("--force-api", action="store_true", help="route to Gemini REST even for gemma-* model strings")
     p.add_argument("--case", default="ieee14", help="ieee14 | case39 | case118")
+    p.add_argument("--scenarios-csv", default=None, help="override scenarios CSV (e.g. ieee14_scenarios_taxonomy2.csv)")
+    p.add_argument("--labels-csv", default=None, help="override reference-labels CSV (e.g. ieee14_reference_labels_taxonomy2.csv)")
+    p.add_argument("--ids-from", default=None, help="runs CSV whose unique scenario_ids define the test set (exact pilot reuse)")
+    p.add_argument("--api-keys", default=None, help="comma-separated Gemini credentials (default: GEMINI_API_KEYS env, then GEMINI_API_KEY)")
     args=p.parse_args()
     case_tag = "" if args.case == "ieee14" else f"_{args.case}"
     _sel = None
     if args.configs:
         _sel = {k: v for k, v in CONFIGS.items() if k in args.configs.split(",")}
     print("="*80); print("STAGES 19-22 — FOUR CONFIGS (E1-E4) dual-model"); print("="*80)
-    scen_path = OUTPUT_DIR / (f"{args.case}_scenarios.csv" if args.case != "ieee14" else "ieee14_scenarios.csv")
-    ref_path = OUTPUT_DIR / (f"{args.case}_reference_labels.csv" if args.case != "ieee14" else "ieee14_reference_labels.csv")
+    scen_path = Path(args.scenarios_csv) if args.scenarios_csv else OUTPUT_DIR / (f"{args.case}_scenarios.csv" if args.case != "ieee14" else "ieee14_scenarios.csv")
+    ref_path = Path(args.labels_csv) if args.labels_csv else OUTPUT_DIR / (f"{args.case}_reference_labels.csv" if args.case != "ieee14" else "ieee14_reference_labels.csv")
     scen=pd.read_csv(scen_path)
     ref=pd.read_csv(ref_path)
+    print(f"[INFO] scenarios: {scen_path} | labels: {ref_path}")
     if args.case == "case39":
         import pandas as _pd
         nan_ids = set(_pd.read_csv("data/case39_nan_scenarios.csv").scenario_id)
         n0 = len(scen)
         scen = scen[~scen.scenario_id.isin(nan_ids)].reset_index(drop=True)
         print(f"[INFO] case39: excluded {n0-len(scen)} islanding-NaN scenarios")
+    if args.ids_from:
+        ids = set(pd.read_csv(args.ids_from).scenario_id.unique())
+        scen = scen[scen.scenario_id.isin(ids)].reset_index(drop=True)
+        print(f"[INFO] ids-from: test set restricted to {len(scen)} scenarios from {args.ids_from}")
     if args.compare:
         # run all three: mock, gemini, muse-spark
         outs=[]
@@ -499,18 +660,22 @@ def main():
             print(f"[INFO] Real LOCAL {model} interval {args.interval}s n_test {args.n_test} -> {out} (paced, no RPM)")
             df=run_local(scen, ref, model, args.interval, args.n_test, ckpt, out)
         else:
-            key=os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-            if not key:
-                print("[GATED] GEMINI_API_KEY not set — export GEMINI_API_KEY to run real Gemini. Skipping.")
+            keys = [k.strip() for k in (args.api_keys or os.getenv("GEMINI_API_KEYS", "")).split(",") if k.strip()]
+            if not keys:
+                single = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+                keys = [single] if single else []
+            if not keys:
+                print("[GATED] no Gemini credentials — set GEMINI_API_KEYS (comma-separated) or GEMINI_API_KEY. Skipping.")
                 return
             model=args.model
             if model=="mock": model="gemini-3.5-flash-lite"
             out=Path(args.out) if args.out else RESULTS_DIR/f"agent_runs_{model.replace('/','_').replace('.','_')}{case_tag}.csv"
-            ckpt=Path("data/results/gemini_checkpoint.json")
-            print(f"[INFO] Real Gemini {model} RPM {args.rpm} n_test {args.n_test} -> {out}")
-            df=run_real_gemini(scen, ref, key, model, args.rpm, args.n_test, ckpt, out, configs=_sel)
+            ckpt=Path(str(out).replace(".csv", "_checkpoint.json"))
+            print(f"[INFO] Real Gemini {model} keys={len(keys)} RPM {args.rpm} (aggregate) n_test {args.n_test} -> {out}")
+            df=run_real_gemini(scen, ref, keys, model, args.rpm, args.n_test, ckpt, out, configs=_sel)
         df.to_csv(out,index=False)
         print(f"[INFO] Saved {out} ({len(df)} rows)")
+        tag = out.stem.replace("agent_runs_", "")
         # also save halluc breakdown — halluc may be dict or json string
         import ast
         def _halluc_rate(sub, ht):
@@ -530,11 +695,11 @@ def main():
             for ht in ["H-NUM","H-TOP","H-EQP","H-PHY","H-TOOL","H-ACT"]:
                 rate=_halluc_rate(sub, ht)
                 halluc_df.append({"config":cfg_name,"type":ht,"rate":rate,"model":model})
-        pd.DataFrame(halluc_df).to_csv(RESULTS_DIR/f"hallucination_rates_{model.replace('/','_')}.csv",index=False)
+        pd.DataFrame(halluc_df).to_csv(RESULTS_DIR/f"hallucination_rates_{tag}.csv",index=False)
         # also per-event and ECE for gemini
         try:
             per=df.groupby(["config","event_class"]).agg(diag_acc=("correct_diag","mean"),tool_acc=("correct_tool","mean")).reset_index()
-            per.to_csv(RESULTS_DIR/f"per_event_{model.replace('/','_')}.csv",index=False)
+            per.to_csv(RESULTS_DIR/f"per_event_{tag}.csv",index=False)
         except: pass
         for cfg_name in CONFIGS:
             sub=df[df.config==cfg_name]
