@@ -47,6 +47,7 @@ pf_tool = _load("pf_tool", "10_power_flow_tool.py")
 import argparse
 _ap = argparse.ArgumentParser()
 _ap.add_argument("--case", default="ieee14", help="ieee14 | case39 | case118")
+_ap.add_argument("--runs-tag", default="", help="select revised-taxonomy run CSVs (e.g. tax2) and suffix the output")
 CASE = _ap.parse_args().case
 PROCESSED = ROOT / "data/processed"
 RESULTS = ROOT / "data/results"
@@ -128,11 +129,16 @@ def net_summary(net):
             "max_loading": max(loadings.values()), "n_uv": len(uv), "n_ov": len(ov), "n_ol": len(ol)}
 
 # ---- pair extraction from existing runs ----
+# optional runs-tag (e.g. "tax2") selects the revised-taxonomy run CSVs and a
+# suffixed output, so execution scoring can be repeated per pilot round
+RUNS_TAG = _ap.parse_known_args()[0].runs_tag
 pair_sources = []
 if CASE == "ieee14":
     pair_sources = ["agent_runs_gemini-3.5-flash-lite.csv", "agent_runs_gemma-4-E4B-it-Q4_0_gguf.csv"]
 else:
     pair_sources = [f"agent_runs_gemini-3_5-flash-lite_{CASE}.csv", f"agent_runs_gemma-4-E4B-it-Q4_0_gguf_{CASE}.csv"]
+if RUNS_TAG:
+    pair_sources = [f.replace(".csv", f"_{RUNS_TAG}.csv") for f in pair_sources]
 pairs = set()
 for f in pair_sources:
     fp = RESULTS / f
@@ -231,6 +237,6 @@ for tool, sub in out.groupby("stated_tool"):
         "rate": round(100 * sub.executed_ok.mean(), 1) if len(sub) else None,
     }
 summary["total_pairs"] = int(len(out))
-(RESULTS / f"tool_execution_summary_{CASE}.json").write_text(json.dumps(summary, indent=2))
+(RESULTS / f"tool_execution_summary_{CASE}{'_' + RUNS_TAG if RUNS_TAG else ''}.json").write_text(json.dumps(summary, indent=2))
 print(json.dumps(summary, indent=2))
 print("[PASS] Stage 35 complete")

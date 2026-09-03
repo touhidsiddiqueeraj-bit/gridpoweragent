@@ -66,7 +66,7 @@ def stated_tool(raw, fallback="power_flow"):
             pass
     return fallback
 
-REF = pd.read_csv(PROCESSED / "ieee14_reference_labels.csv").set_index("scenario_id")
+REF = pd.read_csv(PROCESSED / "ieee14_reference_labels_taxonomy2.csv").set_index("scenario_id")
 
 def strict_flag(sid, tool):
     row = REF.loc[sid]
@@ -106,8 +106,8 @@ def load(fname):
         }
     return df, out
 
-API_DF, API = load("agent_runs_gemini-3.5-flash-lite.csv")
-LOC_DF, LOC = load("agent_runs_gemma-4-E4B-it-Q4_0_gguf.csv")
+API_DF, API = load("agent_runs_gemini-3.5-flash-lite_tax2.csv")
+LOC_DF, LOC = load("agent_runs_gemma-4-E4B-it-Q4_0_gguf_tax2.csv")
 
 def ni_stats():
     rows = []
@@ -162,7 +162,7 @@ ax2.axvline(0, color="#7f8c8d", lw=0.8)
 ax2.set_yticks(range(len(CFGS)), CFG_LABELS)
 ax2.invert_yaxis()
 ax2.set_xlabel("Local $-$ API (pp), 95% CI")
-ax2.set_xlim(-8, 3)
+ax2.set_xlim(-10, 3)
 ax2.grid(axis="x", alpha=0.25, lw=0.4)
 plt.tight_layout(pad=0.4)
 plt.savefig(FIGDIR / "fig_diagnosis.png", dpi=300)
