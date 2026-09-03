@@ -1,0 +1,651 @@
+scenario_id,event_class,config,model,correct_diag,correct_tool,grounded,halluc,recommendation,latency,confidence,is_correct,parse_mode,raw
+IEEE14_SCN_000755,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,37.92129588127136,0.5,True,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to classify an injected event class (E0, E1, E2, E3, E4, E5, E7, E9) based on provided pre/post-event data and rules. The output must be a specific JSON format.
+2.  **Analyze the Input Data (Scenario IEEE14_SCN_000755):**
+    *   *Pre-state:* load 0.81, solar 0.26, wind 0.81, SOC 0.26.
+    *   *Post-state:* V 0.9838-1.0600 pu (Peak 0.91% violation).
+    *   *Switching:* No branches opened, no generators offline.
+    *   *Changed demand elements:* load_bus_2, load_bus_3, load_bus_4, load_bus_5. (Demand changed).
+    *   *Changed renewa"
+IEEE14_SCN_001001,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,38.70904588699341,0.5,False,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post state and observed evidence.
+2.  **Analyze the Scenario (IEEE14_SCN_001001):**
+    *   Pre: load 1.10, solar 0.35, wind 0.76, SOC 0.80
+    *   Post: V 0.9580-1.0600 pu, peak 2.75% viol, 0 under/overload, False over/under.
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branches OPEN: line_1_2 | no generators offline. (Switching occurred)
+    *   Changed demand elements: none. (Demand unchanged)
+    *   Changed ren"
+IEEE14_SCN_002945,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,43.14816951751709,0.5,False,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided scenario evidence. The output must be a specific JSON format.
+2.  **Analyze the Input Data (Scenario IEEE14_SCN_002945):**
+    *   *Pre-state:* load 1.02, solar 0.90, wind 0.39, SOC 0.40.
+    *   *Post-state:* V 0.9634-1.0600 pu (Peak 1.85% violation).
+    *   *Switching:* `branches OPEN: line_3_4` (A branch is open).
+    *   *Changed demand elements:* load_bus_2, load_bus_3, load_bus_4, load_bus_5, load_bus_6, load_bus_9, load_bus_10, load_bus"
+IEEE14_SCN_001338,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,47.16634225845337,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Generator G2 went offline, which is the defined cause for E4, and the resulting state shows an overvoltage violation (E7).""
+}
+```"
+IEEE14_SCN_001027,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,56.17198634147644,0.5,False,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post scenario data and rules. The output must be a specific JSON format.
+
+2.  **Analyze the Scenario Data (IEEE14_SCN_001027):**
+    *   Pre: load 0.85, solar 0.93, wind 0.07, SOC 0.26
+    *   Post: V 0.9821-1.0600 pu, peak 1.13% viol 0, over/under/overload False.
+    *   *Observed Evidence:*
+        *   Switching: branches OPEN: line_2_5 | no generators offline. (Wait, the prompt says ""no generators offline"" but lists ""branches OPEN: line_"
+IEEE14_SCN_002781,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,63.842538833618164,0.5,False,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post scenario data and rules. The output must be a specific JSON format.
+
+2.  **Analyze the Scenario Data (IEEE14_SCN_002781):**
+    *   **Pre:** load 1.04, solar 0.61, wind 0.33, SOC 0.60
+    *   **Post:** V 0.9645-1.0600 pu peak 1.96% viol 0 under False over False overload False
+    *   **Switching:** no branches opened (No E3)
+    *   **Generators OFFLINE:** gen_G2 (Potential E4)
+    *   **Changed demand elements:** none (No E1, E2, E9)
+"
+IEEE14_SCN_001803,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,65.78159999847412,0.5,True,last-E-digit,"```json
+{
+  ""event_class"": ""E3|E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""A transmission line outage (E3) occurred, and the resulting post"
+IEEE14_SCN_000636,E2,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,67.79136204719543,0.5,True,last-E-digit,"```json
+{
+  ""event_class"": ""E2|E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event is classified as E2 (Load Drop) because demand"
+IEEE14_SCN_001535,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': True, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,65.71846032142639,0.5,False,last-E-digit,"```json
+{
+  ""event_class"": ""E5|E7"",
+  ""confidence"": 1.0,
+  """
+IEEE14_SCN_001668,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,57.58620882034302,0.5,True,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post scenario data and rules. The output must be a specific JSON format.
+
+2.  **Analyze the Scenario Data (IEEE14_SCN_001668):**
+    *   **Pre-state:** load 0.86, solar 0.69, wind 0.57, SOC 0.74.
+    *   **Post-state:** V 0.9822-1.0600 pu (Peak 1.20% violation).
+    *   **Switching:** No branches opened, no generators offline. (Rules E3, E4, E9 are likely out).
+    *   **Changed demand elements:** None. (Rules E1, E2 are likely out).
+    * "
+IEEE14_SCN_000512,E1,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,59.5849494934082,0.5,False,last-E-digit,"```json
+{
+  ""event_class"": ""E1|E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"":"
+IEEE14_SCN_002976,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,60.51081204414368,0.5,True,last-E-digit,"```json
+{
+  ""event_class"": ""E7|E9"",
+  ""confidence"
+IEEE14_SCN_001766,E5,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,56.403666734695435,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event involved a change in renewable generation (sgen_WIND6) with no demand change, resulting in an overvoltage condition (E7).""
+}
+```"
+IEEE14_SCN_001918,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.8701605796814,0.5,False,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post state and observed evidence.
+2.  **Analyze the Scenario (IEEE14_SCN_001918):**
+    *   Pre: load 1.05, solar 0.65, wind 0.92, SOC 0.64
+    *   Post: V 0.9337-1.0600 pu, peak 1.51% viol, 2 under True, over False.
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branches OPEN: line_6_13 | no generators offline. (Wait, the prompt says ""no generators offline"" but the switching list shows `line_6_13` is OPEN. This is a "
+IEEE14_SCN_002621,E9,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,61.845364809036255,0.5,True,last-E-digit,"```json
+{
+  ""event_class"": ""E7|E9"",
+  """
+IEEE14_SCN_001060,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,61.856937408447266,0.5,True,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post scenario data and observed evidence.
+2.  **Analyze the Scenario Data:**
+    *   Pre: load 0.93, solar 0.58, wind 0.57, SOC 0.47
+    *   Post: V 0.9458-1.0600 pu, peak 1.35% viol 0, over/under/overload False.
+    *   *Key Observation:* The post-event voltage range includes 1.0600 pu, which is > 1.05 pu. This suggests an Overvoltage condition (E7).
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branches OPEN: line_"
+IEEE14_SCN_002166,E7,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,57.60856223106384,1.0,False,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Multiple generators (G2, G3, G6, G8) are offline while demand remains unchanged, indicating a generator outage.""
+}
+```"
+IEEE14_SCN_001981,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,62.133076906204224,0.5,False,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post scenario data and observed evidence. The output must be a specific JSON format.
+
+2.  **Analyze the Scenario Data:**
+    *   Pre: load 1.03, solar 0.44, wind 0.56, SOC 0.73
+    *   Post: V 0.9364-1.0600 pu, peak 1.52% viol, 2 under True, over False.
+    *   *Key Observation:* The post-event voltage range (0.9364 to 1.0600 pu) includes a violation (V > 1.05 pu).
+
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branc"
+IEEE14_SCN_001828,E3,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,62.53780937194824,0.5,False,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post scenario data and observed evidence. The output must be a specific JSON format.
+
+2.  **Analyze the Scenario Data:**
+    *   *Pre:* load 1.07, solar 0.91, wind 0.33, SOC 0.28
+    *   *Post:* V 0.9378-1.0600 pu, peak 1.61% viol, 2 under True, over False.
+    *   *Observed Evidence (Telemetry):*
+        *   Switching: branches OPEN: line_6_13 | no generators offline. (Wait, the prompt says ""no generators offline"" but the switching list sh"
+IEEE14_SCN_001428,E4,E1_LLM,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,57.05421710014343,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""A generator (gen_G2) went offline while demand remained unchanged, which is the definition of a generator outage.""
+}
+```"
+IEEE14_SCN_000755,E2,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.58235168457031,0.5,False,last-E-digit,"```json
+{
+  ""event_class"": ""E2|E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_"
+IEEE14_SCN_001001,E3,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,60.78904056549072,0.5,True,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to classify an injected event class (E0, E1, E2, E3, E4, E5, E7, E9) based on provided pre/post-event data and rules. The output must be a specific JSON format.
+2.  **Analyze the Scenario (IEEE14_SCN_001001):**
+    *   Pre: load 1.10, solar 0.35, wind 0.76, SOC 0.80.
+    *   Post: V 0.9580-1.0600 pu peak 2.75% viol 0 under False over False overload False.
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branches OPEN: `line_1_2` | no generators offline. (Crucial: A line is opened).
+    *   Changed demand elements:"
+IEEE14_SCN_002945,E9,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,56.086320638656616,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event involves both a switching action (line_3_4 opened) and a significant change in demand (Delta load +40.28 MW).""
+}
+```"
+IEEE14_SCN_001338,E4,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.78543567657471,0.5,False,last-E-digit,"```json
+{
+  ""event_class"": ""E4|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event is caused by a generator outage (E4) and resulted in an overvoltage condition (E7) as evidenced by V"
+IEEE14_SCN_001027,E3,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,61.06515336036682,0.5,False,last-E-digit,"```json
+{
+  ""event_class"": ""E3|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""power_flow"",
+  ""reason"": ""A transmission line outage (line_2"
+IEEE14_SCN_002781,E9,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,61.05168890953064,0.5,False,last-E-digit,"The user wants me to act as a grid-aware LLM operator and diagnose an injected event class based on provided telemetry and rules.
+
+**Scenario Analysis:**
+*   **Pre-state:** load 1.04, solar 0.61, wind 0.33, SOC 0.60
+*   **Post-state:** V 0.9645-1.0600 pu peak 1.96% viol 0 under False over False overload False
+*   **Switching:** no branches opened
+*   **Generators OFFLINE:** gen_G2 (This is a generator outage)
+*   **Changed demand elements:** none
+*   **Changed renewable elements:** sgen_PV14, sgen_WIND6 (This is a renewable ramp)
+*   **Delta load:** +0.00 MW (No change in load)
+*   **Delta sla"
+IEEE14_SCN_001803,E3,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,61.34378933906555,0.5,False,last-E-digit,"The user wants me to act as a grid-aware LLM operator and diagnose an injected event class based on provided evidence and rules.
+
+**Scenario Analysis:**
+*   **Pre-state:** load 1.09, solar 0.82, wind 0.36, SOC 0.55
+*   **Post-state:** V 0.9335-1.0600 pu, peak 1.59% viol, 2 under True, over False.
+*   **Observed evidence:**
+    *   Switching: branches OPEN: line_6_13 | no generators offline
+    *   Changed demand elements: none
+    *   Changed renewable elements: none
+    *   Delta load: +0.00 MW
+    *   Delta slack generation: +1.16 MW
+    *   Delta losses: +1.16 MW
+    *   Delta V_min: -0.038"
+IEEE14_SCN_000636,E2,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,55.403481245040894,1.0,False,json,"```json
+{
+  ""event_class"": ""E2|E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event is classified as E2 because the load dropped (-3.73 MW) with no switching, and E7 because the post-event voltage reached 1.0600 pu, exceeding the 1.05 pu threshold.""
+}
+```"
+IEEE14_SCN_001535,E5,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.920552253723145,0.5,False,last-E-digit,"The user wants me to act as a grid-aware LLM operator and diagnose an injected event class based on provided evidence and rules.
+
+**Scenario Analysis:**
+*   **Pre-state:** load 0.77, solar 0.80, wind 0.22, SOC 0.60.
+*   **Post-state:** V 0.9869-1.0600 pu, peak 1.03% viol, 0 under/overload.
+*   **Switching:** No branches opened, no generators offline.
+*   **Changed demand elements:** None.
+*   **Changed renewable elements:** `sgen_PV14` (This is a change).
+*   **Delta load:** +0.00 MW (No change).
+*   **Delta slack generation:** -2.59 MW (Change).
+*   **Delta losses:** -0.18 MW (Change).
+*   **"
+IEEE14_SCN_001668,E5,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,58.39388966560364,1.0,False,json,"```json
+{
+  ""event_class"": ""E5|E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""Renewable elements changed output without switching or load change (E5), and the post-event voltage reached 1.0600 pu, indicating an overvoltage (E7).""
+}
+```"
+IEEE14_SCN_000512,E1,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.969496726989746,0.5,False,last-E-digit,"```json
+{
+  ""event_class"": ""E1|E7"",
+  ""confidence"": "
+IEEE14_SCN_002976,E9,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,56.68983268737793,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event is compound (E9) as a switching event (line_10_11 OPEN) occurred simultaneously with a significant change in demand (Delta load +67.92 MW).""
+}
+```"
+IEEE14_SCN_001766,E5,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.937259674072266,1.0,False,json,"```json
+{
+  ""event_class"": ""E5|E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event involved a change in renewable generation (sgen_WIND6) without switching, resulting in an overvoltage condition (V_max = 1.0600 pu).""
+}
+```"
+IEEE14_SCN_001918,E3,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,59.086379289627075,1.0,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""A transmission line (line_6_13) was opened, and the demand remained unchanged.""
+}
+```"
+IEEE14_SCN_002621,E9,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,59.677284717559814,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event is compound, involving both a switching action (line_1_2 opened) and a significant change in demand elements, resulting in an overvoltage (E7).""
+}
+```"
+IEEE14_SCN_001060,E3,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.9816529750824,0.5,False,last-E-digit,"```json
+{
+  ""event_class"": ""E3|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""contingency"",
+  """
+IEEE14_SCN_002166,E7,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,61.061772108078,0.5,True,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to classify an injected event class (E0, E1, E2, E3, E4, E5, E7, E9) based on provided telemetry and rules for Scenario IEEE14_SCN_002166. The output must be a specific JSON format.
+
+2.  **Analyze the Input Data (Pre/Post/Telemetry):**
+    *   **Pre:** load 0.82, solar 0.95, wind 0.70, SOC 0.46.
+    *   **Post:** V 1.0033-1.0800 pu, peak 1.11% viol 1, under False, over True, overload False.
+    *   **Switching:** no branches opened.
+    *   **Generators OFFLINE:** gen_G2, gen_G3, gen_G6, gen_G8.
+    *   **Changed demand elements:** no"
+IEEE14_SCN_001981,E3,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,55.104907512664795,0.95,False,json,"```json
+{
+  ""event_class"": ""E3|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""contingency"",
+  ""reason"": ""A transmission line outage (line_6_13) occurred with no change in demand, resulting in an overvoltage condition (V up to 1.0600 pu).""
+}
+```"
+IEEE14_SCN_001828,E3,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,60.9279887676239,0.5,True,last-E-digit,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"":"
+IEEE14_SCN_001428,E4,E2_LLM_RAG,gemma-4-E4B-it-Q4_0.gguf,False,True,False,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,61.0942862033844,0.5,False,json,"The user wants me to act as a grid-aware LLM operator and diagnose an injected event class based on provided evidence and rules.
+
+**Scenario Analysis:**
+*   **Pre-state:** load 0.96, solar 0.34, wind 0.92, SOC 0.40.
+*   **Post-state:** V 0.9742-1.0600 pu, peak 1.65% viol, 0 under/overload.
+*   **Observed evidence:**
+    *   Switching: no branches opened.
+    *   Generators OFFLINE: gen_G2 (This is a generator outage).
+    *   Changed demand elements: none.
+    *   Changed renewable elements: none.
+    *   Delta load: +0.00 MW.
+    *   Delta slack generation: +41.81 MW.
+    *   Delta losses: +1"
+IEEE14_SCN_000755,E2,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,63.412312507629395,0.5,True,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided scenario evidence. The output must be a specific JSON format.
+2.  **Analyze the Scenario Data:**
+    *   **Pre-state:** load 0.81, solar 0.26, wind 0.81, SOC 0.26.
+    *   **Post-state:** V 0.9838-1.0600 pu (Peak 0.91% violation).
+    *   **Switching:** No branches opened, no generators offline.
+    *   **Changed demand elements:** load_bus_2, load_bus_3, load_bus_4, load_bus_5. (Demand changed).
+    *   **Changed renewable elements:** None.
+  "
+IEEE14_SCN_001001,E3,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,60.023436546325684,0.5,True,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post state and observed evidence.
+2.  **Analyze the Scenario (IEEE14_SCN_001001):**
+    *   Pre: load 1.10, solar 0.35, wind 0.76, SOC 0.80.
+    *   Post: V 0.9580-1.0600 pu, peak 2.75% viol, 0 under/overload, False over/under.
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branches OPEN: line_1_2 | no generators offline. (Wait, the prompt says ""branches OPEN: line_1_2"" but the rules for E3/E4/E9 usually relate to *in"
+IEEE14_SCN_002945,E9,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,63.23722839355469,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The scenario exhibits both a switching event (line_3_4 opened) and a change in demand (Delta load +40.28 MW), meeting the criteria for a Compound event.""
+}
+```"
+IEEE14_SCN_001338,E4,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.46886324882507,0.5,False,last-E-digit,"The user wants me to act as a grid-aware LLM operator and diagnose an injected event class based on provided telemetry and rules.
+
+**Scenario Analysis:**
+*   **Pre-state:** load 0.84, solar 0.51, wind 0.24, SOC 0.79
+*   **Post-state:** V 0.9836-1.0600 pu, peak 1.46% viol 0, over/under load False.
+*   **Observed evidence:**
+    *   Switching: no branches opened.
+    *   Generators OFFLINE: gen_G2 (This is a change in generator status).
+    *   Changed demand elements: none.
+    *   Changed renewable elements: none.
+    *   Delta load: +0.00 MW.
+    *   Delta slack generation: +41.41 MW.
+    *  "
+IEEE14_SCN_001027,E3,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,57.99942064285278,1.0,False,json,"```json
+{
+  ""event_class"": ""E3|E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""A line outage (E3) occurred, and the post-event telemetry shows an overvoltage condition (E7) with V_max = 1.0600 pu.""
+}
+```"
+IEEE14_SCN_002781,E9,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,False,True,False,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,61.1070990562439,0.5,False,fallback-E0,```
+IEEE14_SCN_001803,E3,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,60.87083911895752,0.5,True,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to classify an injected event class (E0, E1, E2, E3, E4, E5, E7, E9) based on provided pre/post scenario data and observed telemetry.
+2.  **Analyze the Scenario Data:**
+    *   Pre: load 1.09, solar 0.82, wind 0.36, SOC 0.55
+    *   Post: V 0.9335-1.0600 pu, peak 1.59% viol, 2 under True, over False.
+    *   *Key Observation:* The post-event state shows a voltage violation (V_max = 1.0600 pu, which is > 1.05 pu).
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branches OPEN: line_6_13 | no generators offline. (Wa"
+IEEE14_SCN_000636,E2,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,52.730459451675415,1.0,True,json,"```json
+{
+  ""event_class"": ""E2"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The load decreased by 3.73 MW (Delta load is negative) with no switching, classifying it as a Load Drop (E2), which subsequently resulted in an overvoltage (E7).""
+}
+```"
+IEEE14_SCN_001535,E5,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,52.575878381729126,1.0,True,json,"```json
+{
+  ""event_class"": ""E5"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The event is caused by a change in the renewable element sgen_PV14 while demand and switching remain unchanged.""
+}
+```"
+IEEE14_SCN_001668,E5,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.94217896461487,0.5,False,last-E-digit,"The user wants me to act as a grid-aware LLM operator and diagnose an injected event class based on provided evidence.
+
+**Scenario:** IEEE14_SCN_001668
+**Pre-state:** load 0.86, solar 0.69, wind 0.57, SOC 0.74
+**Post-state:** V 0.9822-1.0600 pu, peak 1.20% viol 0, over/under load False.
+
+**Observed evidence:**
+1.  **Switching:** no branches opened | no generators offline. (Rules E3, E4, E9 are likely out).
+2.  **Changed demand elements:** none. (Rules E1, E2, E9 are likely out).
+3.  **Changed renewable elements:** sgen_PV14, sgen_WIND6. (Rule E5 is relevant).
+4.  **Delta load:** +0.00 MW. (Rul"
+IEEE14_SCN_000512,E1,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,60.696542501449585,0.5,True,last-E-digit,"```json
+{
+  ""event_class"": ""E1"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event is"
+IEEE14_SCN_002976,E9,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,59.674766063690186,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The event is compound (E9) as both a switching event (line_10_11 opened) and a positive change in demand (+67.92 MW) occurred simultaneously.""
+}
+```"
+IEEE14_SCN_001766,E5,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.41039752960205,0.5,False,fallback-E0,"```json
+{
+  ""event_class"": """
+IEEE14_SCN_001918,E3,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.44204616546631,0.5,False,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to classify an injected event class (E0, E1, E2, E3, E4, E5, E7, E9) based on provided pre/post scenario data and observed telemetry.
+2.  **Analyze the Scenario Data:**
+    *   Pre: load 1.05, solar 0.65, wind 0.92, SOC 0.64
+    *   Post: V 0.9337-1.0600 pu, peak 1.51% viol, 2 under True, over False.
+    *   *Key Observation:* The post-event state shows a voltage violation (V_max = 1.0600 pu, which is > 1.05 pu).
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branches OPEN: line_6_13 | no generators offline. (Wa"
+IEEE14_SCN_002621,E9,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,64.0891604423523,0.5,True,last-E-digit,"```json
+{
+  ""event_class"": ""E7|E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The event is compound (E9) as it involves both a switching action (line_1_2 open) and a positive change in load demand, resulting in"
+IEEE14_SCN_001060,E3,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,59.88900589942932,0.5,True,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to classify an injected event class (E0, E1, E2, E3, E4, E5, E7, E9) based on provided pre- and post-event data and specific rules.
+2.  **Analyze the Scenario (IEEE14_SCN_001060):**
+    *   Pre: load 0.93, solar 0.58, wind 0.57, SOC 0.47
+    *   Post: V 0.9458-1.0600 pu, peak 1.35% viol 0, over/under False.
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branches OPEN: line_6_13 | no generators offline. (Wait, the rule for E3/E4 says ""no generators offline"" is a condition, but the telemetry says ""branches OPEN: l"
+IEEE14_SCN_002166,E7,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,59.9052951335907,0.5,True,last-E-digit,"The user wants me to act as a grid-aware LLM operator and diagnose an injected event class based on provided evidence.
+
+**Scenario:** IEEE14_SCN_002166
+**Pre-state:** load 0.82, solar 0.95, wind 0.70, SOC 0.46
+**Post-state:** V 1.0033-1.0800 pu, peak 1.11% viol 1 under False, over True, overload False.
+
+**Observed Evidence:**
+1.  **Switching:** no branches opened.
+2.  **Generators OFFLINE:** gen_G2, gen_G3, gen_G6, gen_G8.
+3.  **Changed demand elements:** none.
+4.  **Changed renewable elements:** none.
+5.  **Delta load:** +0.00 MW.
+6.  **Delta slack generation:** -0.31 MW.
+7.  **Delta losses:*"
+IEEE14_SCN_001981,E3,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.08209252357483,0.5,False,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post state and observed evidence.
+2.  **Analyze the Scenario (IEEE14_SCN_001981):**
+    *   Pre: load 1.03, solar 0.44, wind 0.56, SOC 0.73
+    *   Post: V 0.9364-1.0600 pu, peak 1.52% viol, 2 under True, over False.
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branches OPEN: line_6_13 | no generators offline. (Wait, the rule for E3/E4 says ""no generators offline"" is a condition, but the telemetry says ""branches OPE"
+IEEE14_SCN_001828,E3,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,60.183316469192505,0.5,True,last-E-digit,"Thinking Process:
+
+1.  **Analyze the Request:** The goal is to diagnose the INJECTED EVENT CLASS (E0, E1, E2, E3, E4, E5, E7, E9) based on the provided pre/post state and observed evidence.
+2.  **Analyze the Scenario (IEEE14_SCN_001828):**
+    *   Pre: load 1.07, solar 0.91, wind 0.33, SOC 0.28
+    *   Post: V 0.9378-1.0600 pu, peak 1.61% viol, 2 under True, over False.
+3.  **Analyze the Observed Evidence (Telemetry):**
+    *   Switching: branches OPEN: line_6_13 | no generators offline. (Wait, the rule for E3/E4 says ""no generators offline"" is a condition, but the telemetry says ""branches OPE"
+IEEE14_SCN_001428,E4,E3_LLM_Tools,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,55.95783734321594,1.0,False,json,"```json
+{
+  ""event_class"": ""E4|E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""A generator went offline (E4) and the post-event telemetry shows the maximum voltage exceeding 1.05 pu (E7).""
+}
+```"
+IEEE14_SCN_000755,E2,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,58.56797981262207,0.95,False,json,"```json
+{
+  ""event_class"": ""E2|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The event is an E2 Load Drop because demand decreased by 27.31 MW with no switching, and it is an E7 Overvoltage because the post-event voltage reached 1.0600 pu.""
+}
+```"
+IEEE14_SCN_001001,E3,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,53.13229584693909,0.95,False,json,"```json
+{
+  ""event_class"": ""E3|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""contingency"",
+  ""reason"": ""The line_1_2 was opened (E3) with no change in demand, resulting in an overvoltage condition (E7) where V reached 1.0600 pu.""
+}
+```"
+IEEE14_SCN_002945,E9,E4_Full,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,60.412721395492554,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The event is classified as E9 because a switching event (line_3_4 opened) occurred simultaneously with a significant change in demand (Delta load +40.28 MW).""
+}
+```"
+IEEE14_SCN_001338,E4,E4_Full,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,51.42439079284668,1.0,True,json,"```json
+{
+  ""event_class"": ""E4"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""Generator G2 went offline while demand remained unchanged, which is the definition of a Generator Outage (E4).""
+}
+```"
+IEEE14_SCN_001027,E3,E4_Full,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,60.841819047927856,0.5,True,last-E-digit,"The user wants me to act as a grid-aware LLM operator and diagnose an injected event class based on provided evidence and rules.
+
+**Scenario Analysis:**
+*   **Pre-state:** load 0.85, solar 0.93, wind 0.07, SOC 0.26
+*   **Post-state:** V 0.9821-1.0600 pu, peak 1.13% viol 0, under False, over False, overload False.
+*   **Observed evidence:**
+    *   Switching: branches OPEN: line_2_5 | no generators offline.
+    *   Changed demand elements: none.
+    *   Changed renewable elements: none.
+    *   Delta load: +0.00 MW.
+    *   Delta slack generation: +0.70 MW.
+    *   Delta losses: +0.70 MW.
+    *"
+IEEE14_SCN_002781,E9,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.635050773620605,0.5,False,last-E-digit,"The user wants me to act as a grid-aware LLM operator and diagnose an injected event class based on provided evidence and rules.
+
+**Scenario Analysis:**
+*   **Pre-state:** load 1.04, solar 0.61, wind 0.33, SOC 0.60
+*   **Post-state:** V 0.9645-1.0600 pu peak 1.96% viol 0 under False over False overload False
+*   **Switching:** no branches opened
+*   **Generators OFFLINE:** gen_G2 (This is a generator outage)
+*   **Changed demand elements:** none
+*   **Changed renewable elements:** sgen_PV14, sgen_WIND6
+*   **Delta load:** +0.00 MW
+*   **Delta slack generation:** +56.18 MW
+*   **Delta losses:**"
+IEEE14_SCN_001803,E3,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.843284606933594,0.5,False,last-E-digit,"```json
+{
+  ""event_class"": ""E3|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""contingency"",
+  ""reason"": ""A transmission line outage (line_6_13 OPEN) occurred with no change in demand, leading to an overvoltage condition"
+IEEE14_SCN_000636,E2,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.83896517753601,0.5,False,last-E-digit,"The user wants me to act as a grid-aware LLM operator and diagnose an injected event class based on provided evidence and rules.
+
+**Scenario Analysis:**
+*   **Pre-state:** load 0.78, solar 0.52, wind 0.70, SOC 0.64.
+*   **Post-state:** V 0.9859-1.0600 pu, peak 1.04% viol 0, under False, over False, overload False.
+*   **Observed evidence:**
+    *   Switching: no branches opened | no generators offline.
+    *   Changed demand elements: load_bus_4.
+    *   Changed renewable elements: none.
+    *   Delta load: -3.73 MW.
+    *   Delta slack generation: -3.99 MW.
+    *   Delta losses: -0.26 MW.
+   "
+IEEE14_SCN_001535,E5,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,56.58291721343994,0.95,False,json,"```json
+{
+  ""event_class"": ""E5|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""power_flow"",
+  ""reason"": ""A renewable element changed output (sgen_PV14) while demand remained constant, resulting in an overvoltage condition (V_max 1.0600 pu).""
+}
+```"
+IEEE14_SCN_001668,E5,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': True, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,60.80522584915161,0.5,False,last-E-digit,"```json
+{
+  ""event_class"": ""E5|E7"",
+  ""confidence"": 0"
+IEEE14_SCN_000512,E1,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,57.976383686065674,0.95,False,json,"```json
+{
+  ""event_class"": ""E1|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The event is E1 because demand increased by +0.63 MW without any switching, and E7 because the post-event voltage reached 1.0600 pu, exceeding the 1.05 pu threshold.""
+}
+```"
+IEEE14_SCN_002976,E9,E4_Full,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,61.103511095047,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The event is classified as E9 because both a switching event (line_10_11 opened) and a significant change in demand (Delta load +67.92 MW) occurred simultaneously.""
+}
+```"
+IEEE14_SCN_001766,E5,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,54.54820537567139,0.95,False,json,"```json
+{
+  ""event_class"": ""E5|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""power_flow"",
+  ""reason"": ""The change in renewable output (sgen_WIND6) constitutes a Renewable Ramp (E5), and the post-event maximum voltage (1.0600 pu) indicates an Overvoltage (E7).""
+}
+```"
+IEEE14_SCN_001918,E3,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,59.34780192375183,1.0,False,json,"```json
+{
+  ""event_class"": ""E3|E7"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""A transmission line outage (line_6_13 OPEN) occurred with no change in demand, resulting in an overvoltage condition (V_max = 1.0600 pu).""
+}
+```"
+IEEE14_SCN_002621,E9,E4_Full,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,62.755390644073486,1.0,True,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""grid_query"",
+  ""reason"": ""The event involves both a switching action (line_1_2 opened) and a significant change in demand (+50.88 MW), fitting the definition of a Compound event.""
+}
+```"
+IEEE14_SCN_001060,E3,E4_Full,gemma-4-E4B-it-Q4_0.gguf,True,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",SUCCESS,1010.8486232757568,0.95,True,json,"```json
+{
+  ""event_class"": ""E3"",
+  ""confidence"": 0.95,
+  ""tool"": ""contingency"",
+  ""reason"": ""The evidence shows a transmission line (line_6_13) was opened (switching event) while the demand remained unchanged (Delta load = 0.00 MW).""
+}
+```"
+IEEE14_SCN_002166,E7,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,39.15013790130615,0.95,False,json,"```json
+{
+  ""event_class"": ""E4|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""grid_query"",
+  ""reason"": ""Multiple generators went offline (E4) while demand remained unchanged, resulting in a post-event overvoltage condition (E7) where V_max exceeded 1.05 pu.""
+}
+```"
+IEEE14_SCN_001981,E3,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,40.81894373893738,0.95,False,json,"```json
+{
+  ""event_class"": ""E3|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""contingency"",
+  ""reason"": ""A transmission line outage (line_6_13 OPEN) occurred with no change in demand, resulting in an overvoltage condition (V=1.06 pu).""
+}
+```"
+IEEE14_SCN_001828,E3,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': True, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,44.47090697288513,0.95,False,json,"```json
+{
+  ""event_class"": ""E3|E7"",
+  ""confidence"": 0.95,
+  ""tool"": ""contingency"",
+  ""reason"": ""A transmission line (line_6_13) was opened (switching event) while demand remained unchanged, leading to an overvoltage condition (V_max = 1.0600 pu).""
+}
+```"
+IEEE14_SCN_001428,E4,E4_Full,gemma-4-E4B-it-Q4_0.gguf,False,True,True,"{'H-NUM': False, 'H-TOP': False, 'H-EQP': False, 'H-PHY': False, 'H-TOOL': False, 'H-ACT': False}",NO_EFFECT,48.326197147369385,1.0,False,json,"```json
+{
+  ""event_class"": ""E9"",
+  ""confidence"": 1.0,
+  ""tool"": ""contingency"",
+  ""reason"": ""The event involves a generator outage (E4) and results in an overvoltage condition (E7), classifying it as a compound event (E9).""
+}
+```"
