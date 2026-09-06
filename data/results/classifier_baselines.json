@@ -1,0 +1,11 @@
+{
+  "note": "classifiers fitted on the non-pilot corpus scenarios, evaluated on the 140-scenario pilot draw; features mirror the LLM observation blocks",
+  "n_train": 2860,
+  "n_test": 140,
+  "state_logistic_regression_acc": 47.9,
+  "state_gradient_boosting_acc": 64.3,
+  "telemetry_logistic_regression_acc": 100.0,
+  "telemetry_gradient_boosting_acc": 100.0,
+  "majority_acc": 20.0,
+  "random_acc": 12.5
+}

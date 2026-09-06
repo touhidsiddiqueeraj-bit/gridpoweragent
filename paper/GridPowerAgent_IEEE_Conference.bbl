@@ -150,6 +150,6 @@ E.~Frantar, S.~Ashkboos, T.~Hoefler, and D.~Alistarh, ``{GPTQ}: Accurate
 
 \bibitem{llamacpp}
 G.~Gerganov and contributors, ``llama.cpp: {LLM} inference in {C/C++},''
-  \url{https://github.com/ggml-org/llama.cpp}, 2023, accessed 2026-08-31.
+  \url{github.com/ggml-org/llama.cpp}, 2023.
 
 \end{thebibliography}

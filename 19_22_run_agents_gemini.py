@@ -106,8 +106,11 @@ def _model_id(model):
 
 def _gemini_post(prompt, key, style, model_id, timeout, api_version="v1beta"):
     url = f"https://generativelanguage.googleapis.com/{api_version}/models/{model_id}:generateContent"
-    payload = {"contents": [{"role": "user", "parts": [{"text": prompt}]}],
-               "generationConfig": {"temperature": 0, "maxOutputTokens": 512}}
+    if isinstance(prompt, dict):   # multi-turn payload passed through verbatim
+        payload = prompt
+    else:
+        payload = {"contents": [{"role": "user", "parts": [{"text": prompt}]}],
+                   "generationConfig": {"temperature": 0, "maxOutputTokens": 512}}
     if style == "bearer":
         return requests.post(url, json=payload, timeout=timeout,
                              headers={"Authorization": f"Bearer {key}"})
@@ -386,7 +389,7 @@ def observed_evidence_block(row):
     ]
     return "Observed evidence (from telemetry):\n" + "\n".join(lines) + "\n"
 
-def build_prompt(row, config_name, rag_docs=None, tools_hint=False, include_description=True, evidence=False):
+def build_prompt(row, config_name, rag_docs=None, tools_hint=False, include_description=True, evidence=False, description_only=False, wls_est=None):
     # Taxonomy v2 (37_relabel_taxonomy): cause axis only — E6/E8 were rekeyed to
     # their injected mechanisms (outage->E3/E4, compound->E9); E7 overvoltage is
     # the sole remaining outcome class (its ladder mechanisms match the reading).
@@ -415,15 +418,31 @@ def build_prompt(row, config_name, rag_docs=None, tools_hint=False, include_desc
         # infer the class from the measured grid state alone
         inj_block = (f"Injected mechanism: {row.injected_mechanism} scope {row.injected_scope} targets {row.injected_targets}\n"
                      f"Injected description: {row.injected_description}\n"
-                     f"Effect: {row.effect_summary}\n") if include_description else ""
+                     f"Effect: {row.effect_summary}\n") if (include_description or description_only) else ""
+    if description_only:
+        # leakage quantification: the model sees ONLY the plain-language event
+        # description (no measurements, no state numbers)
+        header = "Diagnose the INJECTED EVENT CLASS (cause axis)."
+        body = "Scenario " + row.scenario_id + "\n" + inj_block
+    else:
+        if wls_est is not None and row.scenario_id in wls_est:
+            # WLS-estimated state (review-2 point 7): the Post block reports the
+            # iterative-WLS estimate, not privileged post-event truth
+            we = wls_est[row.scenario_id]
+            post = (f"V {we['est_v_min']:.4f}-{we['est_v_max']:.4f} pu peak {we['est_peak_loading']:.2f}% "
+                    f"viol {int(we['est_n_under'] + we['est_n_over'] + we['est_n_ol'])} "
+                    f"under {bool(we['est_n_under'] > 0)} over {bool(we['est_n_over'] > 0)} overload {bool(we['est_n_ol'] > 0)}")
+        else:
+            post = (f"V {row.post_v_min_pu:.4f}-{row.post_v_max_pu:.4f} pu peak {row.post_peak_loading_percent:.2f}% "
+                    f"viol {row.n_violations} under {row.has_undervoltage} over {row.has_overvoltage} overload {row.has_overload}")
+        body = ("Scenario " + row.scenario_id
+                + f"\nPre: load {row.pre_load_scale:.2f} solar {row.pre_solar_fraction:.2f} wind {row.pre_wind_fraction:.2f} SOC {row.pre_bess_soc:.2f}"
+                + f"\nPost: {post}\n" + inj_block)
     base = f"""You are a grid-aware LLM operator. {header}
 Taxonomy: {tax}
 Rules:
 {rules}
-Scenario {row.scenario_id}
-Pre: load {row.pre_load_scale:.2f} solar {row.pre_solar_fraction:.2f} wind {row.pre_wind_fraction:.2f} SOC {row.pre_bess_soc:.2f}
-Post: V {row.post_v_min_pu:.4f}-{row.post_v_max_pu:.4f} pu peak {row.post_peak_loading_percent:.2f}% viol {row.n_violations} under {row.has_undervoltage} over {row.has_overvoltage} overload {row.has_overload}
-{inj_block}Respond JSON only: {{"event_class":"E0-E5|E7|E9","confidence":0.0-1.0,"tool":"power_flow|contingency|opf|grid_query|state_estimation|n1_security","reason":"one sentence"}}"""
+{body}Respond JSON only: {{"event_class":"E0-E5|E7|E9","confidence":0.0-1.0,"tool":"power_flow|contingency|opf|grid_query|state_estimation|n1_security","reason":"one sentence"}}"""
     if rag_docs:
         base += "\nRAG context:\n" + "\n".join(rag_docs[:3])
     if tools_hint:
@@ -481,7 +500,7 @@ def simulate_config(cfg_name, cfg, scen, ref, model_label="mock"):
         rows.append({"scenario_id":s.scenario_id,"event_class":s.event_class,"config":cfg_name,"model":model_label,"correct_diag":correct_diag,"correct_tool":correct_tool,"grounded":grounded,"halluc":halluc_flags,"recommendation":rec,"latency":lat,"confidence":conf,"is_correct":correct_diag})
     return pd.DataFrame(rows)
 
-def run_real_gemini(scen, ref, api_keys, model, rpm, n_test, resume_path, out_csv, configs=None, physics_only=False, evidence=False):
+def run_real_gemini(scen, ref, api_keys, model, rpm, n_test, resume_path, out_csv, configs=None, physics_only=False, evidence=False, description_only=False, wls_est=None):
     # api_keys: list of credentials (a single key string is accepted for compat)
     if isinstance(api_keys, str):
         api_keys = [api_keys]
@@ -520,7 +539,8 @@ def run_real_gemini(scen, ref, api_keys, model, rpm, n_test, resume_path, out_cs
             if key in done:
                 continue
             prompt=build_prompt(s, cfg_name, rag_docs=rag, tools_hint=tools,
-                                include_description=not physics_only, evidence=evidence)
+                                include_description=not physics_only, evidence=evidence,
+                                description_only=description_only, wls_est=wls_est)
             try:
                 text, lat = call_gemini_pooled(prompt, pool, model=model)
                 pred_ec, conf, pred_tool, reason = parse_pred(text)
@@ -601,6 +621,10 @@ def main():
                    help="ablation: omit injected-mechanism/description/effect lines — diagnose from measured grid state only")
     p.add_argument("--evidence", action="store_true",
                    help="enriched observation: injected lines hidden, EMS-grade telemetry (switching + deltas) shown instead")
+    p.add_argument("--description-only", action="store_true",
+                   help="ablation: model sees only the plain-language event description, no grid-state numbers")
+    p.add_argument("--wls", action="store_true",
+                   help="supply the WLS-estimated state (41_wls_state.py output) instead of privileged post-event truth")
     args=p.parse_args()
     case_tag = "" if args.case == "ieee14" else f"_{args.case}"
     _sel = None
@@ -611,6 +635,14 @@ def main():
     ref_path = Path(args.labels_csv) if args.labels_csv else OUTPUT_DIR / (f"{args.case}_reference_labels.csv" if args.case != "ieee14" else "ieee14_reference_labels.csv")
     scen=pd.read_csv(scen_path)
     ref=pd.read_csv(ref_path)
+    wls_est = None
+    if getattr(args, "wls", False):
+        _w = Path("data/processed/ieee14_pilot_wls_estimates.csv")
+        if _w.exists():
+            wls_est = pd.read_csv(_w).set_index("scenario_id").to_dict("index")
+            print(f"[INFO] WLS-estimated state loaded for {len(wls_est)} scenarios")
+        else:
+            print("[WARN] --wls requested but estimates file missing; using true state")
     print(f"[INFO] scenarios: {scen_path} | labels: {ref_path}")
     if args.case == "case39":
         import pandas as _pd
@@ -737,7 +769,8 @@ def main():
             print(f"[INFO] Real Gemini {model} keys={len(keys)} RPM {args.rpm} (aggregate) n_test {args.n_test} -> {out}"
                   + (" [PHYSICS-ONLY ablation]" if args.physics_only else ""))
             df=run_real_gemini(scen, ref, keys, model, args.rpm, args.n_test, ckpt, out, configs=_sel,
-                               physics_only=args.physics_only, evidence=args.evidence)
+                               physics_only=args.physics_only, evidence=args.evidence,
+                               description_only=args.description_only, wls_est=wls_est)
         df.to_csv(out,index=False)
         print(f"[INFO] Saved {out} ({len(df)} rows)")
         tag = out.stem.replace("agent_runs_", "")

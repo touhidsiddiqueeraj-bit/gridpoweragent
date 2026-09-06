@@ -274,7 +274,7 @@ ax.text(0.485, 0.048, "E1 LLM -  E2 +RAG -  E3 +Tools -  E4 Full",
         ha="center", va="center", fontsize=6, color="#555", style="italic")
 
 ax.set_xlim(0, 1)
-ax.set_ylim(0, 0.86)
+ax.set_ylim(-0.012, 0.86)
 ax.axis("off")
 plt.tight_layout(pad=0.2)
 plt.savefig(FIGDIR / "fig_architecture.png", dpi=300)
@@ -287,7 +287,7 @@ stages = [
     ("03  Networks & hashes", "IEEE 14/39/118 - hash-pinned"),
     ("04  Operating points", "16k - load 0.70-1.10x"),
     ("05  Scenarios", "15k - classes E0-E9"),
-    ("06-07  Meas. + SE", "9.5M - closed-form SE"),
+    ("06-07  Meas. + SE", "9.5M - iterative WLS"),
     ("08-09  Severity + labels", "10 tools - tier rules"),
     ("10-14  Physics tools", "PF - N-1 - OPF - query"),
     ("16-17  Knowledge base", "FAISS 384-d - 8 docs"),

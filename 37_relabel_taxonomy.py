@@ -17,10 +17,13 @@ has_* outcome flags are untouched; the outcome information stays in the
 columns. Provenance column event_class_v1 preserves the old key.
 
 Outputs (data/processed/* is gitignored — regenerate deterministically):
-  data/processed/ieee14_scenarios_taxonomy2.csv / .jsonl
-  data/processed/ieee14_reference_labels_taxonomy2.csv  (assign_tier re-run,
+  data/processed/{case}_scenarios_taxonomy2.csv / .jsonl
+  data/processed/{case}_reference_labels_taxonomy2.csv  (assign_tier re-run,
   because tool tiers key on event_class)
+
+Run:  python3 37_relabel_taxonomy.py [--case ieee14|case39]
 """
+import argparse
 import json
 from pathlib import Path
 
@@ -42,6 +45,8 @@ RELABEL = {
     ("E6", "generator_outage"): "E4",
     ("E8", "compound"): "E9",
     ("E8", "line_outage"): "E3",
+    # case39 ladders key E8 surges under load_change (ieee14 has none)
+    ("E8", "load_change"): "E1",
 }
 
 
@@ -70,9 +75,14 @@ def relabel_frame(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main():
-    scen_path = PROCESSED / "ieee14_scenarios.csv"
-    jsonl_path = PROCESSED / "ieee14_scenarios.jsonl"
-    sev = pd.read_csv(PROCESSED / "ieee14_violation_severity.csv")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--case", default="ieee14", choices=["ieee14", "case39"])
+    args = ap.parse_args()
+    case = args.case
+
+    scen_path = PROCESSED / f"{case}_scenarios.csv"
+    jsonl_path = PROCESSED / f"{case}_scenarios.jsonl"
+    sev = pd.read_csv(PROCESSED / f"{case}_violation_severity.csv")
 
     scen = pd.read_csv(scen_path)
     n = len(scen)
@@ -87,11 +97,11 @@ def main():
     print(ct.to_string())
 
     # -- write scenarios -------------------------------------------------------
-    out_csv = PROCESSED / "ieee14_scenarios_taxonomy2.csv"
+    out_csv = PROCESSED / f"{case}_scenarios_taxonomy2.csv"
     out.to_csv(out_csv, index=False)
     if jsonl_path.exists():
         import ast
-        with open(jsonl_path) as f, open(PROCESSED / "ieee14_scenarios_taxonomy2.jsonl", "w") as g:
+        with open(jsonl_path) as f, open(PROCESSED / f"{case}_scenarios_taxonomy2.jsonl", "w") as g:
             for line in f:
                 if not line.strip():
                     continue
@@ -127,19 +137,22 @@ def main():
                         "provenance": "deterministic Stage5+Stage8, LLM-independent; taxonomy v2 (37)",
                         "leakage_audit": "severity_tier not in LLM input (input = structured_grid_state: voltages/loadings/outages only)"})
     labels = pd.DataFrame(records)
-    labels_csv = PROCESSED / "ieee14_reference_labels_taxonomy2.csv"
+    labels_csv = PROCESSED / f"{case}_reference_labels_taxonomy2.csv"
     labels.to_csv(labels_csv, index=False)
     print(f"[INFO] wrote {labels_csv} ({len(labels)} rows, {len(tools)} tools)")
 
     # -- pilot-draw distribution under the new key ----------------------------
-    runs = pd.read_csv(HERE / "data/results/agent_runs_gemini-3.5-flash-lite.csv")
+    if case == "ieee14":
+        runs = pd.read_csv(HERE / "data/results/agent_runs_gemini-3.5-flash-lite.csv")
+    else:
+        runs = pd.read_csv(HERE / "data/results/agent_runs_gemini-3_5-flash-lite_case39.csv")
     pilot_ids = set(runs.scenario_id.unique())
     pilot = out[out.scenario_id.isin(pilot_ids)]
     print(f"\nPilot draw ({len(pilot_ids)} scenarios) — class counts v1 -> v2:")
     comp = pd.DataFrame({"v1": pilot.event_class_v1.value_counts(),
                          "v2": pilot.event_class.value_counts()}).fillna(0).astype(int)
     print(comp.to_string())
-    print("\n[PASS] Stage 37 complete")
+    print(f"\n[PASS] Stage 37 complete ({case})")
 
 
 if __name__ == "__main__":

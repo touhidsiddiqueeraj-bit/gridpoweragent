@@ -1,0 +1,14 @@
+{
+  "API": {
+    "cause_acc": 100.0,
+    "outcome_consistent": 94.3,
+    "tool_consistent": 60.2,
+    "n": 560
+  },
+  "Local": {
+    "cause_acc": 96.4,
+    "outcome_consistent": 93.6,
+    "tool_consistent": 59.6,
+    "n": 560
+  }
+}

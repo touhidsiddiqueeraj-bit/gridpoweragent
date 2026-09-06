@@ -1,26 +1,26 @@
 {
   "api": {
     "power_flow": {
-      "n": 291,
-      "required": 103,
-      "pct": 35.4
+      "n": 317,
+      "required": 131,
+      "pct": 41.3
     },
     "contingency": {
-      "n": 244,
-      "required": 174,
-      "pct": 71.3
+      "n": 206,
+      "required": 206,
+      "pct": 100.0
     }
   },
   "local": {
     "power_flow": {
-      "n": 49,
-      "required": 12,
-      "pct": 24.5
+      "n": 73,
+      "required": 19,
+      "pct": 26.0
     },
     "contingency": {
-      "n": 327,
-      "required": 255,
-      "pct": 78.0
+      "n": 315,
+      "required": 315,
+      "pct": 100.0
     }
   }
 }
