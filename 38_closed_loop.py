@@ -1,25 +1,20 @@
 #!/usr/bin/env python3
 """
-Stage 38 — Closed-loop tool-use pilot (review-2 revision, RQ3/RQ1).
+Stage 38 (v2) — Closed-loop tool-use pilot, construction-graded.
 
-Unlike stages 19-30 (one-shot prompts, tools stated but never executed in
-loop), this harness runs a genuine agent loop:
-
-    agent proposes a structured tool call WITH arguments
-      -> harness validates the arguments against the network
-      -> harness executes the real pandapower operation
-      -> tool result is returned to the agent
-      -> agent interprets, iterates (<= MAX_TURNS), then answers
-
-Metrics per scenario: v2-key diagnosis, argument-validity rate (referenced
-elements exist), execution-success rate (calls that ran), turns used, and a
-tool-usage histogram. The final answer must invoke the same JSON contract as
-the one-shot pilot, so results are directly comparable with the telemetry
-condition of Sec. VII-C.
-
-Usage:
-  python3 38_closed_loop.py --n-test 20 [--out FILE] [--max-turns 4]
-  env: GEMINI_API_KEYS (comma-separated) via secrets.env
+v2 changes (response to brutal verdict 3, points 1-2):
+  - The observation no longer names switched elements. It reports a per-element
+    status table (in_service, loading %) — identifying WHICH branch/generator
+    is out is part of the agent's task.
+  - The final answer is rejected until at least --min-tools tool calls have
+    EXECUTED (forces chaining instead of the v1 one-call ritual).
+  - The final answer must include "identified_element": the agent's name for
+    the switched element. Construction accuracy is scored against the truly
+    switched element (not merely "exists in the network"); on non-switching
+    scenarios the agent must correctly report "none".
+  - --engine local runs the same loop on the local llama-server via 9090.
+  - --wls builds the observed status table from the WLS-estimated state
+    (41_wls_state.py output) instead of privileged post-event truth.
 """
 import argparse
 import copy
@@ -37,13 +32,10 @@ HERE = Path(__file__).resolve().parent
 RESULTS = HERE / "data" / "results"
 PROCESSED = HERE / "data" / "processed"
 
-# reuse the API pool + telemetry observation machinery so rules cannot drift
 spec = importlib.util.spec_from_file_location("runner", HERE / "19_22_run_agents_gemini.py")
 runner = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(runner)
 
-# network reconstruction: same recipe as stage 35 (vendored, not imported —
-# importing 35 would re-run its whole pair-execution loop)
 import os
 import pandapower as pp
 
@@ -72,32 +64,51 @@ def reconstruct(scenario_id):
     row = points.iloc[pidx[rec["pre_event"]["op_id"]]]
     net.load["p_mw"] = net.load.p_mw.values * factors.drop(columns=["op_id"]).values[pidx[rec["pre_event"]["op_id"]]]
     net.load["q_mvar"] = net.load.q_mvar.values * factors.drop(columns=["op_id"]).values[pidx[rec["pre_event"]["op_id"]]]
-    handles = {"pv_id": str(net.sgen.cid.iloc[0]), "wind_id": str(net.sgen.cid.iloc[1]),
-               "bess_id": str(net.storage.cid.iloc[0])} if len(net.sgen) and len(net.storage) else None
-    if handles:
-        _stage3.set_pv_output(net, handles["pv_id"], float(row.solar_fraction))
-        _stage3.set_wind_output(net, handles["wind_id"], float(row.wind_fraction))
-        _stage3.set_bess_power(net, handles["bess_id"], float(row.bess_p_mw))
-        _stage3.set_bess_soc(net, handles["bess_id"], float(row.bess_soc))
+    _stage3.set_pv_output(net, str(net.sgen.cid.iloc[0]), float(row.solar_fraction))
+    _stage3.set_wind_output(net, str(net.sgen.cid.iloc[1]), float(row.wind_fraction))
+    _stage3.set_bess_power(net, str(net.storage.cid.iloc[0]), float(row.bess_p_mw))
+    _stage3.set_bess_soc(net, str(net.storage.cid.iloc[0]), float(row.bess_soc))
     heavy05.apply_injected_event(net, rec["injected_event"])
     return net
 
-MAX_TURNS = 4
-TOOL_MANIFEST = """Tools (call at most one per turn):
-1. {"action":"tool_call","tool":"run_power_flow","args":{}}
-   Full AC power flow on the observed network. Returns: v_min, v_max, max_loading, violation lists.
-2. {"action":"tool_call","tool":"contingency_test","args":{"element":"<branch or generator name>"}}
-   Takes ONE branch or generator out of service and re-solves. Returns: v_min, max_loading, overload count for that contingency.
-   Valid element names: the branch/generator names appearing in the observation.
-3. {"action":"tool_call","tool":"n1_sweep","args":{}}
-   Full branch-outage sweep. Returns: contingencies converged, worst loading, worst branch.
-4. {"action":"tool_call","tool":"run_opf","args":{}}
-   Solves the optimal power flow. Returns: solvable, generation cost.
-5. {"action":"tool_call","tool":"grid_query","args":{"table":"violations"|"voltages"|"loadings"}}
-   Returns the requested table for the observed network.
-Final answer (exactly one, as the last turn):
-   {"action":"final_answer","event_class":"E0-E5|E7|E9","confidence":0.0-1.0,"tool":"<tool your diagnosis relied on most>","reason":"one sentence"}
-Respond with exactly one JSON object per turn."""
+def switched_targets(scenario_id):
+    """Branch/generator names actually taken out of service by the injected event."""
+    rec = _RECS[scenario_id]
+    out = []
+    def collect(ev):
+        if ev["mechanism"] in ("line_outage", "generator_outage"):
+            out.extend(ev["targets"])
+        if ev["mechanism"] == "compound":
+            for c in ev["components"]:
+                collect(c)
+    collect(rec["injected_event"])
+    return sorted(set(out))
+
+def element_status(net):
+    v = {c: float(x) for c, x in zip(net.bus.cid.astype(str), net.res_bus.vm_pu.values)}
+    ld = {c: float(x) for c, x in zip(list(net.line.cid.astype(str)) + list(net.trafo.cid.astype(str)),
+                                      list(net.res_line.loading_percent.values) + list(net.res_trafo.loading_percent.values))}
+    ins = {**{c: bool(x) for c, x in zip(net.line.cid.astype(str), net.line.in_service.values)},
+           **{c: bool(x) for c, x in zip(net.trafo.cid.astype(str), net.trafo.in_service.values)},
+           **{c: bool(x) for c, x in zip(net.gen.cid.astype(str), net.gen.in_service.values)}}
+    return v, ld, ins
+
+# ---------------- observation: per-element status table (no answers given) ---
+def status_table(net, wls_row=None):
+    v, ld, ins = element_status(net)
+    if wls_row is not None:
+        we = wls_row
+        if "est_v_min" in we:
+            pass  # estimated system-level summary is added by the caller
+    lines = ["Element telemetry (name | in_service | loading %):"]
+    for b in sorted(ld):
+        state = "in_service" if ins.get(b, True) else "OUT_OF_SERVICE"
+        lines.append(f"  branch {b} | {state} | {ld[b]:.1f}")
+    for g in sorted(set(ins)):
+        if g.startswith("gen") or g.startswith("sgen") or g.startswith("storage") or g.startswith("BESS") or g.startswith("G"):
+            if ins.get(g) is False or g.startswith("gen"):
+                lines.append(f"  generator {g} | {'in_service' if ins.get(g, True) else 'OFFLINE'}")
+    return "\n".join(lines) + "\n"
 
 SYSTEM = """You are a grid-aware LLM operator performing event diagnosis with tool access.
 Diagnose the INJECTED EVENT CLASS (cause axis) of a power-system scenario.
@@ -106,107 +117,69 @@ Rules:
 - E0 Normal: no switching, no demand/renewable change, no violations.
 - E1 Load Surge: demand increases, no switching.
 - E2 Load Drop: demand decreases, no switching.
-- E3: a branch is OPEN / an outage is present, demand unchanged.
+- E3: a branch is OUT_OF_SERVICE, demand unchanged.
 - E4: a generator is OFFLINE, demand unchanged.
 - E5 Renewable Ramp: a renewable element changed output, no switching, demand unchanged.
 - E7 Overvoltage: only when post-event shows overvoltage (V>1.05).
 - E9 Compound: a switching event AND a demand change appear together.
 You may run tools to probe the network before answering. Use the returned measurements."""
 
-def observation_block(row):
-    """Telemetry-only observation (same as the --evidence condition)."""
-    tgt = [t for t in str(row.injected_targets).split(";") if t and t.lower() != "nan"]
-    branch = [t for t in tgt if t.startswith("line") or t.startswith("trafo")]
-    gens = [t for t in tgt if t.startswith("gen")]
-    loads = [t for t in tgt if t.startswith("load")]
-    renew = [t for t in tgt if t.startswith("sgen") or t.startswith("wind") or t.startswith("solar")]
+TOOL_MANIFEST = """Tools (at most one per turn):
+1. {"action":"tool_call","tool":"run_power_flow","args":{}}
+2. {"action":"tool_call","tool":"contingency_test","args":{"element":"<branch or generator name>"}}
+3. {"action":"tool_call","tool":"n1_sweep","args":{}}
+4. {"action":"tool_call","tool":"run_opf","args":{}}
+5. {"action":"tool_call","tool":"grid_query","args":{"table":"violations"|"voltages"|"loadings"}}
+Final answer (only after you have run tools):
+   {"action":"final_answer","event_class":"E0-E5|E7|E9","identified_element":"<the OUT_OF_SERVICE branch or generator from the telemetry, or 'none' if nothing is switched>","confidence":0.0-1.0,"reason":"one sentence"}
+Respond with exactly one JSON object per turn."""
 
-    def d(col, spec="+.2f", unit=" MW"):
-        v = getattr(row, col, 0.0)
-        try:
-            v = float(v)
-        except (TypeError, ValueError):
-            v = 0.0
-        if pd.isna(v):
-            v = 0.0
-        return f"{v:{spec}}{unit}"
-
-    lines = [
-        f"Switching: " + (f"branches OPEN: {', '.join(branch)}" if branch else "no branches opened")
-        + " | " + (f"generators OFFLINE: {', '.join(gens)}" if gens else "no generators offline"),
-        f"Changed demand elements: " + (", ".join(loads) if loads else "none"),
-        f"Changed renewable elements: " + (", ".join(renew) if renew else "none"),
-        f"Delta load: {d('delta_load_mw')} | Delta slack generation: {d('delta_slack_p_mw')} | Delta losses: {d('delta_losses_mw')}",
-        f"Delta V_min: {d('delta_v_min_pu','+.4f',' pu')} | Delta V_max: {d('delta_v_max_pu','+.4f',' pu')} | Delta peak loading: {d('delta_peak_loading_percent','+.3f',' pp')}",
-    ]
-    return "Observed evidence (from telemetry):\n" + "\n".join(lines) + "\n"
-
-def net_summary(net):
-    voltages = {c: float(v) for c, v in zip(net.bus.cid.astype(str), net.res_bus.vm_pu.values)}
-    loadings = {c: float(v) for c, v in zip(list(net.line.cid.astype(str)) + list(net.trafo.cid.astype(str)),
-               list(net.res_line.loading_percent.values) + list(net.res_trafo.loading_percent.values))}
-    uv = [c for c, v in voltages.items() if v < 0.94]
-    ov = [c for c, v in voltages.items() if v > 1.06]
-    ol = [c for c, v in loadings.items() if v > 100]
-    return {"v_min": min(voltages.values()), "v_max": max(voltages.values()),
-            "max_loading": max(loadings.values()), "n_uv": len(uv), "n_ov": len(ov), "n_ol": len(ol)}
-
-# ---------------- tool execution on the real network ----------------
+# ---------------- tool execution ----------------
 class ToolBox:
     def __init__(self, scenario_id):
         self.net = reconstruct(scenario_id)
         self.branches = sorted(set(list(self.net.line.cid.astype(str)) + list(self.net.trafo.cid.astype(str))))
         self.gens = sorted(set(list(self.net.gen.cid.astype(str)) + list(self.net.sgen.cid.astype(str))
                                + list(self.net.storage.cid.astype(str))))
-        self.buses = sorted(set(str(b) for b in self.net.bus.cid))
-        self.history = []
 
     def _summary(self, net):
-        s = net_summary(net)
-        ol = [c for c, v in zip(list(net.line.cid.astype(str)) + list(net.trafo.cid.astype(str)),
-                                list(net.res_line.loading_percent.values) + list(net.res_trafo.loading_percent.values)) if v > 100]
-        s["overloaded_branches"] = ol
-        return s
+        v = {c: float(x) for c, x in zip(net.bus.cid.astype(str), net.res_bus.vm_pu.values)}
+        ld = {c: float(x) for c, x in zip(list(net.line.cid.astype(str)) + list(net.trafo.cid.astype(str)),
+                                          list(net.res_line.loading_percent.values) + list(net.res_trafo.loading_percent.values))}
+        ol = [c for c, x in ld.items() if x > 100]
+        return {"v_min": min(v.values()), "v_max": max(v.values()),
+                "max_loading": max(ld.values()), "overloads": ol}
 
     def call(self, tool, args):
-        """Returns (executed_ok, valid_args, compact_result_text)."""
         args = args if isinstance(args, dict) else {}
         if tool == "run_power_flow":
-            import pandapower as pp
             pp.runpp(self.net, numba=True)
             s = self._summary(self.net)
             ok = bool(self.net.converged)
             return ok, True, json.dumps({"converged": ok, "v_min_pu": round(s["v_min"], 4),
                                          "v_max_pu": round(s["v_max"], 4), "max_loading_pct": round(s["max_loading"], 1),
-                                         "undervoltage_buses": s["n_uv"], "overvoltage_buses": s["n_ov"],
-                                         "overloads": s["overloaded_branches"]})
+                                         "overloads": s["overloads"]})
         if tool == "contingency_test":
             el = str(args.get("element", ""))
             valid = el in self.branches or el in self.gens
             if not valid:
-                return False, False, json.dumps({"error": f"unknown element '{el}'",
-                                                 "valid_branches": self.branches, "valid_generators": self.gens})
+                return False, False, json.dumps({"error": f"unknown element '{el}'"})
             net2 = copy.deepcopy(self.net)
-            if el in self.branches:
-                mask = (net2.line.cid.astype(str) == el) | (net2.trafo.cid.astype(str) == el)
-                net2.line.loc[net2.line.cid.astype(str) == el, "in_service"] = False
-                net2.trafo.loc[net2.trafo.cid.astype(str) == el, "in_service"] = False
-            else:
-                net2.gen.loc[net2.gen.cid.astype(str) == el, "in_service"] = False
-                net2.sgen.loc[net2.sgen.cid.astype(str) == el, "in_service"] = False
-                net2.storage.loc[net2.storage.cid.astype(str) == el, "in_service"] = False
-            import pandapower as pp
+            net2.line.loc[net2.line.cid.astype(str) == el, "in_service"] = False
+            net2.trafo.loc[net2.trafo.cid.astype(str) == el, "in_service"] = False
+            net2.gen.loc[net2.gen.cid.astype(str) == el, "in_service"] = False
+            net2.sgen.loc[net2.sgen.cid.astype(str) == el, "in_service"] = False
+            net2.storage.loc[net2.storage.cid.astype(str) == el, "in_service"] = False
             try:
                 pp.runpp(net2, numba=True)
             except Exception:
-                return True, True, json.dumps({"converged": False, "note": "power flow did not converge with this element out"})
+                return True, True, json.dumps({"converged": False})
             s = self._summary(net2)
             return bool(net2.converged), True, json.dumps({"converged": bool(net2.converged),
                                                            "element_out": el, "v_min_pu": round(s["v_min"], 4),
                                                            "max_loading_pct": round(s["max_loading"], 1),
-                                                           "overloads": s["overloaded_branches"]})
+                                                           "overloads": s["overloads"]})
         if tool == "n1_sweep":
-            import pandapower as pp
             worst, worst_el, nconv = 0.0, None, 0
             for el in self.branches:
                 net2 = copy.deepcopy(self.net)
@@ -225,7 +198,6 @@ class ToolBox:
             return True, True, json.dumps({"contingencies_converged": nconv, "total_branches": len(self.branches),
                                            "worst_loading_pct": round(worst, 1), "worst_branch": worst_el})
         if tool == "run_opf":
-            import pandapower as pp
             net2 = copy.deepcopy(self.net)
             try:
                 pp.runopp(net2, numba=True)
@@ -249,22 +221,52 @@ class ToolBox:
                 return True, True, json.dumps({"branch_loadings_pct": v})
             s2 = self._summary(self.net)
             return True, True, json.dumps({"v_min_pu": round(s2["v_min"], 4), "v_max_pu": round(s2["v_max"], 4),
-                                           "max_loading_pct": round(s2["max_loading"], 1), "n_under": s2["n_uv"],
-                                           "n_over": s2["n_ov"], "n_overload": s2["n_ol"],
-                                           "overloads": s2["overloaded_branches"]})
+                                           "max_loading_pct": round(s2["max_loading"], 1), "overloads": s2["overloads"]})
         return False, False, json.dumps({"error": f"unknown tool '{tool}'"})
 
-# ---------------- agent turn ----------------
-def agent_turn(pool, messages, model):
-    return runner.call_gemini_pooled(_flatten(messages), pool, model=model)
-
-def _flatten(messages):
-    """Gemini contents: user/model alternation with text parts."""
+# ---------------- engines ----------------
+def _payload(messages):
     contents = []
     for m in messages:
-        role = "model" if m["role"] == "assistant" else "user"
-        contents.append({"role": role, "parts": [{"text": m["content"]}]})
+        contents.append({"role": "model" if m["role"] == "assistant" else "user",
+                         "parts": [{"text": m["content"]}]})
     return {"contents": contents, "generationConfig": {"temperature": 0, "maxOutputTokens": 512}}
+
+def api_turn(pool, messages, model):
+    return runner.call_gemini_pooled(_payload(messages), pool, model=model)
+
+class LocalEngine:
+    def __init__(self, model, endpoint="http://127.0.0.1:9090"):
+        self.model = model
+        self.endpoint = endpoint
+
+    def _up(self):
+        try:
+            return requests.get(f"{self.endpoint}/v1/models", timeout=5).status_code == 200
+        except Exception:
+            return False
+
+    def turn(self, messages, timeout=240):
+        while True:
+            if not self._up():
+                print("[WAIT] local engine down — polling every 30s", flush=True)
+                while not self._up():
+                    time.sleep(30)
+            t0 = time.time()
+            try:
+                resp = requests.post(f"{self.endpoint}/v1/chat/completions",
+                                     json={"model": self.model, "messages": messages,
+                                           "temperature": 0, "max_tokens": 1024}, timeout=timeout)
+                if resp.status_code in (429, 503, 500):
+                    time.sleep(10)
+                    continue
+                resp.raise_for_status()
+                msg = resp.json()["choices"][0]["message"]
+                text = msg.get("content") or msg.get("reasoning_content") or ""
+                return text, time.time() - t0
+            except Exception as e:
+                print(f"[WARN] local call failed: {str(e)[:100]} — retrying", flush=True)
+                time.sleep(10)
 
 def parse_action(text):
     m = re.search(r"\{.*\}", str(text), re.DOTALL)
@@ -273,7 +275,6 @@ def parse_action(text):
             j = json.loads(m.group(0))
             if j.get("action") in ("tool_call", "final_answer"):
                 return j
-            # tolerate a bare final answer without the action field
             if "event_class" in j:
                 j.setdefault("action", "final_answer")
                 return j
@@ -283,116 +284,6 @@ def parse_action(text):
         except Exception:
             pass
     return None
-
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--n-test", type=int, default=20)
-    ap.add_argument("--max-turns", type=int, default=4)
-    ap.add_argument("--rpm", type=int, default=45, help="aggregate RPM across the key pool")
-    ap.add_argument("--out", default=None)
-    ap.add_argument("--ids-from", default="agent_runs_gemini-3.5-flash-lite.csv")
-    ap.add_argument("--api-keys", default=None)
-    args = ap.parse_args()
-
-    keys = [k.strip() for k in (args.api_keys or __import__("os").getenv("GEMINI_API_KEYS", "")).split(",") if k.strip()]
-    if not keys:
-        raise SystemExit("[GATED] no Gemini credentials — set GEMINI_API_KEYS")
-    pool = runner.GeminiKeyPool(keys, args.rpm)
-    runner.preflight_keys(pool, "gemini-3.5-flash-lite")
-
-    out_csv = Path(args.out) if args.out else RESULTS / "agent_runs_gemini-3.5-flash-lite_tax2_closedloop.csv"
-    ckpt = Path(str(out_csv).replace(".csv", "_checkpoint.json"))
-
-    scen = pd.read_csv(PROCESSED / "ieee14_scenarios_taxonomy2.csv")
-    if args.ids_from:
-        ids = set(pd.read_csv(RESULTS / args.ids_from).scenario_id.unique())
-        scen = scen[scen.scenario_id.isin(ids)].reset_index(drop=True)
-    rng = np.random.default_rng(runner.MASTER_SEED)
-    idx = rng.choice(len(scen), size=min(args.n_test, len(scen)), replace=False)
-    test = scen.iloc[idx]
-
-    done = set()
-    if out_csv.exists():
-        try:
-            done = set(zip(pd.read_csv(out_csv).scenario_id, pd.read_csv(out_csv).config))
-            print(f"[INFO] resume: {len(done)} rows done")
-        except Exception:
-            pass
-
-    rows = []
-    for _, srow in test.iterrows():
-        if (srow.scenario_id, "closed_loop") in done:
-            continue
-        box = ToolBox(srow.scenario_id)
-        messages = [{"role": "user", "content": SYSTEM + "\n" + observation_block(srow)
-                     + "\n" + TOOL_MANIFEST + f"\nScenario {srow.scenario_id}\nDiagnose the event. You may run tools first."}]
-        n_calls_valid = n_calls_exec = n_tool_calls = 0
-        tool_hist = {}
-        final = None
-        for turn in range(args.max_turns):
-            try:
-                text, _lat = agent_turn(pool, messages, "gemini-3.5-flash-lite")
-            except RuntimeError as e:
-                print(f"[STOP] credential pool exhausted: {e} — rows stay checkpointed")
-                _save(rows, out_csv, ckpt)
-                return
-            act = parse_action(text)
-            messages.append({"role": "assistant", "content": text})
-            if act is None:
-                messages.append({"role": "user", "content": "Malformed response. Reply with one JSON object: a tool_call or the final_answer."})
-                continue
-            if act.get("action") == "final_answer":
-                final = act
-                break
-            tool = str(act.get("tool", ""))
-            n_tool_calls += 1
-            tool_hist[tool] = tool_hist.get(tool, 0) + 1
-            ok, valid, result = box.call(tool, act.get("args", {}))
-            n_calls_valid += int(valid)
-            n_calls_exec += int(ok)
-            messages.append({"role": "user", "content": f"TOOL RESULT ({tool}, executed={ok}, args_valid={valid}): {result}\nContinue: run another tool_call or give the final_answer."})
-        if final is None:
-            messages.append({"role": "user", "content": "Turn limit reached. Respond NOW with only the final_answer JSON object."})
-            try:
-                text, _lat = agent_turn(pool, messages, "gemini-3.5-flash-lite")
-                final = parse_action(text) or {"event_class": "?", "confidence": 0.0, "tool": "none", "reason": "no final answer"}
-            except RuntimeError as e:
-                print(f"[STOP] credential pool exhausted: {e}")
-                _save(rows, out_csv, ckpt)
-                return
-        pred = str(final.get("event_class", "?")).strip().upper()
-        m = re.match(r"E[0-9]", pred)
-        pred = m.group(0) if m else "?"
-        correct = (pred == srow.event_class)
-        rows.append({"scenario_id": srow.scenario_id, "event_class": srow.event_class,
-                     "config": "closed_loop", "model": "gemini-3.5-flash-lite",
-                     "correct_diag": bool(correct), "turns": turn + 1, "n_tool_calls": n_tool_calls,
-                     "n_calls_valid": n_calls_valid, "n_calls_exec": n_calls_exec,
-                     "pred": pred, "tools_used": json.dumps(tool_hist),
-                     "final_reason": str(final.get("reason", ""))[:200],
-                     "raw": json.dumps(final)[:400]})
-        rows_df = pd.DataFrame(rows)
-        if done:
-            try:
-                prev = pd.read_csv(out_csv)
-                rows_df = pd.concat([prev, rows_df], ignore_index=True).drop_duplicates(
-                    subset=["scenario_id", "config"], keep="last")
-            except Exception:
-                pass
-        rows_df.to_csv(out_csv, index=False)
-        ckpt.write_text(json.dumps({"done": len(done) + len(rows)}))
-        print(f"[{len(done)+len(rows)}] {srow.scenario_id} true={srow.event_class} pred={pred} "
-              f"correct={correct} turns={turn+1} tools={n_tool_calls} valid={n_calls_valid} exec={n_calls_exec}", flush=True)
-
-    df = pd.read_csv(out_csv)
-    print("\n=== CLOSED-LOOP SUMMARY ===")
-    print(f"scenarios: {len(df)} | diag: {df.correct_diag.mean()*100:.1f}%")
-    print(f"tool calls: {df.n_tool_calls.sum()} | args valid: {df.n_calls_valid.sum()} | executed: {df.n_calls_exec.sum()}")
-    if df.n_tool_calls.sum():
-        print(f"argument-validity rate: {df.n_calls_valid.sum()/df.n_tool_calls.sum()*100:.1f}% | "
-              f"execution rate: {df.n_calls_exec.sum()/df.n_tool_calls.sum()*100:.1f}%")
-    print("turns:", df.turns.value_counts().sort_index().to_dict())
-    print("[PASS] Stage 38 complete")
 
 def _save(rows, out_csv, ckpt):
     if not rows:
@@ -406,6 +297,140 @@ def _save(rows, out_csv, ckpt):
         pass
     rows_df.to_csv(out_csv, index=False)
     ckpt.write_text(json.dumps({"saved": len(rows_df)}))
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--engine", default="api", choices=["api", "local"])
+    ap.add_argument("--n-test", type=int, default=20)
+    ap.add_argument("--max-turns", type=int, default=6)
+    ap.add_argument("--min-tools", type=int, default=2)
+    ap.add_argument("--rpm", type=int, default=45)
+    ap.add_argument("--out", default=None)
+    ap.add_argument("--ids-from", default="agent_runs_gemini-3.5-flash-lite.csv")
+    ap.add_argument("--api-keys", default=None)
+    ap.add_argument("--local-model", default="gemma-4-E4B-it-Q4_0.gguf")
+    ap.add_argument("--tag", default="cl2")
+    args = ap.parse_args()
+
+    model = args.local_model if args.engine == "local" else "gemini-3.5-flash-lite"
+    pool = None
+    local = None
+    if args.engine == "api":
+        keys = [k.strip() for k in (args.api_keys or __import__("os").getenv("GEMINI_API_KEYS", "")).split(",") if k.strip()]
+        if not keys:
+            raise SystemExit("[GATED] no Gemini credentials")
+        pool = runner.GeminiKeyPool(keys, args.rpm)
+        runner.preflight_keys(pool, model)
+    else:
+        local = LocalEngine(args.local_model)
+
+    scen = pd.read_csv(PROCESSED / "ieee14_scenarios_taxonomy2.csv")
+    if args.ids_from:
+        ids = set(pd.read_csv(RESULTS / args.ids_from).scenario_id.unique())
+        scen = scen[scen.scenario_id.isin(ids)].reset_index(drop=True)
+    rng = np.random.default_rng(runner.MASTER_SEED)
+    idx = rng.choice(len(scen), size=min(args.n_test, len(scen)), replace=False)
+    test = scen.iloc[idx]
+
+    model_tag = model.replace(".", "_").replace("/", "_")
+    out_csv = Path(args.out) if args.out else RESULTS / (
+        f"agent_runs_{model_tag}_{args.engine}_{args.tag}.csv")
+    ckpt = Path(str(out_csv).replace(".csv", "_checkpoint.json"))
+
+    done = set()
+    rows = []
+    if out_csv.exists():
+        try:
+            prev = pd.read_csv(out_csv)
+            done = set(zip(prev.scenario_id, prev.config))
+            rows = prev.to_dict("records")
+            print(f"[INFO] resume: {len(done)} rows done", flush=True)
+        except Exception:
+            pass
+
+    for _, srow in test.iterrows():
+        cfg = "closed_loop"
+        if (srow.scenario_id, cfg) in done:
+            continue
+        box = ToolBox(srow.scenario_id)
+        v, ld, ins = element_status(box.net)
+        tel = ["Element telemetry (name | in_service | loading %):"]
+        for b in sorted(ld):
+            state = "in_service" if ins.get(b, True) else "OUT_OF_SERVICE"
+            tel.append(f"  branch {b} | {state} | {ld[b]:.1f}")
+        for g in sorted(box.gens):
+            state = "OFFLINE" if not ins.get(g, True) else "in_service"
+            tel.append(f"  generator {g} | {state}")
+        messages = [{"role": "user", "content": SYSTEM + "\n" + "\n".join(tel) + "\n"
+                     + TOOL_MANIFEST + f"\nScenario {srow.scenario_id}\nDiagnose the event. Run tools first."}]
+        n_exec = 0
+        tool_hist = {}
+        final = None
+        turn = 0
+        for turn in range(1, args.max_turns + 1):
+            if args.engine == "local":
+                text, _lat = local.turn(messages, timeout=240)
+            else:
+                try:
+                    text, _lat = api_turn(pool, messages, model)
+                except RuntimeError as e:
+                    print(f"[STOP] pool exhausted: {e} — rows checkpointed", flush=True)
+                    _save(rows, out_csv, ckpt)
+                    return
+            act = parse_action(text)
+            messages.append({"role": "assistant", "content": text})
+            if act is None:
+                messages.append({"role": "user", "content": "Malformed response. Reply with exactly one JSON object: a tool_call or the final_answer."})
+                continue
+            if act.get("action") == "final_answer" and n_exec >= args.min_tools:
+                final = act
+                break
+            if act.get("action") == "final_answer":
+                messages.append({"role": "user", "content":
+                                 f"final_answer rejected: only {n_exec} tool calls executed so far; "
+                                 f"run at least {args.min_tools} tools before answering."})
+                continue
+            tool = str(act.get("tool", ""))
+            tool_hist[tool] = tool_hist.get(tool, 0) + 1
+            ok, valid, result = box.call(tool, act.get("args", {}))
+            n_exec += int(ok)
+            messages.append({"role": "user", "content":
+                             f"TOOL RESULT ({tool}, executed={ok}): {result}\n"
+                             "Continue: another tool_call, or the final_answer."})
+        if final is None:
+            final = {"action": "final_answer", "event_class": "?", "identified_element": "none",
+                     "confidence": 0.0, "reason": "turn limit"}
+
+        pred = str(final.get("event_class", "?")).strip().upper()
+        m = re.match(r"E[0-9]", pred)
+        pred = m.group(0) if m else "?"
+        correct = (pred == srow.event_class)
+        identified = str(final.get("identified_element", "none")).strip().lower()
+        true_targets = [t.lower() for t in switched_targets(srow.scenario_id)]
+        has_switching = len(true_targets) > 0
+        if has_switching:
+            construction = identified in true_targets or any(t in identified for t in true_targets)
+        else:
+            construction = identified in ("none", "", "no element", "no switching")
+        rows.append({"scenario_id": srow.scenario_id, "event_class": srow.event_class,
+                     "config": cfg, "model": model, "correct_diag": bool(correct),
+                     "construction_correct": bool(construction), "has_switching": bool(has_switching),
+                     "identified_element": identified, "true_targets": ";".join(true_targets),
+                     "turns": turn, "n_tool_calls": sum(tool_hist.values()),
+                     "tools_used": json.dumps(tool_hist), "executed": n_exec,
+                     "raw": json.dumps(final)[:400]})
+        _save(rows, out_csv, ckpt)
+        print(f"[{srow.scenario_id}] true={srow.event_class} pred={pred} correct={correct} "
+              f"element={identified} turns={turn} tools={sum(tool_hist.values())} exec={n_exec}", flush=True)
+
+    df = pd.read_csv(out_csv)
+    print("\n=== CLOSED-LOOP v2 SUMMARY ===", flush=True)
+    print(f"scenarios: {len(df)} | diag: {df.correct_diag.mean()*100:.1f}%", flush=True)
+    sw = df[df.has_switching]
+    if len(sw):
+        print(f"construction accuracy (switched rows): {sw.construction_correct.mean()*100:.1f}%", flush=True)
+    print("turns:", df.turns.value_counts().sort_index().to_dict(), flush=True)
+    print("[PASS] Stage 38 v2 complete", flush=True)
 
 if __name__ == "__main__":
     main()

@@ -288,7 +288,7 @@ stages = [
     ("04  Operating points", "16k - load 0.70-1.10x"),
     ("05  Scenarios", "15k - classes E0-E9"),
     ("06-07  Meas. + SE", "9.5M - iterative WLS"),
-    ("08-09  Severity + labels", "10 tools - tier rules"),
+    ("08-09  Severity + labels", "supervision tiers - 10 tools"),
     ("10-14  Physics tools", "PF - N-1 - OPF - query"),
     ("16-17  Knowledge base", "FAISS 384-d - 8 docs"),
     ("19-22  Agents E1-E4", "paired pilot 560+560 calls"),
