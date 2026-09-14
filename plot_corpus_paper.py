@@ -50,7 +50,7 @@ print("fig_corpus_composition.png saved")
 
 # ---- Fig: observation channels (grouped bars, values labeled, legend above) ----
 conds = ["Desc.\nonly", "Desc.\n+state", "Telem.", "Telem.\n(WLS)", "Raw\nstate"]
-api_vals = [100.0, 100.0, 93.9, 8.0, 97.1]
+api_vals = [100.0, 100.0, 93.9, 97.1, 8.0]
 loc_vals = [96.8, np.nan, np.nan, np.nan, np.nan]
 
 x = np.arange(len(conds))
@@ -59,7 +59,7 @@ fig, ax = plt.subplots(figsize=(3.5, 2.3))
 bars1 = ax.bar(x - bw / 2, api_vals, bw, label="API (Flash Lite)", color="#4C72B0",
                edgecolor="black", linewidth=0.4)
 loc_clean = [v if not np.isnan(v) else 0 for v in loc_vals]
-bars2 = ax.bar(x + bw / 2, loc_vals, bw, label="Local (Gemma 4B Q4)", color="#DD8452",
+bars2 = ax.bar(x + bw / 2, loc_vals, bw, label="Local (Gemma 4 E4B)", color="#DD8452",
                edgecolor="black", linewidth=0.4)
 for xi, v in zip(x - bw / 2, api_vals):
     ax.text(xi, v + 1.5, f"{v:.1f}", ha="center", fontsize=6)
@@ -67,13 +67,14 @@ for xi, v in zip(x + bw / 2, loc_vals):
     if not np.isnan(v):
         ax.text(xi, v + 1.5, f"{v:.1f}", ha="center", fontsize=6)
 ax.axhline(20.0, color="#555", linestyle=":", linewidth=0.8)
-ax.text(len(conds) - 0.4, 21.5, "majority 20", fontsize=6, color="#555", ha="right")
+ax.text(0.22, 21.8, "majority 20", fontsize=6, color="#555", ha="left")
 ax.axhline(12.5, color="#999", linestyle=":", linewidth=0.8)
 ax.set_xticks(x)
 ax.set_xticklabels(conds, fontsize=7)
 ax.set_ylabel("Diagnosis accuracy (%)")
 ax.set_ylim(0, 118)
-ax.legend(loc="upper right", frameon=False, fontsize=6.5)
+ax.legend(loc="lower left", bbox_to_anchor=(0.0, 1.01), ncol=2, frameon=False,
+          fontsize=6.5, columnspacing=1.2, handlelength=1.2)
 ax.grid(axis="y", alpha=0.25, linewidth=0.4)
 ax.set_axisbelow(True)
 fig.tight_layout(pad=0.3)
