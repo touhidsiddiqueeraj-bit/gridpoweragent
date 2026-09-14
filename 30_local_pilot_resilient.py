@@ -111,6 +111,8 @@ def main():
     ap.add_argument("--scenarios-csv", default=None, help="override scenarios CSV (e.g. ieee14_scenarios_taxonomy2.csv)")
     ap.add_argument("--labels-csv", default=None, help="override reference-labels CSV")
     ap.add_argument("--ids-from", default=None, help="runs CSV whose unique scenario_ids define the test set (exact pilot reuse)")
+    ap.add_argument("--evidence", action="store_true",
+                    help="enriched observation: injected lines hidden, EMS-grade telemetry shown instead")
     args = ap.parse_args()
 
     case_tag = "" if args.case == "ieee14" else f"_{args.case}"
@@ -165,7 +167,7 @@ def main():
     for i, (cfg_name, s) in enumerate(todo):
         cfg = runner.CONFIGS[cfg_name]
         prompt = runner.build_prompt(s, cfg_name, rag_docs=docs if cfg["rag"] else None,
-                                     tools_hint=cfg["tools"])
+                                     tools_hint=cfg["tools"], evidence=args.evidence)
         t0 = time.time()
         try:
             text, lat = call_local_resilient(prompt, args.model, args.interval)
