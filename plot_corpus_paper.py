@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Corpus-paper figures, rendered at true column width (3.5 in, IEEEtran)."""
+"""Corpus-paper figures — final version, clean formatting."""
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -17,7 +17,7 @@ plt.rcParams.update({
     "xtick.labelsize": 7, "ytick.labelsize": 7, "legend.fontsize": 7,
 })
 
-# ---- Fig A: corpus composition (class x system, count per class) ----
+# ---- Fig: corpus composition (class x system) ----
 systems = [("IEEE-14", "ieee14_scenarios.csv"),
            ("IEEE-39", "case39_scenarios.csv"),
            ("IEEE-118", "case118_scenarios.csv")]
@@ -38,7 +38,9 @@ ax.set_xticks(x)
 ax.set_xticklabels(classes)
 ax.set_ylabel("Scenarios (count)")
 ax.set_xlabel("Injected disturbance class")
-ax.legend(loc="upper right", frameon=False, fontsize=7)
+ax.legend(loc="upper left", frameon=False, fontsize=6.5, ncol=2,
+          columnspacing=0.8, handlelength=1.0)
+ax.set_ylim(0, 780)
 ax.grid(axis="y", alpha=0.25, linewidth=0.4)
 ax.set_axisbelow(True)
 fig.tight_layout(pad=0.3)
@@ -46,29 +48,32 @@ fig.savefig(FIGDIR / "fig_corpus_composition.png", dpi=300)
 plt.close(fig)
 print("fig_corpus_composition.png saved")
 
-# ---- Fig B: observation channels x tiers (grouped bars, values labeled) ----
-conds = ["Desc. only", "Desc. + state", "Telemetry", "Telem. (WLS)", "Raw state"]
-api_conds = [100.0, 100.0, 93.9, 8.0, 97.1]
-loc_conds = [96.8, np.nan, np.nan, np.nan, np.nan]
+# ---- Fig: observation channels (grouped bars, values labeled, legend above) ----
+conds = ["Desc.\nonly", "Desc.\n+state", "Telem.", "Telem.\n(WLS)", "Raw\nstate"]
+api_vals = [100.0, 100.0, 93.9, 8.0, 97.1]
+loc_vals = [96.8, np.nan, np.nan, np.nan, np.nan]
 
 x = np.arange(len(conds))
-w = 0.36
+bw = 0.32
 fig, ax = plt.subplots(figsize=(3.5, 2.3))
-ax.bar(x - w / 2, api_conds, w, label="API (Flash Lite)", color="#4C72B0",
-       edgecolor="black", linewidth=0.4)
-loc_bars = [96.8, np.nan, np.nan, np.nan, np.nan]
-ax.bar(x + w / 2, [v if not np.isnan(v) else 0 for v in loc_bars], w,
-       label="Local (Gemma 4B Q4)", color="#DD8452", edgecolor="black", linewidth=0.4)
-for xi, v in zip(x - w / 2, api_conds):
-    ax.text(xi, v + 1.5, f"{v:.1f}", ha="center", fontsize=6.5)
+bars1 = ax.bar(x - bw / 2, api_vals, bw, label="API (Flash Lite)", color="#4C72B0",
+               edgecolor="black", linewidth=0.4)
+loc_clean = [v if not np.isnan(v) else 0 for v in loc_vals]
+bars2 = ax.bar(x + bw / 2, loc_vals, bw, label="Local (Gemma 4B Q4)", color="#DD8452",
+               edgecolor="black", linewidth=0.4)
+for xi, v in zip(x - bw / 2, api_vals):
+    ax.text(xi, v + 1.5, f"{v:.1f}", ha="center", fontsize=6)
+for xi, v in zip(x + bw / 2, loc_vals):
+    if not np.isnan(v):
+        ax.text(xi, v + 1.5, f"{v:.1f}", ha="center", fontsize=6)
 ax.axhline(20.0, color="#555", linestyle=":", linewidth=0.8)
-ax.text(len(conds) - 0.55, 21.2, "majority 20.0", fontsize=6, color="#555", ha="right")
+ax.text(len(conds) - 0.4, 21.5, "majority 20", fontsize=6, color="#555", ha="right")
 ax.axhline(12.5, color="#999", linestyle=":", linewidth=0.8)
 ax.set_xticks(x)
-ax.set_xticklabels(["Desc. only", "Desc. + state", "Telemetry", "Telem. (WLS)", "Raw state"], fontsize=7)
+ax.set_xticklabels(conds, fontsize=7)
 ax.set_ylabel("Diagnosis accuracy (%)")
-ax.set_ylim(0, 112)
-ax.legend(loc="upper right", frameon=False, fontsize=7)
+ax.set_ylim(0, 118)
+ax.legend(loc="upper right", frameon=False, fontsize=6.5)
 ax.grid(axis="y", alpha=0.25, linewidth=0.4)
 ax.set_axisbelow(True)
 fig.tight_layout(pad=0.3)

@@ -37,7 +37,13 @@
 
 \title{GridPowerAgent: A Seeded, Reproducible Power-System Scenario Corpus for Benchmarking LLM Event Diagnosis}
 
+\markboth{Revision 2 --- prepared in response to the second review round}{}
+
 \maketitle
+
+\vspace{-3ex}
+\begin{center}\small\textit{Revision 2 --- prepared in response to the second review round.}\end{center}
+\vspace{1ex}
 
 \begin{abstract}
 Evaluating large language models (LLMs) on power-system tasks requires observations that reveal what the model actually reads: several recent evaluations feed a plain-language description of the injected disturbance alongside the measurements and report near-perfect diagnosis. We present the GridPowerAgent corpus and evaluation harness: 15,000 seeded, fully regenerable scenarios across the IEEE 14, 39, and 118 bus systems, ten injected disturbance classes, 9.54 million correlated measurements, per-scenario iterative weighted-least-squares (WLS) state estimates, a dual-axis reference keying, a reproducible failure registry, and an executable pandapower tool back-end. The corpus ships three observation channels that separate what a model reads from what it reasons about: a plain-language event description, EMS-grade telemetry, and raw summary state. We benchmark two deployment tiers---a lightweight API model and a 4-bit quantized local model---on 140 paired scenarios per configuration. Description-only diagnosis is 100\%: the description is the answer key. From telemetry alone the API model reaches 93.9\% while the local model drops to 43.8\% (20-scenario probe); from raw summary state the API model collapses to 8.0\%. A gradient-boosted classifier on the telemetry features reaches 100\%, and on raw-state features 64.3\%: the telemetry encoding is fully class-separable, the raw state is not, and the LLM cannot exploit unlabeled numeric summaries. A closed-loop extension that requires naming the switched element and chaining two real tool executions reaches 30.8\%. All results are exploratory single temperature-zero runs with exact denominators.
@@ -45,7 +51,7 @@ Evaluating large language models (LLMs) on power-system tasks requires observati
 
 \noindent\textit{Keywords---}benchmark corpus, cause-keyed labels, iterative WLS, LLM evaluation, observation channels, pandapower, power systems, reproducibility, scenario generation
 
-\section{Introduction}
+\section{Introduction and Related Work}
 LLMs are increasingly proposed for power-system operations: reading grid states, classifying disturbances, selecting analysis tools, and advising operators \cite{majumder2024joule,zhang2025gridagent,wen2025xgridagent}. Evaluating such claims requires a test corpus with three properties that published evaluations rarely provide together \cite{zhou2024elecbench,cheng2025gaia}: the labels are derived by a transparent, reproducible rule system; every scenario carries physical ground truth; and the observation given to the model is separated from the information used to grade it. This paper presents such a corpus and the evaluation harness built around it.
 
 GridPowerAgent generates 15,000 scenarios across the IEEE 14, 39, and 118 bus systems (3,000/5,000/7,000; 300--700 per disturbance class) from seeded, deterministic injections over 16,000 operating points. Each scenario carries pre- and post-event power-flow ground truth, 9.54 million correlated measurements, an iterative weighted-least-squares (WLS) state estimate over ~120 noisy meters, physics flags (under-voltage, over-voltage, overload), dual-axis reference keying, and a reproducible registry of the 41 injection cases that produce unresolvable islands on IEEE-39. An executable pandapower tool back-end (power flow, contingency on a named element, N-1 sweep, OPF, grid queries) is included so that agents can be evaluated on executed tool calls, not stated intentions.
@@ -97,22 +103,18 @@ Two IEEE-39 switching injections disconnect load pockets and produce unresolvabl
 Every scenario ships two label versions: the original v1 keying labeled the two outcome classes (E6 undervoltage, E8 thermal overload) by post-event outcome, and the revised v2 keying labels every scenario by its injected mechanism. The outcome information remains in the per-scenario physics flags, so both axes stay scoreable. The v1 keying proved consequential---models graded under it scored zero on E6/E8 while describing the injecting cause correctly---so the cause-keyed version is the evaluation default, and the failure mode is reproducible by design rather than latent.
 
 \subsection{Tools and Knowledge Base}
-A pandapower back-end exposes five executable operations: full AC power flow, N-1 contingency testing on a named branch, OPF, and grid queries (topology, limits, equipment). A FAISS knowledge base \cite{johnson2021faiss} chunks eight operational documents (thermal/voltage limits, contingency procedure, storage/equipment, topology) into 384-d sentence-transformer embeddings, retrieving $k=3$ chunks with citations.
+A pandapower back-end exposes five executable operations: full AC power flow, N-1 contingency testing on a named branch, OPF, and grid queries (topology, limits, equipment). A FAISS knowledge base \cite{johnson2021faiss} chunks eight operational documents (thermal/voltage limits, contingency procedure, storage/equipment, topology) into 384-d sentence-transformer embeddings \cite{reimers2019sentencebert}, retrieving $k=3$ chunks with citations.
 
 \section{Evaluation Design}
 \label{sec:design}
 
-\subsection{Models and Tiers}
-Two deployment tiers of the same prompt contract are compared: a lightweight API model (Gemini 3.5 Flash Lite, temperature 0, $\le 512$ output tokens) and a small 4-bit-quantized open-weight model \cite{dettmers2023fourbit,gemma4_2026} (Gemma 4 E4B-it \cite{gemma4_2026}, served locally from a GGUF build \cite{llamacpp}; temperature 0, $\le 1{,}024$ tokens, reasoning channel parsed with content priority). The API tier is deliberately lightweight: the comparison characterizes a local deployment against a budget API tier, not against frontier models.
+\textbf{Models and tiers.} Two deployment tiers of the same prompt contract are compared: a lightweight API model (Gemini 3.5 Flash Lite, temperature 0, $\le 512$ output tokens) and a small 4-bit-quantized open-weight model (Gemma 4 E4B-it, served locally from a GGUF build; temperature 0, $\le 1{,}024$ tokens, reasoning channel parsed with content priority). The API tier is deliberately lightweight: the comparison characterizes a local deployment against a budget API tier, not against frontier models.
 
-\subsection{Observation Channels}
-Three prompt-side conditions probe what diagnosis measures: \emph{description-only} (the plain-language event statement, no grid numbers), \emph{telemetry} (per-element status table and system-wide deltas, no event statement), and \emph{full} (both). A WLS-estimated variant of the telemetry channel replaces true post-event values with estimated ones.
+\textbf{Observation channels.} Three prompt-side conditions probe what diagnosis measures: \emph{description-only} (the plain-language event statement, no grid numbers), \emph{telemetry} (per-element status table and system-wide deltas, no event statement), and \emph{full} (both). A WLS-estimated variant of the telemetry channel replaces true post-event values with estimated ones.
 
-\subsection{Closed-Loop Tool Protocol}
-The closed-loop condition embeds the agent in a tool loop: it proposes structured calls with arguments, each call is validated against the network (referenced elements must exist) and executed by the real pandapower back-end, returned measurements re-enter the conversation, at least two executed calls are required before an answer is accepted, and the answer must name the switched element.
+\textbf{Closed-Loop tool protocol.} The closed-loop condition embeds the agent in a tool loop: it proposes structured calls with arguments, each call is validated against the network (referenced elements must exist) and executed by the real pandapower back-end, returned measurements re-enter the conversation, at least two executed calls are required before an answer is accepted, and the answer must name the switched element.
 
-\subsection{Metrics and Power}
-Diagnosis correctness is exact class match against the cause-keyed reference. Tool-call validity requires referenced elements to exist and calls to execute. The paired minimum detectable difference (MDE) at $\alpha=0.05$, power 0.80 is $(z_{0.975}+z_{0.80})\sqrt{p_\mathrm{d}/n}$, where $p_\mathrm{d}$ is the paired discordance rate. All results are exploratory single temperature-zero runs with exact denominators.
+\textbf{Metrics and power.} Diagnosis correctness is exact class match against the cause-keyed reference. Tool-call validity requires referenced elements to exist and calls to execute. The paired minimum detectable difference (MDE) at $\alpha=0.05$, power 0.80 is $(z_{0.975}+z_{0.80})\sqrt{p_\mathrm{d}/n}$, where $p_\mathrm{d}$ is the paired discordance rate. All results are exploratory single temperature-zero runs with exact denominators.
 
 \section{Results and Discussion}
 \label{sec:results}
@@ -160,6 +162,9 @@ Stated-tool selection retains a style difference: 57\% of API stated tools are p
 
 \section{Conclusion}
 GridPowerAgent contributes what grid-LLM evaluation currently lacks: a seeded, regenerable scenario corpus with physical ground truth, dual-axis reference keying, iterative-WLS state estimates, three observation channels that separate description-reading from state-based diagnosis, an executable tool back-end, and a construction-graded closed-loop protocol. The baseline demonstration shows the observation channel, not the model, decides what is diagnosable: description-only diagnosis is trivially perfect, telemetry-only separates tiers, and raw-state diagnosis collapses. Expert review of the reference labels, the powered sweep, dynamics, full-precision local runs, and action-quality evaluation remain future work.
+
+\section*{Acknowledgment}
+The authors acknowledge writing-support tools (OpenAI ChatGPT, Grammarly, and QuillBot) for grammar correction, readability improvement, language refinement, and sentence restructuring. All technical content, analysis, interpretations, and research contributions are those of the authors.
 
 \balance
 \begin{thebibliography}{25}
