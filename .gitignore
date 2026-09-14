@@ -41,3 +41,6 @@ paper/figures/fig_generalization.png
 # credentials (never commit)
 secrets.env
 *.key
+paper_gridagent_wiecon/main.aux
+paper_gridagent_wiecon/main.out
+paper_gridagent_wiecon/main.log
