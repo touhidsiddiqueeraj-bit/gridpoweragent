@@ -51,7 +51,7 @@ print("fig_corpus_composition.png saved")
 # ---- Fig: observation channels (grouped bars, values labeled, legend above) ----
 conds = ["Desc.\nonly", "Desc.\n+state", "Telem.", "Telem.\n(WLS)", "Raw\nstate"]
 api_vals = [100.0, 100.0, 93.9, 97.1, 8.0]
-loc_vals = [96.8, np.nan, np.nan, np.nan, np.nan]
+loc_vals = [np.nan, 96.8, np.nan, np.nan, np.nan]
 
 x = np.arange(len(conds))
 bw = 0.32

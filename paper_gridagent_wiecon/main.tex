@@ -1,5 +1,6 @@
-% WIECON-ECE 2026 conference paper -- review-response revision.
-% Generated numbers: make_conference_numbers.py -> generated/*.tex
+% WIECON-ECE 2026 conference paper -- corpus/resource-paper revision.
+% The corpus, the WLS pipeline, the dual-axis keying, and the failure registry
+% are the contributions; the two-model channel study is explicitly illustrative.
 \documentclass[conference]{IEEEtran}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
@@ -32,37 +33,37 @@
 \fi\fi\fi}
 \makeatother
 
-
 \begin{document}
 
-\title{GridPowerAgent: A Seeded, Reproducible Power-System Scenario Corpus for Benchmarking LLM Event Diagnosis}
+\title{GridPowerAgent: A Seeded, Reproducible Scenario Corpus for Power-System LLM Evaluation}
 
-\markboth{Revision 2 --- prepared in response to the second review round}{}
+\markboth{GridPowerAgent: A Seeded, Reproducible Scenario Corpus for Power-System LLM Evaluation}{}
 
 \maketitle
-
 \vspace{-3ex}
-\begin{center}\small\textit{Revision 2 --- prepared in response to the second review round.}\end{center}
 \vspace{1ex}
 
 \begin{abstract}
-Evaluating large language models (LLMs) on power-system tasks requires observations that reveal what the model actually reads: several recent evaluations feed a plain-language description of the injected disturbance alongside the measurements and report near-perfect diagnosis. We present the GridPowerAgent corpus and evaluation harness: 15,000 seeded, fully regenerable scenarios across the IEEE 14, 39, and 118 bus systems, ten injected disturbance classes, 9.54 million correlated measurements, per-scenario iterative weighted-least-squares (WLS) state estimates, a dual-axis reference keying, a reproducible failure registry, and an executable pandapower tool back-end. The corpus ships three observation channels that separate what a model reads from what it reasons about: a plain-language event description, EMS-grade telemetry, and raw summary state. We benchmark two deployment tiers---a lightweight API model and a 4-bit quantized local model---on 140 paired scenarios per configuration. Description-only diagnosis is 100\%: the description is the answer key. From telemetry alone the API model reaches 93.9\% while the local model drops to 43.8\% (20-scenario probe); from raw summary state the API model collapses to 8.0\%. A gradient-boosted classifier on the telemetry features reaches 100\%, and on raw-state features 64.3\%: the telemetry encoding is fully class-separable, the raw state is not, and the LLM cannot exploit unlabeled numeric summaries. A closed-loop extension that requires naming the switched element and chaining two real tool executions reaches 30.8\%. All results are exploratory single temperature-zero runs with exact denominators.
+Evaluating large language models (LLMs) on power-system tasks requires observations that reveal what the model actually reads: several recent evaluations feed a plain-language description of the injected disturbance alongside the measurements and report near-perfect diagnosis. We present GridPowerAgent, a seeded, fully regenerable scenario corpus for power-system LLM evaluation: 15,000 scenarios across the IEEE 14, 39, and 118 bus systems, ten injected disturbance classes, 9.54 million correlated measurements, per-scenario iterative weighted-least-squares (WLS) state estimates, dual-axis reference keying, a reproducible 41-scenario failure registry, and an executable pandapower tool back-end. The corpus ships three observation channels that separate what a model reads from what it reasons about: a plain-language event description, EMS-grade telemetry, and raw summary state. An illustrative study---one seeded 140-scenario draw, two models, single temperature-zero runs with exact denominators---demonstrates the corpus's central measurement: description-only diagnosis is 100\%, the description is the answer key; from telemetry alone the API model reaches 93.9\% while a 4-bit local model drops to 43.8\% (20-scenario probe); from raw summary state the API model collapses to 8.0\% while a gradient-boosted classifier on identical features reaches 64.3\%. The corpus, the estimation pipeline, the keying, and the registry are the contribution; the study illustrates what they enable, not a general finding about grid-LLM evaluation.
 \end{abstract}
 
-\noindent\textit{Keywords---}benchmark corpus, cause-keyed labels, iterative WLS, LLM evaluation, observation channels, pandapower, power systems, reproducibility, scenario generation
+\noindent\textit{Keywords---}benchmark corpus, cause-keyed labels, iterative WLS, LLM evaluation, observation channels, pandapower, power systems, reproducibility, scenario generation, state estimation
 
 \section{Introduction and Related Work}
 LLMs are increasingly proposed for power-system operations: reading grid states, classifying disturbances, selecting analysis tools, and advising operators \cite{achiam2023gpt4,majumder2024joule,zhang2025gridagent,wen2025xgridagent}. Evaluating such claims requires a test corpus with three properties that published evaluations---LLM dispatch benchmarks \cite{zhou2024elecbench,cheng2025gaia} and reinforcement-learning grid testbeds \cite{marot2020l2rpn,donnot2020grid2op} alike---rarely provide: the labels are derived by a transparent, reproducible rule system; every scenario carries physical ground truth; and the observation given to the model is separated from the information used to grade it. This paper presents such a corpus and the evaluation harness built around it.
 
-\emph{Why seeded and regenerable matters.} A seeded corpus changes what an evaluation can claim. Fixed draws mean every model, prompt version, and observation channel is scored on byte-identical inputs, so paired comparisons are exact rather than resampled. Regeneration from seeds makes label provenance auditable: every label traces to an injection record and a solver run, and leakage audits (did the observation disclose the label?) are plain joins over the 54 scenario fields. Physical ground truth also enables non-LLM baselines---the classifiers in Sec.~IV-B that bound what information each channel carries---which pure text benchmarks cannot run. Finally, a released corpus turns evaluation into regression testing: new models are scored against prior runs on identical scenarios instead of re-annotated prompts.
+\emph{Why seeded and regenerable matters.} A seeded corpus changes what an evaluation can claim. Fixed draws mean every model, prompt version, and observation channel is scored on byte-identical inputs, so paired comparisons are exact rather than resampled. Regeneration from seeds makes label provenance auditable: every label traces to an injection record and a solver run, and leakage audits (did the observation disclose the label?) are plain joins over the 54 scenario fields. Physical ground truth also enables non-LLM baselines---the classifiers in Sec.~\ref{sec:channels} that bound what information each channel carries---which pure text benchmarks cannot run. Finally, a released corpus turns evaluation into regression testing: new models are scored against prior runs on identical scenarios instead of re-annotated prompts.
 
 Three threads are relevant. \emph{LLM grid evaluations} report strong task performance: ElecBench evaluates dispatch prompting \cite{zhou2024elecbench} and GAIA fine-tunes a dispatch model \cite{cheng2025gaia}; both grade answers to prompts that describe the event in plain language. \emph{Agentic grid systems} couple LLMs to grid environments---Grid-Agent \cite{zhang2025gridagent} for control, X-GridAgent \cite{wen2025xgridagent} for analysis---and report end-to-end system behavior without shipping an evaluation corpus. \emph{Reinforcement-learning testbeds} (L2RPN \cite{marot2020l2rpn}, Grid2Op \cite{donnot2020grid2op}) ship reproducible scenario sets with simulator ground truth, but their interfaces target RL topology control rather than LLM-facing observation channels. Table~\ref{tab:comparison} positions GridPowerAgent against these artifacts: it combines seeded regenerable scenarios, per-scenario physics ground truth, cause-keyed reference labels, separated observation channels, shipped state estimates, and an executable tool back-end in one artifact.
+
+This paper contributes the artifact, not a model ranking. The contributions are: (1) a seeded, fully regenerable corpus of 15,000 scenarios across the IEEE 14, 39, and 118 bus systems (3,000/5,000/7,000; 300--700 per disturbance class), generated from seeded injections over 16,000 operating points, each carrying pre- and post-event power-flow ground truth \cite{wood2014power}, 9.54 million correlated measurements, and physics flags; (2) a per-scenario measurement and iterative-WLS state-estimation pipeline with a disclosed noise model, shipped estimates, and audited accuracy; (3) a dual-axis reference keying that keeps outcome-keyed and cause-keyed labels scoreable side by side, plus a reproducible registry of the 41 IEEE-39 injections that produce unresolvable islands; (4) three separated observation channels with an executable pandapower tool back-end and a closed-loop protocol; and (5) an explicitly illustrative two-model, one-draw study of the observation channels that demonstrates what the corpus measures. The corpus, the estimation pipeline, the keying, and the registry stand on their own; nothing in this paper argues a general claim about grid-LLM performance.
 
 \begin{table}[!t]
 \centering
 \caption{Released artifacts compared. Seed = reproducible scenario sets; Phys. = per-scenario power-flow ground truth; Obs. = LLM-facing observation channels; Label = cause-keyed reference labels; WLS = shipped iterative-WLS state estimates; Tools = executable pandapower back-end; LLM = LLM performance reported. --- = not part of the released artifact.}
 \label{tab:comparison}
 \fontsize{7}{8}\selectfont
+\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{|l|c|c|c|c|c|c|c|}
 \hline
 \textbf{Artifact} & \textbf{Seed} & \textbf{Phys.} & \textbf{Obs.} & \textbf{Label} & \textbf{WLS} & \textbf{Tools} & \textbf{LLM} \\ \hline
@@ -76,10 +77,6 @@ GridPowerAgent (ours) & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark
 \end{tabular}
 \end{table}
 
-GridPowerAgent generates 15,000 scenarios across the IEEE 14, 39, and 118 bus systems (3,000/5,000/7,000; 300--700 per disturbance class) from seeded, deterministic injections over 16,000 operating points. Each scenario carries pre- and post-event power-flow ground truth \cite{wood2014power}, 9.54 million correlated measurements, an iterative weighted-least-squares (WLS) state estimate over ~120 noisy meters, physics flags (under-voltage, over-voltage, overload), dual-axis reference keying, and a reproducible registry of the 41 injection cases that produce unresolvable islands on IEEE-39. An executable pandapower tool back-end (power flow, contingency on a named element, N-1 sweep, OPF, grid queries) is included so that agents can be evaluated on executed tool calls, not stated intentions.
-
-We use the corpus to benchmark two deployment tiers---a lightweight API model (Gemini 3.5 Flash Lite) and a 4-bit quantized local model (Gemma 4 E4B)---on 140 paired scenarios per configuration, under three observation channels, and in a closed-loop variant that requires naming the switched element and chaining two real tool executions. The findings are: (i) the evaluation is only as good as its observation channel---description-only diagnosis is 100\%, telemetry-only 93.9\% (API) and 43.8\% (local probe), and raw-state 8.0\%; (ii) cause-keyed labels make the task well-posed, unlike outcome-keyed alternatives; and (iii) the tiers separate only under the realistic channel. All results are exploratory single temperature-zero runs with exact denominators.
-
 \section{The GridPowerAgent Corpus}
 \label{sec:corpus}
 Fig.~\ref{fig:methodology} overviews the generation pipeline. Networks use pandapower \cite{thurner2018pandapower} IEEE 14/39/118 cases \cite{zimmerman2011matpower} with tuned thermal limits to make compound events observable (14: 3\% line / 4\% transformer; 118: 6\%; 39: nameplate). Limits are disclosed per system and deliberately \emph{not} comparable across systems. Operating points sweep load $0.70$--$1.10\times$ with $\pm5\%$ bus-local noise, renewable fractions, and storage state of charge $0.15$--$0.85$ (20 MW/40 MWh at bus 9 on IEEE-14). Topology hashes pin all three networks. Ten classes are injected: E0 Normal; E1 load surge, E2 load drop, E3 line outage, E4 generator outage, E5 renewable ramp (cause classes); E6 undervoltage, E7 overvoltage, E8 thermal overload (outcome classes, physically iterated to target severity); E9 compound.
@@ -87,7 +84,7 @@ Fig.~\ref{fig:methodology} overviews the generation pipeline. Networks use panda
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig_methodology_tree.png}
-\caption{Generation pipeline (stages 03--28).}
+\caption{Corpus generation pipeline (stages 03--28).}
 \label{fig:methodology}
 \end{figure}
 
@@ -97,19 +94,6 @@ Table~\ref{tab:corpus} summarizes the corpus. Scenarios inject the ten classes w
 \emph{Scenario anatomy.} Every scenario row is self-describing (54 fields). For example, IEEE14\_SCN\_000901 (E3, transmission-line outage) draws operating point IEEE14\_OP\_002268 (load scale 0.77, 194.9~MW system load), injects a \texttt{line\_outage} on target \texttt{line\_6\_12}, and records matched pre/post quantities: minimum voltage 0.9865$\to$0.9851~pu at bus 14, with no resulting limit violations on this draw. Injection descriptors (mechanism, scope, targets, magnitude), the operating point, post-event power-flow quantities, violation counts and flags, and per-quantity deltas all ship in one row, so labeling, subsetting, and leakage audits are plain joins.
 
 Under the cause-keyed default, class counts shift from the 300-per-class injection design because the E6/E8 scenarios re-key to the mechanism that produced them: the IEEE-14 labels are 300 each for E0--E2, E5, and E7; 579 for E3; 329 for E4; and 592 for E9.
-
-\subsection{Severity Ladders and Compound Design}
-The cause classes (E1--E5, E9) inject a mechanism and record whatever state results. The outcome classes are built the opposite way: a physical disturbance is applied, the power flow is solved, and the outcome is \emph{detected}---if the disturbance did not produce the target state, the scenario is escalated along a severity ladder or discarded, so for every E6/E8 scenario the solver, not the author, decided the voltage or loading. This is also why E7 is generated through reactive mechanisms (excitation set-point shifts rather than load/renewable manipulation): on the stiff IEEE-14 system, injections cannot lift the bus-voltage maximum above 1.05~pu at all (the measured ceiling is 1.0347~pu at minimum load with both renewables at 100\% and the battery discharging). Compound scenarios apply exactly two component mechanisms in order and record the union of their targets. The measured severity envelope on IEEE-14 bounds the corpus: every single-line outage converges and none islands the system, the worst branch loading reaches 228\% (line\_1\_2 outage), and the deepest voltage sag reaches 0.9425~pu (line\_9\_14 outage).
-
-\subsection{Artifact Inventory and Reproducibility}
-Per system, the released artifact contains the scenario table (CSV and JSONL), pre/post power-flow ground truth, the full measurement set with true value, noisy measurement, $\sigma$, and $z$-score per meter, the WLS state estimates for the pilot draws, both reference-label axes, and the islanding registry; the tool back-end, the FAISS knowledge base, and all run CSVs ship alongside. Networks are pinned by topology hash, operating points and injections are seeded draws, and 40-draw replay reproduces the scenarios byte-identically. Regeneration requires only pandapower and the seeded generation scripts; no number in this paper depends on unreleased data.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\columnwidth]{figs/fig_corpus_composition.png}
-\caption{Class composition of the three systems (scenarios per injected class).}
-\label{fig:composition}
-\end{figure}
 
 \begin{table}[!t]
 \centering
@@ -125,6 +109,9 @@ Per system, the released artifact contains the scenario table (CSV and JSONL), p
 \end{tabular}
 \end{table}
 
+\subsection{Severity Ladders and Compound Design}
+The cause classes (E1--E5, E9) inject a mechanism and record whatever state results. The outcome classes are built the opposite way: a physical disturbance is applied, the power flow is solved, and the outcome is \emph{detected}---if the disturbance did not produce the target state, the scenario is escalated along a severity ladder or discarded, so for every E6/E8 scenario the solver, not the author, decided the voltage or loading. This is also why E7 is generated through reactive mechanisms (excitation set-point shifts rather than load/renewable manipulation): on the stiff IEEE-14 system, injections cannot lift the bus-voltage maximum above 1.05~pu at all (the measured ceiling is 1.0347~pu at minimum load with both renewables at 100\% and the battery discharging). Compound scenarios apply exactly two component mechanisms in order and record the union of their targets. The measured severity envelope on IEEE-14 bounds the corpus: every single-line outage converges and none islands the system, the worst branch loading reaches 228\% (line\_1\_2 outage), and the deepest voltage sag reaches 0.9425~pu (line\_9\_14 outage).
+
 \subsection{Measurements and Iterative WLS State Estimation}
 Each scenario carries a fixed meter complement generated from the noise-free power-flow solution: 118 meters per IEEE-14 scenario (14 bus-voltage magnitudes with $\sigma_V=0.003$~pu, 76 branch-end P/Q, 28 bus injections), 301 per IEEE-39 scenario, and 1{,}098 per IEEE-118 scenario---9.54 million readings corpus-wide. Branch-end and injection meters both use $\sigma_P=\max(0.0075|S_{\text{true}}|, 0.05)$~MVA, and every reading ships its true value, noisy measurement, $\sigma$, and standardized $z$-score. The state estimate supplied to the agent is produced by an \emph{iterative AC-WLS estimator} \cite{abur2004power,monticelli1999state} (\texttt{pandapower.estimation}) over these measurements, with branch meters of outaged elements excluded: the estimator converges on 140/140 pilot scenarios with voltage RMSE 0.0064~pu against post-event truth, and the under-voltage flag agrees with truth in 75\% of scenarios---marginal violations can vanish under estimation, which the closed-loop evaluation in Sec.~\ref{sec:closedloop} probes directly.
 
@@ -136,7 +123,7 @@ Two IEEE-39 switching injections disconnect load pockets and produce unresolvabl
 \caption{Islanding failure registry (IEEE-39, 41 scenarios, excluded from evaluation).}
 \label{tab:registry}
 \fontsize{7}{8}\selectfont
-\begin{tabular}{|l|c|c|}
+\begin{tabular}{|l|l|c|}
 \hline
 \textbf{Switched element} & \textbf{Islanded buses} & \textbf{Scenarios} \\ \hline
 line\_16\_19 & 19, 20, 33, 34 & 24 \\ \hline
@@ -146,15 +133,29 @@ line\_23\_36 & 36 & 17 \\ \hline
 \end{table}
 
 \subsection{Dual-Axis Reference Keying}
+\label{sec:dualaxis}
 Every scenario ships two label versions: the original v1 keying labeled the two outcome classes (E6 undervoltage, E8 thermal overload) by post-event outcome, and the revised v2 keying labels every scenario by its injected mechanism. The outcome information remains in the per-scenario physics flags, so both axes stay scoreable. The v1 keying proved consequential---models graded under it scored zero on E6/E8 while describing the injecting cause correctly---so the cause-keyed version is the evaluation default, and the failure mode is reproducible by design rather than latent.
+
+\subsection{Artifact Inventory and Reproducibility}
+Per system, the released artifact contains the scenario table (CSV and JSONL), pre/post power-flow ground truth, the full measurement set with true value, noisy measurement, $\sigma$, and $z$-score per meter, the WLS state estimates for the pilot draws, both reference-label axes, and the islanding registry; the tool back-end, the FAISS knowledge base, and all run CSVs ship alongside. Networks are pinned by topology hash, operating points and injections are seeded draws, and 40-draw replay reproduces the scenarios byte-identically. Regeneration requires only pandapower and the seeded generation scripts; no number in this paper depends on unreleased data.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig_corpus_composition.png}
+\caption{Class composition of the three systems (scenarios per injected class).}
+\label{fig:composition}
+\end{figure}
 
 \subsection{Tools and Knowledge Base}
 A pandapower back-end exposes five executable operations: full AC power flow, N-1 contingency testing on a named branch, OPF \cite{frank2012opf}, and grid queries (topology, limits, equipment). A retrieval-augmented knowledge base \cite{lewis2020rag}: FAISS \cite{johnson2021faiss} chunks eight operational documents (thermal/voltage limits, contingency procedure, storage/equipment, topology) into 384-d sentence-transformer embeddings \cite{reimers2019sentencebert}, retrieving $k=3$ chunks with citations.
 
-\section{Evaluation Design}
+\subsection{Using the Corpus}
+The generation choices imply an evaluation protocol. Score against the cause-keyed axis and report which axis was used: the outcome-keyed variant ships so that the keying failure of Sec.~\ref{sec:dualaxis} is reproducible by design rather than latent. Report the observation channel with every number: the three channels are separate prompt-side payloads over byte-identical scenarios, so channel and model effects never have to be disentangled after the fact. Prefer paired seeded draws: regression-testing a new model against prior runs on identical inputs makes comparisons exact rather than resampled. Exclude the 41 registry scenarios (or handle islands explicitly)---their identifiers ship with the corpus. Run non-LLM classifier baselines on each channel before interpreting model scores: a channel that no classifier can separate cannot be expected to inform any model. In closed-loop use, grade element construction separately from class match: the two coincide on single-mechanism events and part on compounds (Sec.~\ref{sec:closedloop}).
+
+\section{Evaluation Harness}
 \label{sec:design}
 
-\textbf{Models and tiers.} Two deployment tiers of the same prompt contract are compared: a lightweight API model (Gemini 3.5 Flash Lite, temperature 0, $\le 512$ output tokens) and a small 4-bit-quantized open-weight model \cite{dettmers2023fourbit,frantar2023gptq} (Gemma 4 E4B-it \cite{gemma4_2026}, served locally from a GGUF build \cite{llamacpp}; temperature 0, $\le 1{,}024$ tokens, reasoning channel parsed with content priority). The prompt contract is identical across tiers: the system prompt fixes the persona and tool rules, the user message carries the observation-channel payload, and the answer must be a JSON object naming the diagnosis class---and, in the closed-loop condition, the switched element. Retrieval-augmented configurations (E2, E4) append the $k=3$ retrieved knowledge-base chunks with citations to the user message. The API tier is deliberately lightweight: the comparison characterizes a local deployment against a budget API tier, not against frontier models.
+\textbf{Prompt contract and configurations.} The prompt contract is fixed across all studies: the system prompt fixes the persona and tool rules, the user message carries the observation-channel payload, and the answer must be a JSON object naming the diagnosis class---and, in the closed-loop condition, the switched element. Four tool configurations ship with the harness---E1 bare prompt, E2 with retrieved knowledge-base chunks, E3 with executable tools, E4 with both---so retrieval and tool effects can be ablated under an identical contract; retrieval-augmented configurations append the $k=3$ retrieved chunks with citations to the user message.
 
 \textbf{Observation channels.} Three prompt-side conditions probe what diagnosis measures: \emph{description-only} (the plain-language event statement, no grid numbers), \emph{telemetry} (an observed-evidence block with no event statement), and \emph{full} (both). The telemetry block is fixed and fully disclosed---five lines: which branches are open and which generators are offline (by element name); which demand elements changed; which renewable elements changed; system-wide pre$\to$post deltas for load, slack generation, and losses; and deltas for $V_\mathrm{min}$, $V_\mathrm{max}$, and peak loading. It contains observable facts only: no injected intent, no natural-language description. A WLS-estimated variant of the telemetry channel replaces the true post-event values in this block with estimated ones. Table~\ref{tab:telemetry} shows the complete block for the case-study scenario of Sec.~\ref{sec:casestudy}: the demand-side component is fully legible here (eleven changed demand elements, $\Delta$load $+40.28$~MW)---exactly the information the closed-loop status table omits.
 
@@ -173,51 +174,30 @@ $\Delta V_\mathrm{min}$: $-0.0118$~pu; $\Delta V_\mathrm{max}$: $+0.0000$~pu; $\
 \end{tabular}
 \end{table}
 
-\textbf{Closed-Loop tool protocol.} The closed-loop condition embeds the agent in a tool loop in the reasoning-plus-acting \cite{yao2023react} and tool-calling \cite{schick2023toolformer} style: it proposes structured calls with arguments, each call is validated against the network (referenced elements must exist) and executed by the real pandapower back-end, returned measurements re-enter the conversation, at least two executed calls are required before an answer is accepted, and the answer must name the switched element. The closed-loop observation differs from the one-shot telemetry block: the agent sees a per-element status table (each branch as \emph{name $|$ in-service $|$ loading \%}, each generator as \emph{name $|$ offline state}) and, from tools, system summaries (voltage extremes, peak loading, overload list)---switching state and loading, but no demand-side deltas.
+\textbf{Models.} The illustrative study of Sec.~\ref{sec:results} runs two models under this contract: a lightweight API model (Gemini 3.5 Flash Lite, temperature 0, $\le 512$ output tokens) and a small 4-bit-quantized open-weight model \cite{dettmers2023fourbit,frantar2023gptq} (Gemma 4 E4B-it \cite{gemma4_2026}, served locally from a GGUF build \cite{llamacpp}; temperature 0, $\le 1{,}024$ tokens, reasoning channel parsed with content priority). The API tier is deliberately lightweight: the study characterizes a local deployment against a budget API tier, not against frontier models.
 
-\textbf{Metrics and power.} Diagnosis correctness is exact class match against the cause-keyed reference. Tool-call validity requires referenced elements to exist and calls to execute. The paired minimum detectable difference (MDE) at $\alpha=0.05$, power 0.80 is $(z_{0.975}+z_{0.80})\sqrt{p_\mathrm{d}/n}$, where $p_\mathrm{d}$ is the paired discordance rate. All results are exploratory single temperature-zero runs with exact denominators.
+\textbf{Closed-loop tool protocol.} The closed-loop condition embeds the agent in a tool loop in the reasoning-plus-acting \cite{yao2023react} and tool-calling \cite{schick2023toolformer} style: it proposes structured calls with arguments, each call is validated against the network (referenced elements must exist) and executed by the real pandapower back-end, returned measurements re-enter the conversation, at least two executed calls are required before an answer is accepted, and the answer must name the switched element. The closed-loop observation differs from the one-shot telemetry block: the agent sees a per-element status table (each branch as \emph{name $|$ in-service $|$ loading \%}, each generator as \emph{name $|$ offline state}) and, from tools, system summaries (voltage extremes, peak loading, overload list)---switching state and loading, but no demand-side deltas.
 
-\section{Results and Discussion}
+\textbf{Metrics.} Diagnosis correctness is exact class match against the cause-keyed reference; tool-call validity requires referenced elements to exist and calls to execute; closed-loop episodes additionally receive a construction grade (did the answer name the true switched element). For paired designs the harness reports the minimum detectable difference (MDE) at $\alpha=0.05$, power 0.80, $(z_{0.975}+z_{0.80})\sqrt{p_\mathrm{d}/n}$, where $p_\mathrm{d}$ is the paired discordance rate. All study numbers are exploratory single temperature-zero runs with exact denominators.
+
+\section{Illustrative Study}
 \label{sec:results}
-
-\subsection{Textual Leakage: Description-Only Diagnosis}
-With only the plain-language event description available, the API model diagnoses 100.0\% (560 scenarios): reading the description is sufficient, confirming that the description functions as an answer key when present.
+This section demonstrates what the corpus measures; it does not establish a model ranking. Scope: one seeded draw of 140 scenarios per condition (20 for the local telemetry probe), the two models of Sec.~\ref{sec:design}, single temperature-zero runs with exact denominators. We read the numbers as evidence about the corpus's instruments---that its channels separate description-reading from state-based diagnosis---not as findings about model classes.
 
 \subsection{Observation Channels and Baselines}
-Table~\ref{tab:channels} and Fig.~\ref{fig:channels} report diagnosis by observation channel. From telemetry alone the API model reaches 93.9\%; replacing the true post-event state with the WLS estimate leaves it at 97.1\%. From raw summary state it collapses to 8.0\%, answering E7 for most scenarios. The signal exists: a gradient-boosted classifier on identical features reaches 64.3\% from raw state and 100.0\% from telemetry, so the LLM's failures are encoding/composition limits, not information limits. The tier pattern follows the same logic: description-only removes all state reasoning, description+state lets the model quote the description, telemetry removes the description and demands state reading---where instruction following and numeric grounding dominate and the small model degrades---and raw state removes even the encoding. The methodological reading is the paper's second finding: the observation encoding is a first-class design variable. The same model, prompts, and labels span 100\% to 8.0\% purely on what is disclosed, and the gradient-boosted baseline shows where the information ceiling of each channel sits---grid-LLM evaluations should report the observation channel with the same precision as the model.
-
-\subsection{Class-Level Diagnosis}
-Table~\ref{tab:perclass} resolves the full configuration (E4) by cause-keyed class. The API model is correct on every class; the local model's misses concentrate on the load-side classes E2 (90.0\%) and E1 (92.3\%), whose telemetry deltas are proportional and unlabeled, while E7 overvoltage---the one class whose telemetry carries an explicit threshold violation---is diagnosed perfectly by both tiers.
-
-\begin{table}[!t]
-\centering
-\caption{Cause-keyed diagnosis per class, full configuration (E4), 140 scenarios.}
-\label{tab:perclass}
-\fontsize{7}{8}\selectfont
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Class} & $n$ & \textbf{API correct} & \textbf{Local correct} \\ \hline
-E0 normal & 5 & 5/5 & 5/5 \\ \hline
-E1 load surge & 13 & 13/13 & 12/13 \\ \hline
-E2 load drop & 10 & 10/10 & 9/10 \\ \hline
-E3 line outage & 30 & 30/30 & 29/30 \\ \hline
-E4 gen. outage & 18 & 18/18 & 17/18 \\ \hline
-E5 renewable ramp & 19 & 19/19 & 18/19 \\ \hline
-E7 overvoltage & 11 & 11/11 & 11/11 \\ \hline
-E9 compound & 34 & 34/34 & 33/34 \\ \hline
-\end{tabular}
-\end{table}
+\label{sec:channels}
+With only the plain-language event description available, the API model diagnoses 100.0\% (560 scenarios): reading the description is sufficient, confirming that the description functions as an answer key when present. Table~\ref{tab:channels} and Fig.~\ref{fig:channels} report diagnosis by channel. From telemetry alone the API model reaches 93.9\%; replacing the true post-event state with the WLS estimate leaves it at 97.1\%. From raw summary state it collapses to 8.0\%, answering E7 for most scenarios. The signal exists: a gradient-boosted classifier on identical features reaches 64.3\% from raw state and 100.0\% from telemetry, so the raw-state shortfall is an encoding limit, not an information limit---exactly the distinction the corpus is built to expose. The local model shows the same logic from the other side: 96.8\% with description+state, 43.8\% from telemetry alone (20-scenario probe); the two readings separate only under the realistic channel. Because the channels are prompt-side payloads scored on byte-identical draws, every number above is exactly paired: the corpus makes the observation channel a first-class reported variable by construction rather than by discipline.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{figs/fig_observation_channels.png}
-\caption{Diagnosis by observation channel and tier. Dotted lines: majority (20.0\%) and random (12.5\%) baselines.}
+\caption{Illustrative study: diagnosis by observation channel and tier (one seed draw, two models). Dotted lines: majority (20.0\%) and random (12.5\%) baselines.}
 \label{fig:channels}
 \end{figure}
 
 \begin{table}[!t]
 \centering
-\caption{Diagnosis accuracy (\%) by observation condition. Classifiers fitted on non-pilot scenarios, evaluated on the pilot draw.}
+\caption{Illustrative study: diagnosis accuracy (\%) by observation condition. Classifiers fitted on non-pilot scenarios, evaluated on the pilot draw.}
 \label{tab:channels}
 \fontsize{7}{8}\selectfont
 \begin{tabular}{|l|c|c|c|}
@@ -225,69 +205,32 @@ E9 compound & 34 & 34/34 & 33/34 \\ \hline
 \textbf{Condition} & \textbf{API} & \textbf{Local} & \textbf{GBM} \\ \hline
 Description only & 100.0 & -- & -- \\ \hline
 Description + state & 100.0 & 96.8 & -- \\ \hline
-Telemetry & 93.9 & -- & -- \\ \hline
+Telemetry & 93.9 & -- & 100.0 \\ \hline
 Telemetry (WLS est.) & 97.1 & -- & -- \\ \hline
 Raw state only & 8.0 & -- & 64.3 \\ \hline
 \end{tabular}
 \end{table}
 
-\subsection{Configuration Effects and Power}
-Table~\ref{tab:perconfig} breaks the description+state condition down by tool configuration. The API model holds 140/140 across all four configurations; the local model ranges 95.0--98.6\%, with paired discordance entirely API-correct/local-wrong ($n_{10}=3,7,2,6$; $n_{01}=0$). The paired MDE at $\alpha=0.05$, power 0.80 is 2.8--5.3\,pp per configuration: no configuration effect (RAG, tools, full) is detectable at this scale, and the tier gap sits at or below the detection threshold---the tiers are statistically indistinguishable under this channel at $n=140$.
+\subsection{Cross-Network Draw}
+A second seeded draw on IEEE-39 (140 scenarios) runs under the identical prompt contract, taxonomy rules, and scoring code: on the description+state channel the API model diagnoses 140/140 and the local model 134--139/140 across configurations. Nothing was re-tuned for the larger system.
 
-\begin{table}[!t]
-\centering
-\caption{Cause-keyed diagnosis by tool configuration (description+state channel, 140 paired scenarios each).}
-\label{tab:perconfig}
-\fontsize{7}{8}\selectfont
-\begin{tabular}{|l|c|c|c|c|c|}
-\hline
-\textbf{Config} & \textbf{API} & \textbf{Local} & $n_{10}$ & $p_\mathrm{d}$ & \textbf{MDE} \\ \hline
-E1 LLM & 140/140 & 137 (97.9\%) & 3 & 0.021 & 3.5\,pp \\ \hline
-E2 +RAG & 140/140 & 133 (95.0\%) & 7 & 0.050 & 5.3\,pp \\ \hline
-E3 +Tools & 140/140 & 138 (98.6\%) & 2 & 0.014 & 2.8\,pp \\ \hline
-E4 Full & 140/140 & 134 (95.7\%) & 6 & 0.043 & 4.9\,pp \\ \hline
-\end{tabular}
-\end{table}
+\subsection{Closed-Loop Channel Illustration}
+\label{sec:closedloop}\label{sec:casestudy}
+In the closed-loop condition the agent must name the switched element and chain at least two real tool executions. On 107 scenarios the API model reaches 30.8\% construction-graded diagnosis, with 71.9\% element construction on the 64 switched-element scenarios; all 219 proposed calls validated and executed (219/219), averaging 2.05 calls and 3.59 turns per episode.
 
-\subsection{Closed-Loop Tool Execution}
-\label{sec:closedloop}
-In the closed-loop condition the agent must name the switched element and chain at least two real tool executions. On 107 scenarios the API model reaches 30.8\% construction-graded diagnosis, with 71.9\% element construction on the 64 switched-element scenarios (Table~\ref{tab:closedloop}). All 219 proposed calls validated and executed (219/219); episodes averaged 2.05 calls and 3.59 turns. The task is materially harder than the one-shot telemetry condition (93.9\%), and the encoding is one reason: the status table and tool summaries carry switching state and loading but no demand-side deltas, so the demand component of a compound event is essentially unobservable---which is precisely the failure mode Sec.~\ref{sec:casestudy} isolates.
+Episode IEEE14\_SCN\_002945 shows what the construction grade adds. The scenario is a compound E9 event: an outage of line\_3\_4 plus a 15\% demand increase spread over eleven buses. In three turns the agent issued two executed \texttt{grid\_query} calls, located the out-of-service branch, and named line\_3\_4---the true target, so construction succeeds. Its final answer was E3: the status table shows the outage clearly, and its stated reason reads ``branch line\_3\_4 is OUT\_OF\_SERVICE with demand unchanged,'' so the distributed demand-side component went unnoticed. The pattern is systematic: all 21 switched episodes that name the correct element but answer the wrong class are E9 compound scenarios, and class agreement on switched episodes is 25/64 (39.1\%) against 33/107 (30.8\%) overall.
 
-\subsection{Case Study: Construction Without Diagnosis}
-\label{sec:casestudy}
-Episode IEEE14\_SCN\_002945 illustrates what the construction grade adds. The scenario is a compound E9 event: an outage of line\_3\_4 plus a 15\% demand increase spread over eleven buses. In three turns the agent issued two executed \texttt{grid\_query} calls, located the out-of-service branch, and named line\_3\_4---the true target, so construction succeeds. Its final answer was E3: the status table shows the outage clearly, and its stated reason reads ``branch line\_3\_4 is OUT\_OF\_SERVICE with demand unchanged,'' so the distributed demand-side component went unnoticed. The pattern is systematic: all 21 switched episodes that name the correct element but answer the wrong class are E9 compound scenarios, and class agreement on switched episodes is 25/64 (39.1\%) against 33/107 (30.8\%) overall. Construction and class coincide when the named element's mechanism is the whole event; compound events are where they part, and a class match alone would hide that the agent was right about what switched.
-
-\begin{table}[!t]
-\centering
-\caption{Closed-loop episode metrics (API tier, 107 scenarios).}
-\label{tab:closedloop}
-\fontsize{7}{8}\selectfont
-\begin{tabular}{|l|c|}
-\hline
-\textbf{Metric} & \textbf{Value} \\ \hline
-Episodes & 107 \\ \hline
-Switched-element episodes & 64 \\ \hline
-Construction-graded diagnosis & 30.8\% \\ \hline
-Element construction (switched) & 71.9\% \\ \hline
-Calls proposed / executed & 219 / 219 \\ \hline
-Calls per episode & 2.05 \\ \hline
-Turns per episode & 3.59 \\ \hline
-\end{tabular}
-\end{table}
-
-\subsection{Cross-Network Check}
-The IEEE-39 draw (140 scenarios, rescored under the same key) reproduces the pattern: the API model diagnoses 140/140 and the local model 134--139/140 on average across configurations. The draw uses the same prompt contract, taxonomy rules, and scoring code as IEEE-14---nothing was re-tuned for the larger system.
-
-\subsection{Tool Selection, Judge Flags, and Latency}
-Stated-tool selection retains a style difference: 57\% of API stated tools are power flow versus 13\% for the local model. The automated judge flags 0 API and 3 local responses across 1,120 paired rows; given known LLM failure modes \cite{ji2023surveyhalluc} and miscalibration \cite{guo2017calibration}, these are judge agreements, not expert-annotated ground truth. Latency is the deployment trade-off: 1.1\,s per API call versus 44--49\,s locally.
+The corpus-level reading is an encoding measurement, not a model verdict: the closed-loop status table and tool summaries carry switching state and loading but no demand-side deltas, so the demand component of a compound event is unobservable in that channel---while the one-shot telemetry block lists changed demand elements explicitly (Table~\ref{tab:telemetry}). The corpus ships both encodings precisely so that this difference is measurable. Construction and class grades coincide when the named element's mechanism is the whole event; compound events are where they part, and a class match alone would hide that the agent was right about what switched.
 
 \subsection{Limitations and Threats to Validity}
-Every cell is a single temperature-zero run: reported differences carry no sampling variance, and the paired MDE bounds only what this design could detect. The pilots cover 140 scenarios per condition (20 for the local telemetry probe), so class-level rates on rare classes are coarse. The judge is automated, not expert-annotated; flag counts are agreements, not clinical error rates. The construction-graded closed-loop metric is defined relative to this observation format (status table and tool summaries without demand-side deltas); a richer encoding would shift it. Latency reflects single-stream local serving, not a tuned deployment. The outcome-keyed axis ships for reproducibility of the keying result but is not exercised by the models reported here.
+\textbf{Study scope.} Every cell is a single temperature-zero run on one seed draw: reported differences carry no sampling variance, and the paired MDE bounds only what this design could detect. The pilots cover 140 scenarios per condition (20 for the local telemetry probe), so rates on rare classes are coarse. The two models are a budget API tier and a 4-bit-quantized local model; nothing here characterizes frontier models. The automated judge flagged 0 API and 3 local responses across 1,120 paired rows; given known LLM failure modes \cite{ji2023surveyhalluc} and miscalibration \cite{guo2017calibration}, these are judge agreements, not expert-annotated ground truth. Latency (1.1~s per API call versus 44--49~s locally) reflects single-stream local serving, not a tuned deployment.
+
+\textbf{Corpus scope.} The corpus covers three static test systems with snapshot disturbances; dynamic (time-series) events are future work. Thermal limits are tuned per system to make compound events observable and are deliberately not comparable across systems. The 41 islanding scenarios are excluded from evaluation pending an islanding-aware contingency pre-filter. The closed-loop construction metric is defined relative to the shipped observation format; a richer encoding would shift it. The outcome-keyed axis ships for reproducibility of the keying result but is not exercised by the models reported here.
 
 \section{Conclusion}
-GridPowerAgent contributes what grid-LLM evaluation currently lacks: a seeded, regenerable scenario corpus with physical ground truth, dual-axis reference keying, iterative-WLS state estimates, three observation channels that separate description-reading from state-based diagnosis, an executable tool back-end, and a construction-graded closed-loop protocol. Because every scenario regenerates from seeds and every row carries its own ground truth, the corpus turns grid-LLM evaluation into exact paired regression testing rather than re-annotated prompting.
+GridPowerAgent contributes what power-system LLM evaluation currently lacks: a seeded, regenerable 15,000-scenario corpus with physical ground truth, a per-scenario iterative-WLS estimation pipeline, dual-axis reference keying, a reproducible islanding failure registry, three observation channels that separate description-reading from state-based diagnosis, and an executable tool back-end with a closed-loop protocol. Because every scenario regenerates from seeds and every row carries its own ground truth, the corpus turns grid-LLM evaluation into exact paired regression testing rather than re-annotated prompting.
 
-The baseline demonstration shows the observation channel, not the model, decides what is diagnosable: description-only diagnosis is trivially perfect, telemetry-only separates tiers, and raw-state diagnosis collapses---while the classifier baselines show the missing performance is an encoding limit, not an information limit. The closed-loop study sharpens the point for agentic evaluation: an agent can name the switched element correctly and still miss the event, and a class-match metric alone would report both failures identically. Future work includes expert $\kappa$ annotation of a labeled subset, a powered 600-scenario sweep across tiers, dynamic (time-series) disturbances, full-precision local serving, the islanding-aware contingency pre-filter for the 41 registry cases, and action-quality evaluation beyond executed-call validity.
+The illustrative study shows the kind of measurement the corpus makes routine: the observation channel, not the model, decides what is diagnosable---description-only diagnosis is trivially perfect, telemetry-only separates the two models tested, and raw-state diagnosis collapses while the classifier baselines show the missing performance is an encoding limit, not an information limit. In closed-loop use, an agent can name the switched element correctly and still miss the event, and a class-match metric alone would report both failures identically. Future work includes expert $\kappa$ annotation of a labeled subset, a powered 600-scenario sweep, dynamic (time-series) disturbances, the islanding-aware contingency pre-filter for the 41 registry cases, richer closed-loop observation encodings, and full-precision local serving.
 
 \section*{Acknowledgment}
 The authors acknowledge writing-support tools (OpenAI ChatGPT, Grammarly, and QuillBot) for grammar correction, readability improvement, language refinement, and sentence restructuring. All technical content, analysis, interpretations, and research contributions are those of the authors.
