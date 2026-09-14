@@ -1,0 +1,319 @@
+% WIECON-ECE 2026 conference paper -- review-response revision.
+% Generated numbers: make_conference_numbers.py -> generated/*.tex
+\documentclass[conference]{IEEEtran}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{booktabs}
+\usepackage{balance}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
+
+\setlength{\abovecaptionskip}{3pt}
+\setlength{\belowcaptionskip}{1pt}
+\setlength{\textfloatsep}{7pt plus 2pt minus 2pt}
+\setlength{\floatsep}{7pt plus 2pt minus 2pt}
+\setlength{\intextsep}{7pt plus 2pt minus 2pt}
+
+\makeatletter
+% force table/figure captions to exactly 8pt (class default is 9pt here)
+\long\def\@makecaption#1#2{%
+\ifx\@captype\@IEEEtablestring%
+\fontsize{8}{9}\selectfont\bgroup\par\centering\@IEEEtabletopskipstrut{\normalfont\fontsize{8}{9}\selectfont #1}\\{\normalfont\fontsize{8}{9}\selectfont\scshape #2}\par\addvspace{0.5\baselineskip}\egroup%
+\@IEEEtablecaptionsepspace
+\else
+\@IEEEfigurecaptionsepspace
+\setbox\@tempboxa\hbox{\normalfont\fontsize{8}{9}\selectfont {#1.}\nobreakspace\nobreakspace #2}%
+\ifdim \wd\@tempboxa >\hsize%
+\setbox\@tempboxa\hbox{\normalfont\fontsize{8}{9}\selectfont {#1.}\nobreakspace\nobreakspace}%
+\parbox[t]{\hsize}{\normalfont\fontsize{8}{9}\selectfont\noindent\unhbox\@tempboxa#2}%
+\else%
+\ifCLASSOPTIONconference \hbox to\hsize{\normalfont\fontsize{8}{9}\selectfont\hfil\box\@tempboxa\hfil}%
+\else \hbox to\hsize{\normalfont\fontsize{8}{9}\selectfont\box\@tempboxa\hfil}%
+\fi\fi\fi}
+\makeatother
+
+
+\begin{document}
+
+\title{GridPowerAgent: A Seeded, Reproducible Power-System Scenario Corpus for Benchmarking LLM Event Diagnosis}
+
+\maketitle
+
+\begin{abstract}
+Evaluating large language models (LLMs) on power-system tasks requires observations that reveal what the model actually reads: several recent evaluations feed a plain-language description of the injected disturbance alongside the measurements and report near-perfect diagnosis. We present the GridPowerAgent corpus and evaluation harness: 15,000 seeded, fully regenerable scenarios across the IEEE 14, 39, and 118 bus systems, ten injected disturbance classes, 9.54 million correlated measurements, per-scenario iterative weighted-least-squares (WLS) state estimates, a dual-axis reference keying, a reproducible failure registry, and an executable pandapower tool back-end. The corpus ships three observation channels that separate what a model reads from what it reasons about: a plain-language event description, EMS-grade telemetry, and raw summary state. We benchmark two deployment tiers---a lightweight API model and a 4-bit quantized local model---on 140 paired scenarios per configuration. Description-only diagnosis is 100\%: the description is the answer key. From telemetry alone the API model reaches 93.9\% while the local model drops to 43.8\% (20-scenario probe); from raw summary state the API model collapses to 8.0\%. A gradient-boosted classifier on the telemetry features reaches 100\%, and on raw-state features 64.3\%: the telemetry encoding is fully class-separable, the raw state is not, and the LLM cannot exploit unlabeled numeric summaries. A closed-loop extension that requires naming the switched element and chaining two real tool executions reaches 30.8\%. All results are exploratory single temperature-zero runs with exact denominators.
+\end{abstract}
+
+\noindent\textit{Keywords---}benchmark corpus, cause-keyed labels, iterative WLS, LLM evaluation, observation channels, pandapower, power systems, reproducibility, scenario generation
+
+\section{Introduction}
+LLMs are increasingly proposed for power-system operations: reading grid states, classifying disturbances, selecting analysis tools, and advising operators \cite{majumder2024joule,zhang2025gridagent,wen2025xgridagent}. Evaluating such claims requires a test corpus with three properties that published evaluations rarely provide together \cite{zhou2024elecbench,cheng2025gaia}: the labels are derived by a transparent, reproducible rule system; every scenario carries physical ground truth; and the observation given to the model is separated from the information used to grade it. This paper presents such a corpus and the evaluation harness built around it.
+
+GridPowerAgent generates 15,000 scenarios across the IEEE 14, 39, and 118 bus systems (3,000/5,000/7,000; 300--700 per disturbance class) from seeded, deterministic injections over 16,000 operating points. Each scenario carries pre- and post-event power-flow ground truth, 9.54 million correlated measurements, an iterative weighted-least-squares (WLS) state estimate over ~120 noisy meters, physics flags (under-voltage, over-voltage, overload), dual-axis reference keying, and a reproducible registry of the 41 injection cases that produce unresolvable islands on IEEE-39. An executable pandapower tool back-end (power flow, contingency on a named element, N-1 sweep, OPF, grid queries) is included so that agents can be evaluated on executed tool calls, not stated intentions.
+
+We use the corpus to benchmark two deployment tiers---a lightweight API model (Gemini 3.5 Flash Lite) and a 4-bit quantized local model (Gemma 4 E4B)---on 140 paired scenarios per configuration, under three observation channels, and in a closed-loop variant that requires naming the switched element and chaining two real tool executions. The findings are: (i) the evaluation is only as good as its observation channel---description-only diagnosis is 100\%, telemetry-only 93.9\% (API) and 43.8\% (local probe), and raw-state 8.0\%; (ii) cause-keyed labels make the task well-posed, unlike outcome-keyed alternatives; and (iii) the tiers separate only under the realistic channel. All results are exploratory single temperature-zero runs with exact denominators.
+
+\section{The GridPowerAgent Corpus}
+\label{sec:corpus}
+Fig.~\ref{fig:methodology} overviews the generation pipeline. Networks use pandapower \cite{thurner2018pandapower} IEEE 14/39/118 cases with tuned thermal limits to make compound events observable (14: 3\% line / 4\% transformer; 118: 6\%; 39: nameplate). Limits are disclosed per system and deliberately \emph{not} comparable across systems. Operating points sweep load $0.70$--$1.10\times$ with $\pm5\%$ bus-local noise, renewable fractions, and storage state of charge $0.15$--$0.85$ (20 MW/40 MWh at bus 9 on IEEE-14). Topology hashes pin all three networks. Ten classes are injected: E0 Normal; E1 load surge, E2 load drop, E3 line outage, E4 generator outage, E5 renewable ramp (cause classes); E6 undervoltage, E7 overvoltage, E8 thermal overload (outcome classes, physically iterated to target severity); E9 compound.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig_methodology_tree.png}
+\caption{Generation pipeline (stages 03--28).}
+\label{fig:methodology}
+\end{figure}
+
+\subsection{Composition}
+Table~\ref{tab:corpus} summarizes the corpus. Scenarios inject the ten classes with 300/500/700 per class on 14/39/118; replay over 40 draws confirms exact determinism. Fig.~\ref{fig:composition} shows the class composition of the three systems.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig_corpus_composition.png}
+\caption{Class composition of the three systems (scenarios per injected class).}
+\label{fig:composition}
+\end{figure}
+
+\begin{table}[!t]
+\centering
+\caption{Corpus summary per system.}
+\label{tab:corpus}
+\fontsize{7}{8}\selectfont
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Case} & \textbf{OPs} & \textbf{Scenarios} & \textbf{Per class} & \textbf{Measurements} \\ \hline
+14 (ref) & 4k & 3,000 & 300 & 361k \\ \hline
+39 & 5k & 5,000 & 500 & 1.50M \\ \hline
+118 & 7k & 7,000 & 700 & 7.68M \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Measurements and Iterative WLS State Estimation}
+Each scenario carries ~120 noisy measurements (bus-voltage magnitudes with $\sigma_V=0.003$~pu, branch P/Q at both ends with $\sigma_P=\max(0.0075|S_{\text{true}}|,0.05)$~MVA, and bus injections), generated from the noise-free power-flow solution. The state estimate supplied to the agent is produced by an \emph{iterative AC-WLS estimator} \cite{abur2004power,monticelli1999state} (\texttt{pandapower.estimation}) over these measurements, with branch meters of outaged elements excluded: the estimator converges on 140/140 pilot scenarios with voltage RMSE 0.0064~pu against post-event truth, and the under-voltage flag agrees with truth in 75\% of scenarios---marginal violations can vanish under estimation, which the closed-loop evaluation in Sec.~IV-D probes directly.
+
+\subsection{Failure Registry}
+Two IEEE-39 switching injections disconnect load pockets and produce unresolvable islands (41 scenarios, NaN post-event voltages). Their identifiers and causes ship with the corpus (case39\_nan\_scenarios.csv) and the scenarios are excluded from evaluation; the resolution plan is an islanding-aware contingency pre-filter in the next corpus revision.
+
+\subsection{Dual-Axis Reference Keying}
+Every scenario ships two label versions: the original v1 keying labeled the two outcome classes (E6 undervoltage, E8 thermal overload) by post-event outcome, and the revised v2 keying labels every scenario by its injected mechanism. The outcome information remains in the per-scenario physics flags, so both axes stay scoreable. The v1 keying proved consequential---models graded under it scored zero on E6/E8 while describing the injecting cause correctly---so the cause-keyed version is the evaluation default, and the failure mode is reproducible by design rather than latent.
+
+\subsection{Tools and Knowledge Base}
+A pandapower back-end exposes five executable operations: full AC power flow, N-1 contingency testing on a named branch, OPF, and grid queries (topology, limits, equipment). A FAISS knowledge base \cite{johnson2021faiss} chunks eight operational documents (thermal/voltage limits, contingency procedure, storage/equipment, topology) into 384-d sentence-transformer embeddings, retrieving $k=3$ chunks with citations.
+
+\section{Evaluation Design}
+\label{sec:design}
+
+\subsection{Models and Tiers}
+Two deployment tiers of the same prompt contract are compared: a lightweight API model (Gemini 3.5 Flash Lite, temperature 0, $\le 512$ output tokens) and a small 4-bit-quantized open-weight model \cite{dettmers2023fourbit,gemma4_2026} (Gemma 4 E4B-it \cite{gemma4_2026}, served locally from a GGUF build \cite{llamacpp}; temperature 0, $\le 1{,}024$ tokens, reasoning channel parsed with content priority). The API tier is deliberately lightweight: the comparison characterizes a local deployment against a budget API tier, not against frontier models.
+
+\subsection{Observation Channels}
+Three prompt-side conditions probe what diagnosis measures: \emph{description-only} (the plain-language event statement, no grid numbers), \emph{telemetry} (per-element status table and system-wide deltas, no event statement), and \emph{full} (both). A WLS-estimated variant of the telemetry channel replaces true post-event values with estimated ones.
+
+\subsection{Closed-Loop Tool Protocol}
+The closed-loop condition embeds the agent in a tool loop: it proposes structured calls with arguments, each call is validated against the network (referenced elements must exist) and executed by the real pandapower back-end, returned measurements re-enter the conversation, at least two executed calls are required before an answer is accepted, and the answer must name the switched element.
+
+\subsection{Metrics and Power}
+Diagnosis correctness is exact class match against the cause-keyed reference. Tool-call validity requires referenced elements to exist and calls to execute. The paired minimum detectable difference (MDE) at $\alpha=0.05$, power 0.80 is $(z_{0.975}+z_{0.80})\sqrt{p_\mathrm{d}/n}$, where $p_\mathrm{d}$ is the paired discordance rate. All results are exploratory single temperature-zero runs with exact denominators.
+
+\section{Results and Discussion}
+\label{sec:results}
+
+\subsection{Textual Leakage: Description-Only Diagnosis}
+With only the plain-language event description available, the API model diagnoses 100.0\% (560 scenarios): reading the description is sufficient, confirming that the description functions as an answer key when present.
+
+\subsection{Observation Channels and Baselines}
+Table~\ref{tab:channels} and Fig.~\ref{fig:channels} report diagnosis by observation channel. From telemetry alone the API model reaches 93.9\%; replacing the true post-event state with the WLS estimate leaves it at 97.1\%. From raw summary state it collapses to 8.0\%, answering E7 for most scenarios. The signal exists: a gradient-boosted classifier on identical features reaches 64.3\% from raw state and 100.0\% from telemetry, so the LLM's failures are encoding/composition limits, not information limits.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig_observation_channels.png}
+\caption{Diagnosis by observation channel and tier. Dotted lines: majority (20.0\%) and random (12.5\%) baselines.}
+\label{fig:channels}
+\end{figure}
+
+\begin{table}[!t]
+\centering
+\caption{Diagnosis accuracy (\%) by observation condition. Classifiers fitted on non-pilot scenarios, evaluated on the pilot draw.}
+\label{tab:channels}
+\fontsize{7}{8}\selectfont
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Condition} & \textbf{API} & \textbf{Local} & \textbf{GBM} \\ \hline
+Description only & 100.0 & -- & -- \\ \hline
+Description + state & 100.0 & 96.8 & -- \\ \hline
+Telemetry & 93.9 & -- & -- \\ \hline
+Telemetry (WLS est.) & 97.1 & -- & -- \\ \hline
+Raw state only & 8.0 & -- & 64.3 \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Configuration Effects and Power}
+Cause-keyed diagnosis per configuration: the API model holds at 100\% across E1--E4; the local model varies within 95.0--98.6\%, inside the paired MDE of 3.4--5.2\,pp (discordance counts per configuration: 3, 7, 2, 6). No configuration effect is detectable at this scale.
+
+\subsection{Closed-Loop Tool Execution}
+In the closed-loop condition the agent must name the switched element and chain at least two real tool executions. On 107 scenarios the API model reaches 30.8\% construction-graded diagnosis, with 71.9\% element construction on the 64 switched-element scenarios, 100.0\% argument validity, 100.0\% execution success, and 3.59 turns on average over 219 calls. The task is materially harder than the one-shot telemetry condition (93.9\%): identifying the switched element from a status table without being told is where performance concentrates.
+
+\subsection{Cross-Network Check}
+The IEEE-39 draw (140 scenarios, rescored under the same key) reproduces the pattern: the API model diagnoses 140/140 and the local model 134--139/140 on average across configurations.
+
+\subsection{Tool Selection, Judge Flags, and Latency}
+Stated-tool selection retains a style difference: 57\% of API stated tools are power flow versus 13\% for the local model. The automated judge flags 0 API and 3 local responses across 1,120 paired rows; these are judge agreements, not expert-annotated ground truth. Latency is the deployment trade-off: 1.1\,s per API call versus 44--49\,s locally.
+
+\section{Conclusion}
+GridPowerAgent contributes what grid-LLM evaluation currently lacks: a seeded, regenerable scenario corpus with physical ground truth, dual-axis reference keying, iterative-WLS state estimates, three observation channels that separate description-reading from state-based diagnosis, an executable tool back-end, and a construction-graded closed-loop protocol. The baseline demonstration shows the observation channel, not the model, decides what is diagnosable: description-only diagnosis is trivially perfect, telemetry-only separates tiers, and raw-state diagnosis collapses. Expert review of the reference labels, the powered sweep, dynamics, full-precision local runs, and action-quality evaluation remain future work.
+
+\balance
+\begin{thebibliography}{25}
+\providecommand{\url}[1]{#1}
+\csname url@samestyle\endcsname
+\providecommand{\newblock}{\relax}
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\BIBentrySTDinterwordspacing}{\spaceskip=0pt\relax}
+\providecommand{\BIBentryALTinterwordstretchfactor}{4}
+\providecommand{\BIBentryALTinterwordspacing}{\spaceskip=\fontdimen2\font plus
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
+  \fontdimen4\font\relax}
+\providecommand{\BIBforeignlanguage}[2]{{%
+\expandafter\ifx\csname l@#1\endcsname\relax
+\typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
+\typeout{** loaded for the language `#1'. Using the pattern for}%
+\typeout{** the default language instead.}%
+\else
+\language=\csname l@#1\endcsname
+\fi
+#2}}
+\providecommand{\BIBdecl}{\relax}
+\BIBdecl
+
+\bibitem{majumder2024joule}
+S.~Majumder, L.~Dong, F.~Doudi, Y.~Cai, C.~Tian, D.~Kalathil, K.~Ding, A.~A.
+  Thatte, N.~Li, and L.~Xie, ``Exploring the capabilities and limitations of
+  large language models in the electric energy sector,'' \emph{Joule}, vol.~8,
+  pp. 1544--1549, 2024.
+
+\bibitem{cheng2025gaia}
+Y.~Cheng, H.~Zhao, X.~Zhou, J.~Zhao, Y.~Cao, and C.~Yang, ``A large language
+  model for advanced power dispatch,'' \emph{Scientific Reports}, vol.~15, p.
+  8925, 2025.
+
+\bibitem{zhang2025gridagent}
+Y.~Zhang, A.~M. Saber, A.~Youssef, and D.~Kundur, ``Grid-agent: An
+  {LLM}-powered multi-agent system for power grid control,'' \emph{arXiv
+  preprint arXiv:2508.05702}, 2025.
+
+\bibitem{wen2025xgridagent}
+Y.~Wen and X.~Chen, ``{X-GridAgent}: An {LLM}-powered agentic {AI} system for
+  assisting power grid analysis,'' \emph{arXiv preprint arXiv:2512.20789},
+  2025.
+
+\bibitem{zhou2024elecbench}
+X.~Zhou, H.~Zhao, Y.~Cheng, Y.~Cao, G.~Liang, G.~Liu, W.~Liu, Y.~Xu, and
+  J.~Zhao, ``{ElecBench}: A power dispatch evaluation benchmark for large
+  language models,'' \emph{arXiv preprint arXiv:2407.05365}, 2024.
+
+\bibitem{lewis2020rag}
+P.~Lewis, E.~Perez, A.~Piktus, F.~Petroni, V.~Karpukhin, N.~Goyal,
+  H.~K{\"u}ttler, M.~Lewis, W.-t. Yih, T.~Rockt{\"a}schel, S.~Riedel, and
+  D.~Kiela, ``Retrieval-augmented generation for knowledge-intensive {NLP}
+  tasks,'' in \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, vol.~33, 2020, pp. 9459--9474.
+
+\bibitem{yao2023react}
+S.~Yao, J.~Zhao, D.~Yu, N.~Du, I.~Shafran, K.~Narasimhan, and Y.~Cao,
+  ``{ReAct}: Synergizing reasoning and acting in language models,'' in
+  \emph{International Conference on Learning Representations (ICLR)}, 2023.
+
+\bibitem{schick2023toolformer}
+T.~Schick, J.~Dwivedi-Yu, R.~Dess{\`i}, R.~Raileanu, M.~Lomeli, L.~Zettlemoyer,
+  N.~Cancedda, and T.~Scialom, ``Toolformer: Language models can teach
+  themselves to use tools,'' in \emph{Advances in Neural Information Processing
+  Systems (NeurIPS)}, vol.~36, 2023.
+
+\bibitem{achiam2023gpt4}
+J.~Achiam, S.~Adler, S.~Agarwal, L.~Ahmad, I.~Akkaya, F.~L. Aleman
+  \emph{et~al.}, ``{GPT-4} technical report,'' \emph{arXiv preprint
+  arXiv:2303.08774}, 2023.
+
+\bibitem{abur2004power}
+A.~Abur and A.~G{\'o}mez-Exp{\'o}sito, \emph{Power System State Estimation:
+  Theory and Implementation}.\hskip 1em plus 0.5em minus 0.4em\relax Marcel
+  Dekker, 2004.
+
+\bibitem{monticelli1999state}
+A.~Monticelli, \emph{State Estimation in Electric Power Systems: A Generalized
+  Approach}.\hskip 1em plus 0.5em minus 0.4em\relax Springer, 1999.
+
+\bibitem{wood2014power}
+A.~J. Wood, B.~F. Wollenberg, and G.~B. Shebl{\'e}, \emph{Power Generation,
+  Operation, and Control}, 3rd~ed.\hskip 1em plus 0.5em minus 0.4em\relax
+  Wiley, 2014.
+
+\bibitem{frank2012opf}
+S.~Frank, I.~Steponavice, and S.~Rebennack, ``Optimal power flow: a
+  bibliographic survey {I},'' \emph{Energy Systems}, vol.~3, no.~3, pp.
+  221--289, 2012.
+
+\bibitem{zimmerman2011matpower}
+R.~D. Zimmerman, C.~E. Murillo-S{\'a}nchez, and R.~J. Thomas, ``{MATPOWER}:
+  Steady-state operations, planning, and analysis tools for power systems
+  research and education,'' \emph{IEEE Transactions on Power Systems}, vol.~26,
+  no.~1, pp. 12--19, 2011.
+
+\bibitem{guo2017calibration}
+C.~Guo, G.~Pleiss, Y.~Sun, and K.~Q. Weinberger, ``On calibration of modern
+  neural networks,'' in \emph{Proceedings of the 34th International Conference
+  on Machine Learning (ICML)}, 2017, pp. 1321--1330.
+
+\bibitem{ji2023surveyhalluc}
+Z.~Ji, N.~Lee, R.~Frieske, T.~Yu, D.~Su, Y.~Xu, E.~Ishii, Y.~J. Bang,
+  A.~Madotto, and P.~Fung, ``Survey of hallucination in natural language
+  generation,'' \emph{ACM Computing Surveys}, vol.~55, no.~12, pp. 1--38, 2023.
+
+\bibitem{marot2020l2rpn}
+A.~Marot, B.~Donnot, G.~Dulac-Arnold, A.~Kelly, A.~O'Sullivan, J.~Viebahn,
+  M.~Awad, I.~Guyon, and B.~Donon, ``Learning to run a power network challenge
+  for training topology controllers,'' \emph{Electric Power Systems Research},
+  vol. 189, p. 106635, 2020.
+
+\bibitem{donnot2020grid2op}
+B.~Donnot \emph{et~al.}, ``{Grid2Op}: A testbed platform to model sequential
+  decision making in power systems,''
+  \url{https://github.com/rte-france/grid2op}, 2020.
+
+\bibitem{thurner2018pandapower}
+L.~Thurner, A.~Scheidler, F.~Sch{\"a}fer, J.-H. Menke, J.~Dollichon, F.~Meier,
+  S.~Meinecke, and M.~Braun, ``pandapower---an open-source {Python} tool for
+  convenient modeling, analysis, and optimization of electric power systems,''
+  \emph{IEEE Transactions on Power Systems}, vol.~33, no.~6, pp. 6510--6521,
+  2018.
+
+\bibitem{johnson2021faiss}
+J.~Johnson, M.~Douze, and H.~J{\'e}gou, ``Billion-scale similarity search with
+  {GPUs},'' \emph{IEEE Transactions on Big Data}, vol.~7, no.~3, pp. 535--547,
+  2021.
+
+\bibitem{reimers2019sentencebert}
+N.~Reimers and I.~Gurevych, ``Sentence-{BERT}: Sentence embeddings using
+  siamese {BERT}-networks,'' in \emph{Proceedings of the 2019 Conference on
+  Empirical Methods in Natural Language Processing (EMNLP-IJCNLP)}, 2019, pp.
+  3982--3992.
+
+\bibitem{dettmers2023fourbit}
+T.~Dettmers and L.~Zettlemoyer, ``The case for 4-bit precision: k-bit inference
+  scaling laws,'' in \emph{Proceedings of the 40th International Conference on
+  Machine Learning (ICML)}, 2023, pp. 10\,775--10\,804.
+
+\bibitem{frantar2023gptq}
+E.~Frantar, S.~Ashkboos, T.~Hoefler, and D.~Alistarh, ``{GPTQ}: Accurate
+  post-training quantization for generative pre-trained transformers,'' in
+  \emph{International Conference on Learning Representations (ICLR)}, 2023.
+
+\bibitem{gemma4_2026}
+{Gemma Team, Google DeepMind}, ``Gemma 4 technical report,'' \emph{arXiv
+  preprint arXiv:2607.02770}, 2026.
+
+\bibitem{llamacpp}
+G.~Gerganov and contributors, ``llama.cpp: {LLM} inference in {C/C++},''
+  \url{github.com/ggml-org/llama.cpp}, 2023.
+\end{thebibliography}
+
+\end{document}
