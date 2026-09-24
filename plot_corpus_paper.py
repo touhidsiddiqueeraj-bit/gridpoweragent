@@ -38,8 +38,8 @@ ax.set_xticks(x)
 ax.set_xticklabels(classes)
 ax.set_ylabel("Scenarios (count)")
 ax.set_xlabel("Injected disturbance class")
-ax.legend(loc="upper left", frameon=False, fontsize=6.5, ncol=2,
-          columnspacing=0.8, handlelength=1.0)
+ax.legend(loc="lower left", bbox_to_anchor=(0.0, 1.02), frameon=False,
+          fontsize=6.5, ncol=3, columnspacing=1.0, handlelength=1.0)
 ax.set_ylim(0, 780)
 ax.grid(axis="y", alpha=0.25, linewidth=0.4)
 ax.set_axisbelow(True)
@@ -67,7 +67,7 @@ for xi, v in zip(x + bw / 2, loc_vals):
     if not np.isnan(v):
         ax.text(xi, v + 1.5, f"{v:.1f}", ha="center", fontsize=6)
 ax.axhline(20.0, color="#555", linestyle=":", linewidth=0.8)
-ax.text(0.22, 21.8, "majority 20", fontsize=6, color="#555", ha="left")
+ax.text(4.35, 21.8, "majority 20", fontsize=6, color="#555", ha="right")
 ax.axhline(12.5, color="#999", linestyle=":", linewidth=0.8)
 ax.set_xticks(x)
 ax.set_xticklabels(conds, fontsize=7)
